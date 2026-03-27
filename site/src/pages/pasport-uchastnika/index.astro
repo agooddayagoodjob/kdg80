@@ -51,8 +51,11 @@ const copies = [
           <button class="passport-toolbar__button is-active" type="button" data-tone-button="color">Цветной preview</button>
           <button class="passport-toolbar__button" type="button" data-tone-button="mono">Ч/б preview</button>
         </div>
-        <button class="passport-toolbar__button passport-toolbar__button--primary" type="button" data-passport-print>
-          Печать
+        <a class="passport-toolbar__button passport-toolbar__button--primary" href="/pasport-uchastnika/passport-a4.pdf" download>
+          Скачать PDF
+        </a>
+        <button class="passport-toolbar__button" type="button" data-passport-print>
+          Печать из браузера
         </button>
       </div>
     </section>
@@ -726,7 +729,12 @@ const copies = [
   }
 
   @media print {
-    :global(body) {
+    :global(html, body) {
+      margin: 0;
+      padding: 0;
+      width: 297mm;
+      height: 210mm;
+      overflow: hidden;
       background: #fff;
     }
 
@@ -736,41 +744,200 @@ const copies = [
 
     .passport-print {
       min-height: auto;
+      width: 297mm;
+      height: 210mm;
       padding: 0;
       background: #fff;
+      overflow: hidden;
     }
 
     .passport-sheet {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
       width: 297mm;
-      min-height: 210mm;
-      padding: 7mm;
+      height: 210mm;
+      max-height: 210mm;
+      padding: 4mm 5mm;
       border: 0;
       border-radius: 0;
       box-shadow: none;
       background: #fff;
       backdrop-filter: none;
+      overflow: hidden;
+      column-gap: 4mm;
     }
 
     .passport-sheet__cutline {
-      inset: 7mm auto 7mm 50%;
+      position: absolute;
+      inset: 3mm auto 3mm 50%;
+      width: 0;
+      border-left: 1px dashed rgba(0, 0, 0, 0.35);
     }
 
     .passport-sheet__cutline span {
       background: #fff;
+      font-size: 0.48rem;
     }
 
     .passport-sheet__half {
-      min-height: 196mm;
+      min-height: 0;
+      height: 202mm;
+      max-height: 202mm;
+      overflow: hidden;
     }
 
     .passport-card {
-      border-radius: 0.8rem;
+      height: 100%;
+      border-radius: 0;
       box-shadow: none;
-      break-inside: avoid;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.22);
+      gap: 0.32rem;
+      padding: 0.5rem 0.6rem;
+      overflow: hidden;
+    }
+
+    .passport-card__header {
+      gap: 0.5rem;
+    }
+
+    .passport-card__eyebrow {
+      font-size: 0.48rem;
+      margin-bottom: 0.1rem;
+    }
+
+    .passport-card__document-title {
+      font-size: 1.15rem;
+    }
+
+    .passport-card__festival-name {
+      font-size: 0.72rem;
+      margin-top: 0.1rem;
+    }
+
+    .passport-card__hero-mark {
+      width: 3.2rem;
+    }
+
+    .passport-card__cta {
+      background: var(--passport-accent-deep);
+      padding: 0.5rem 0.6rem;
+    }
+
+    .passport-card__cta-lead {
+      font-size: 0.78rem;
+    }
+
+    .passport-card__cta-text {
+      font-size: 0.58rem;
+      margin-top: 0.2rem;
+    }
+
+    .passport-card__meta {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.18);
+      padding: 0.35rem 0.5rem;
+      font-size: 0.62rem;
+    }
+
+    .passport-card__identity,
+    .passport-card__stamp-note {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.15);
+      padding: 0.4rem 0.5rem;
+    }
+
+    .passport-card__stamp-note p {
+      font-size: 0.56rem;
+    }
+
+    .passport-card__field-line {
+      margin-top: 0.3rem;
+      min-height: 0.7rem;
+    }
+
+    .passport-card__stamps {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.15);
+      padding: 0.35rem;
+    }
+
+    .passport-card__stamps-head {
+      margin-bottom: 0.3rem;
+    }
+
+    .passport-card__stamps-grid {
+      gap: 0.28rem;
+    }
+
+    .stamp-slot {
+      background: #fff;
+      min-height: 2.8rem;
+      padding: 0.2rem 0.15rem 0.18rem;
+      border-color: rgba(0, 0, 0, 0.18);
+      gap: 0.15rem;
+      border-radius: 0.5rem;
+    }
+
+    .stamp-slot__badge {
+      font-size: 0.42rem;
+    }
+
+    .stamp-slot__seal {
+      width: 1.55rem;
+      height: 1.55rem;
+      background: none;
+      border-width: 1px;
+    }
+
+    .stamp-slot__date {
+      font-size: 0.4rem;
+    }
+
+    .passport-card__info {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.15);
+      padding: 0.4rem 0.5rem;
+      gap: 0.35rem;
+    }
+
+    .passport-card__section-label {
+      font-size: 0.48rem;
+    }
+
+    .passport-card__info-cta {
+      font-size: 0.72rem;
+      margin-top: 0.1rem;
+    }
+
+    .passport-card__info-note {
+      font-size: 0.56rem;
+    }
+
+    .passport-card__qr-grid {
+      gap: 0.5rem;
     }
 
     .passport-card__qr {
       break-inside: avoid;
+      background: #fff;
+      border-color: rgba(0, 0, 0, 0.2);
+      padding: 0.3rem 0.25rem;
+      gap: 0.15rem;
+      border-radius: 0.55rem;
+    }
+
+    .passport-card__qr img {
+      width: min(100%, 3rem);
+    }
+
+    .passport-card__qr strong {
+      font-size: 0.62rem;
+    }
+
+    .passport-card__qr span {
+      font-size: 0.52rem;
     }
   }
 </style>
