@@ -11,6 +11,7 @@
 - E2E-план регистрации: [docs/registration-system-e2e-plan.md](/workspaces/kdg80/docs/registration-system-e2e-plan.md)
 - Gherkin source of truth: [docs/behave/registration-system.feature](/workspaces/kdg80/docs/behave/registration-system.feature)
 - Ticket / invitation UI и PDF: [docs/ticket-design-brief.md](/workspaces/kdg80/docs/ticket-design-brief.md)
+- Паспорт участника фестиваля и печатный A5-макет: [docs/participant-passport-requirements.md](/workspaces/kdg80/docs/participant-passport-requirements.md)
 - Prompt для Claude Opus по финальному registration/PDF pass: [docs/prompts/opus-registration-visual-pdf-pass.md](/workspaces/kdg80/docs/prompts/opus-registration-visual-pdf-pass.md)
 - Hero и визуальный канон: [docs/hero-requirements.md](/workspaces/kdg80/docs/hero-requirements.md)
 - Тематические маршруты / страницы по интересам: [docs/po-interesam-requirements.md](/workspaces/kdg80/docs/po-interesam-requirements.md)
