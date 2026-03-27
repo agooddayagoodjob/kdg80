@@ -1,5 +1,5 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import PreviewLayout from '../../layouts/PreviewLayout.astro';
 import type { VideoPreviewScene } from '../../lib/video-preview-scenes';
 import { getVideoPreviewScene, getVideoPreviewScenes } from '../../lib/video-preview-scenes';
 
@@ -19,6 +19,7 @@ if (!scene) {
 }
 
 const allScenes = getVideoPreviewScenes();
+const sitePeriodLabel = '28 марта – 19 июля 2026';
 
 function getSceneTitle(value: VideoPreviewScene) {
   if (value.kind === 'boost') {
@@ -37,119 +38,112 @@ function getSceneTitle(value: VideoPreviewScene) {
     return value.routeLabel;
   }
 
-  return value.lines.join(' ');
+  return `${value.tagline.join(' ')} ${value.period}`;
 }
 ---
 
-<Layout
+<PreviewLayout
   title={`Video Preview — ${scene.label}`}
-  description="Служебная сцена для быстрой локальной отработки композиции и движения."
-  robots="noindex, nofollow"
+  description="Служебная сцена для быстрой локальной отработки композиции, масштаба и motion."
 >
-  <main class="video-preview-page">
-    <aside class="video-preview-page__hud">
-      <a class="video-preview-page__back" href="/video-preview/">/video-preview/</a>
-      <p class="video-preview-page__caption">СЦЕНА</p>
-      <h1 class="video-preview-page__title">{scene.label}</h1>
-      <nav class="video-preview-page__nav" aria-label="Список preview-сцен">
+  <main class="preview-scene-page">
+    <aside class="preview-scene-page__hud">
+      <a class="preview-scene-page__back" href="/video-preview/">/video-preview/</a>
+      <p class="preview-scene-page__caption">СЦЕНА</p>
+      <h1 class="preview-scene-page__title">{scene.label}</h1>
+      <nav class="preview-scene-page__nav" aria-label="Список preview-сцен">
         {allScenes.map((entry) => (
           <a
-            class:list={['video-preview-page__nav-link', entry.slug === scene.slug && 'is-active']}
+            class:list={['preview-scene-page__nav-link', entry.slug === scene.slug && 'is-active']}
             href={`/video-preview/${entry.slug}/`}
           >
             {entry.label}
           </a>
         ))}
       </nav>
-      <div class="video-preview-page__controls">
-        <button type="button" data-preview-restart>Перезапустить анимацию</button>
+      <div class="preview-scene-page__controls">
+        <button type="button" data-preview-restart>Перезапустить</button>
         <button type="button" data-preview-pause>Пауза</button>
         <button type="button" data-preview-play>Пуск</button>
       </div>
-      <p class="video-preview-page__hint">
-        Для capture-скрипта используется только кадр `1920x1080` внутри сцены.
-      </p>
+      <p class="preview-scene-page__hint">Для capture берётся только кадр `1920x1080` внутри video-stage.</p>
     </aside>
 
-    <section class="video-preview-page__stage">
+    <section class="preview-scene-page__stage">
       <div
         class={`video-scene video-scene--${scene.kind}`}
         data-video-scene
         data-capture-root
         style={`--scene-duration:${scene.durationMs}ms;`}
       >
-        <div class="video-scene__grain"></div>
-        <div class="video-scene__brand anim anim--fade">
-          <img src="/shared-assets/logo-znanie-main.svg" alt="Знание" />
-        </div>
+        {scene.kind !== 'site' && (
+          <div class="video-scene__brand anim anim--fade">
+            <img src="/shared-assets/logo-znanie-main.svg" alt="Знание" />
+          </div>
+        )}
 
         {scene.kind === 'cold-open' && (
           <div class="cold-open">
-            <div class="cold-open__split anim anim--wipe"></div>
-            <div class="cold-open__content">
-              {scene.lines.map((line, index) => (
+            <div class="cold-open__left"></div>
+            <div class="cold-open__right anim anim--wipe"></div>
+            <div class="cold-open__lockup-shell anim anim--lockup">
+              <img class="cold-open__lockup" src="/shared-assets/logo-80-istorii-hero.svg" alt="80 историй о главном" />
+            </div>
+            <div class="cold-open__copy">
+              <p class="cold-open__support anim anim--fade-up">{scene.supportLine}</p>
+              {scene.tagline.map((line, index) => (
                 <p
-                  class:list={['cold-open__line', index === 0 && 'cold-open__line--accent', 'anim', 'anim--title']}
-                  style={`--anim-delay:${index * 120}ms;`}
+                  class="cold-open__tagline-line anim anim--title"
+                  style={`--anim-delay:${120 + index * 140}ms;`}
                 >
                   {line}
                 </p>
               ))}
-              <p class="cold-open__period anim anim--fade-up" style="--anim-delay:680ms;">{scene.period}</p>
             </div>
+            <div class="cold-open__accent anim anim--grow-x" style="--anim-delay:260ms;"></div>
+            <p class="cold-open__period anim anim--fade-up" style="--anim-delay:520ms;">{scene.period}</p>
           </div>
         )}
 
         {scene.kind === 'boost' && (
           <div class="boost-scene">
-            <div class="boost-scene__poster-shell anim anim--poster">
-              {scene.posterImage && <img class="boost-scene__poster" src={scene.posterImage} alt="" />}
+            <div class="boost-scene__photo-shell">
+              {scene.posterImage && <img class="boost-scene__photo anim anim--backdrop" src={scene.posterImage} alt="" />}
+              <div class="boost-scene__photo-veil"></div>
             </div>
+            <div class="boost-scene__panel anim anim--panel"></div>
             <div class="boost-scene__copy">
               <p class="boost-scene__eyebrow anim anim--fade-up">{scene.eyebrow}</p>
-              <h2 class="boost-scene__title anim anim--title" style="--anim-delay:120ms;">{scene.shortTitle}</h2>
-              <p class="boost-scene__hook anim anim--fade-up" style="--anim-delay:240ms;">{scene.hook}</p>
-              <dl class="boost-scene__meta anim anim--fade-up" style="--anim-delay:360ms;">
-                <div>
-                  <dt>СПИКЕР</dt>
-                  <dd>{scene.speakerName}</dd>
-                </div>
-                <div>
-                  <dt>КОГДА</dt>
-                  <dd>{scene.dateLabel}</dd>
-                </div>
-                <div>
-                  <dt>ГДЕ</dt>
-                  <dd>{scene.venue}</dd>
-                </div>
-              </dl>
-              <p class="boost-scene__access anim anim--fade" style="--anim-delay:520ms;">{scene.accessLabel}</p>
+              <div class="boost-scene__rule anim anim--grow-x" style="--anim-delay:120ms;"></div>
+              <h2 class="boost-scene__title anim anim--title" style="--anim-delay:180ms;">{scene.shortTitle}</h2>
+              <p class="boost-scene__hook anim anim--fade-up" style="--anim-delay:320ms;">{scene.hook}</p>
+              <p class="boost-scene__meta anim anim--fade-up" style="--anim-delay:450ms;">
+                {scene.speakerName} · {scene.dateLabel} · {scene.venue}
+              </p>
+              <p class="boost-scene__access anim anim--fade-up" style="--anim-delay:560ms;">{scene.accessLabel}</p>
             </div>
-            <div class="boost-scene__portrait-shell">
-              <div class="boost-scene__portrait-panel anim anim--panel"></div>
-              {scene.portraitImage && (
-                <img
-                  class="boost-scene__portrait anim anim--portrait"
-                  style={scene.portraitStyle}
-                  src={scene.portraitImage}
-                  alt={scene.speakerName}
-                />
-              )}
-              <div class="boost-scene__speaker-tag anim anim--fade-up" style="--anim-delay:460ms;">
-                <strong>{scene.speakerName}</strong>
-                <span>{scene.speakerRole}</span>
-              </div>
+            {scene.portraitImage && (
+              <img
+                class="boost-scene__portrait anim anim--portrait"
+                style={scene.portraitStyle}
+                src={scene.portraitImage}
+                alt={scene.speakerName}
+              />
+            )}
+            <div class="boost-scene__speaker-tag anim anim--fade-up" style="--anim-delay:500ms;">
+              <strong>{scene.speakerName}</strong>
+              <span>{scene.speakerRole}</span>
             </div>
           </div>
         )}
 
         {scene.kind === 'cascade' && (
           <div class="cascade-scene">
-            <p class="cascade-scene__eyebrow anim anim--fade-up">КАСКАД НАЗВАНИЙ</p>
-            <h2 class="cascade-scene__title anim anim--title" style="--anim-delay:100ms;">{scene.routeLabel}</h2>
+            <p class="cascade-scene__eyebrow anim anim--fade-up">ВЫБРАТЬ СВОЙ МАРШРУТ</p>
+            <h2 class="cascade-scene__title anim anim--title" style="--anim-delay:110ms;">{scene.routeLabel}</h2>
             <div class="cascade-scene__grid">
               {scene.cards.map((card, index) => (
-                <article class="cascade-card anim anim--card" style={`--anim-delay:${180 + index * 110}ms;`}>
+                <article class="cascade-card anim anim--card" style={`--anim-delay:${190 + index * 110}ms;`}>
                   <p class="cascade-card__date">{card.date}</p>
                   <h3>{card.title}</h3>
                 </article>
@@ -160,14 +154,26 @@ function getSceneTitle(value: VideoPreviewScene) {
 
         {scene.kind === 'site' && (
           <div class="site-scene">
-            <div class="site-scene__lockup anim anim--fade">
-              <img src="/shared-assets/logo-80-istorii-hero.svg" alt="80 историй о главном" />
+            <div class="site-scene__brand anim anim--fade">
+              <img src="/shared-assets/logo-znanie-main.svg" alt="Знание" />
             </div>
-            <p class="site-scene__domain anim anim--domain">{scene.domain}</p>
+            <div class="site-scene__domain-row">
+              <span class="site-scene__domain site-scene__domain--muted anim anim--slide-up">KGD</span>
+              <span class="site-scene__domain site-scene__domain--accent anim anim--domain-accent" style="--anim-delay:120ms;">
+                80
+              </span>
+              <span class="site-scene__domain site-scene__domain--muted anim anim--slide-up" style="--anim-delay:220ms;">
+                .RU
+              </span>
+            </div>
             <div class="site-scene__copy">
-              <p class="site-scene__title anim anim--fade-up" style="--anim-delay:180ms;">{scene.title}</p>
-              <p class="site-scene__period anim anim--fade-up" style="--anim-delay:260ms;">{scene.period}</p>
-              <p class="site-scene__subtitle anim anim--fade-up" style="--anim-delay:340ms;">{scene.subtitle}</p>
+              <p class="site-scene__title anim anim--fade-up" style="--anim-delay:280ms;">
+                ИСТОРИЙ
+                <br />
+                О ГЛАВНОМ
+              </p>
+              <p class="site-scene__period anim anim--fade-up" style="--anim-delay:380ms;">{sitePeriodLabel}</p>
+              <p class="site-scene__subtitle anim anim--fade-up" style="--anim-delay:470ms;">{scene.subtitle}</p>
             </div>
           </div>
         )}
@@ -176,12 +182,11 @@ function getSceneTitle(value: VideoPreviewScene) {
           <div class="qr-scene">
             <div class="qr-scene__copy">
               <p class="qr-scene__eyebrow anim anim--fade-up">{scene.platform}</p>
-              <h2 class="qr-scene__title anim anim--title" style="--anim-delay:110ms;">{scene.title}</h2>
-              <p class="qr-scene__subtitle anim anim--fade-up" style="--anim-delay:230ms;">{scene.subtitle}</p>
-              <p class="qr-scene__secondary anim anim--fade-up" style="--anim-delay:320ms;">{scene.secondary}</p>
+              <h2 class="qr-scene__title anim anim--title" style="--anim-delay:120ms;">{scene.title}</h2>
+              <p class="qr-scene__secondary anim anim--fade-up" style="--anim-delay:300ms;">{scene.secondary}</p>
+              <p class="qr-scene__subtitle anim anim--fade-up" style="--anim-delay:420ms;">{scene.subtitle}</p>
             </div>
-            <div class="qr-scene__panel anim anim--panel"></div>
-            <div class="qr-scene__code-shell anim anim--qr" style="--anim-delay:180ms;">
+            <div class="qr-scene__code-shell anim anim--qr" style="--anim-delay:220ms;">
               <img class="qr-scene__code" src={scene.qrPath} alt={`${scene.platform} QR`} />
             </div>
           </div>
@@ -237,86 +242,87 @@ function getSceneTitle(value: VideoPreviewScene) {
       restartAnimations();
     });
   </script>
-</Layout>
+</PreviewLayout>
 
 <style>
-  .video-preview-page {
+  .preview-scene-page {
     min-height: 100vh;
     display: grid;
-    grid-template-columns: minmax(18rem, 22rem) 1fr;
-    gap: 1.25rem;
-    padding: 1.25rem;
-    background:
-      radial-gradient(circle at 12% 10%, rgba(216, 75, 49, 0.12), transparent 22rem),
-      linear-gradient(180deg, #efe7dc 0%, #e6ddd0 100%);
+    grid-template-columns: minmax(18rem, 21rem) 1fr;
+    gap: 1rem;
+    padding: 1rem;
   }
 
-  .video-preview-page__hud {
+  .preview-scene-page__hud {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    padding: 1.25rem;
-    border-radius: 1.6rem;
-    background: rgba(252, 246, 237, 0.78);
-    border: 1px solid rgba(18, 17, 14, 0.08);
-    box-shadow: 0 18px 48px rgba(18, 15, 12, 0.08);
+    gap: 0.9rem;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(20, 16, 16, 0.76);
+    backdrop-filter: blur(16px);
   }
 
-  .video-preview-page__back,
-  .video-preview-page__caption,
-  .video-preview-page__hint {
-    color: var(--ink-muted);
+  .preview-scene-page__back,
+  .preview-scene-page__caption,
+  .preview-scene-page__hint {
+    color: rgba(255, 255, 255, 0.56);
   }
 
-  .video-preview-page__caption {
+  .preview-scene-page__caption {
     margin: 0;
-    font: 600 0.74rem/1 var(--font-display);
+    font: 600 0.78rem/1 var(--font-display);
     letter-spacing: 0.18em;
   }
 
-  .video-preview-page__title {
+  .preview-scene-page__title {
     margin: 0;
-    font: 600 clamp(1.8rem, 3vw, 2.6rem)/0.92 var(--font-display);
+    font: 700 clamp(1.9rem, 3vw, 2.7rem)/0.94 var(--font-display);
+    color: #fff8f1;
   }
 
-  .video-preview-page__nav {
+  .preview-scene-page__nav {
     display: grid;
     gap: 0.45rem;
   }
 
-  .video-preview-page__nav-link {
-    padding: 0.72rem 0.9rem;
-    border-radius: 0.95rem;
-    background: rgba(255, 255, 255, 0.54);
-    border: 1px solid rgba(18, 17, 14, 0.06);
+  .preview-scene-page__nav-link {
+    padding: 0.72rem 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.03);
   }
 
-  .video-preview-page__nav-link.is-active {
+  .preview-scene-page__nav-link.is-active {
+    border-color: rgba(216, 75, 49, 0.42);
     color: white;
-    background: var(--accent);
-    border-color: transparent;
+    background: rgba(216, 75, 49, 0.16);
   }
 
-  .video-preview-page__controls {
+  .preview-scene-page__controls {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
   }
 
-  .video-preview-page__controls button {
+  .preview-scene-page__controls button {
     border: 0;
-    border-radius: 999px;
-    padding: 0.78rem 1rem;
-    color: var(--ink);
-    background: rgba(18, 17, 14, 0.08);
+    padding: 0.75rem 0.95rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
     font: 500 0.92rem/1 var(--font-body);
     cursor: pointer;
   }
 
-  .video-preview-page__stage {
+  .preview-scene-page__hint {
+    margin: 0.2rem 0 0;
+    font: 400 0.9rem/1.3 var(--font-body);
+  }
+
+  .preview-scene-page__stage {
     display: grid;
     place-items: center;
-    min-width: 0;
+    overflow: auto;
   }
 
   .video-scene {
@@ -324,33 +330,16 @@ function getSceneTitle(value: VideoPreviewScene) {
     width: 1920px;
     height: 1080px;
     overflow: hidden;
-    border-radius: 2rem;
-    background:
-      radial-gradient(circle at top left, rgba(216, 75, 49, 0.14), transparent 24rem),
-      linear-gradient(180deg, #f6efe4 0%, #efe5d7 100%);
-    box-shadow: 0 28px 84px rgba(18, 15, 12, 0.16);
+    background: #120f10;
     isolation: isolate;
-  }
-
-  .video-scene__grain {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03)),
-      url('/shared-assets/hero-added-09.webp');
-    background-size: cover;
-    background-position: center;
-    mix-blend-mode: soft-light;
-    opacity: 0.08;
-    pointer-events: none;
   }
 
   .video-scene__brand {
     position: absolute;
-    top: 44px;
-    left: 56px;
-    z-index: 4;
-    width: 210px;
+    top: 48px;
+    left: 58px;
+    z-index: 10;
+    width: 162px;
   }
 
   .cold-open,
@@ -363,65 +352,115 @@ function getSceneTitle(value: VideoPreviewScene) {
     height: 100%;
   }
 
-  .cold-open__split {
+  .cold-open__left,
+  .cold-open__right {
     position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(90deg, rgba(255, 255, 255, 0.88) 0 54%, rgba(216, 75, 49, 0.93) 54% 100%);
+    top: 0;
+    bottom: 0;
   }
 
-  .cold-open__content {
+  .cold-open__left {
+    left: 0;
+    width: 54%;
+    background: #fcf8f2;
+  }
+
+  .cold-open__right {
+    right: 0;
+    width: 46%;
+    background: #d84b31;
+  }
+
+  .cold-open__lockup-shell {
     position: absolute;
-    right: 96px;
-    bottom: 112px;
+    left: 88px;
+    top: 160px;
     z-index: 2;
-    display: grid;
-    justify-items: start;
-    gap: 0.15rem;
+    width: 640px;
   }
 
-  .cold-open__line {
+  .cold-open__copy {
+    position: absolute;
+    top: 246px;
+    right: 88px;
+    z-index: 3;
+    width: 560px;
+    color: white;
+  }
+
+  .cold-open__support {
+    margin: 0 0 1rem;
+    font: 600 1.08rem/1 var(--font-display);
+    letter-spacing: 0.14em;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .cold-open__tagline-line {
     margin: 0;
-    font: 700 clamp(4.8rem, 8vw, 7.4rem)/0.9 var(--font-display);
-    letter-spacing: -0.04em;
-    color: var(--ink);
+    font: 700 6rem/0.9 var(--font-display);
+    letter-spacing: -0.05em;
   }
 
-  .cold-open__line--accent {
-    font-size: clamp(8rem, 15vw, 12.8rem);
-    color: var(--accent);
+  .cold-open__accent {
+    position: absolute;
+    left: 88px;
+    bottom: 134px;
+    width: 520px;
+    height: 6px;
+    background: #d84b31;
+    transform-origin: left center;
   }
 
   .cold-open__period {
-    margin: 1.3rem 0 0;
-    font: 500 1.7rem/1.1 var(--font-body);
-    color: rgba(18, 17, 14, 0.84);
-  }
-
-  .boost-scene__poster-shell {
     position: absolute;
-    inset: 88px auto 88px 56px;
-    width: 560px;
-    border-radius: 1.8rem;
-    overflow: hidden;
-    opacity: 0.18;
-    box-shadow: 0 18px 60px rgba(18, 15, 12, 0.14);
+    left: 88px;
+    bottom: 82px;
+    margin: 0;
+    font: 500 2rem/1 var(--font-body);
+    color: #2b2522;
   }
 
-  .boost-scene__poster {
+  .boost-scene {
+    background: #130f10;
+  }
+
+  .boost-scene__photo-shell {
+    position: absolute;
+    inset: 0 34% 0 0;
+    overflow: hidden;
+  }
+
+  .boost-scene__photo {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
+  .boost-scene__photo-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(14, 12, 12, 0.14) 0%, rgba(14, 12, 12, 0.38) 48%, rgba(14, 12, 12, 0.82) 100%),
+      linear-gradient(180deg, rgba(14, 12, 12, 0.08) 0%, rgba(14, 12, 12, 0.52) 100%);
+  }
+
+  .boost-scene__panel {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 42%;
+    background:
+      radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.08), transparent 24rem),
+      linear-gradient(180deg, #d84b31 0%, #a82c1d 100%);
+    clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
   .boost-scene__copy {
     position: absolute;
-    left: 120px;
-    top: 170px;
-    z-index: 3;
-    width: min(760px, calc(100% - 900px));
-    display: grid;
-    gap: 0.9rem;
+    left: 72px;
+    bottom: 78px;
+    z-index: 4;
+    width: 860px;
+    color: white;
   }
 
   .boost-scene__eyebrow,
@@ -430,74 +469,59 @@ function getSceneTitle(value: VideoPreviewScene) {
     margin: 0;
     font: 600 1rem/1 var(--font-display);
     letter-spacing: 0.18em;
-    color: var(--accent-deep);
+    color: rgba(255, 255, 255, 0.76);
+    text-transform: uppercase;
+  }
+
+  .boost-scene__rule {
+    width: 220px;
+    height: 6px;
+    margin: 1rem 0 1.2rem;
+    background: #d84b31;
+    transform-origin: left center;
   }
 
   .boost-scene__title,
   .cascade-scene__title,
   .qr-scene__title {
     margin: 0;
-    font: 700 clamp(5rem, 7vw, 7.5rem)/0.9 var(--font-display);
-    letter-spacing: -0.05em;
-    max-width: 8ch;
+    font: 700 6.2rem/0.9 var(--font-display);
+    letter-spacing: -0.06em;
+  }
+
+  .boost-scene__title {
+    max-width: 7ch;
+    text-wrap: balance;
   }
 
   .boost-scene__hook {
-    margin: 0;
-    font: 500 2rem/1.02 var(--font-body);
-    max-width: 17ch;
-    color: rgba(18, 17, 14, 0.88);
+    margin: 1rem 0 0;
+    max-width: 16ch;
+    font: 500 2.2rem/0.98 var(--font-body);
+    color: rgba(255, 255, 255, 0.88);
   }
 
   .boost-scene__meta {
-    margin: 0;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-  }
-
-  .boost-scene__meta dt {
-    margin-bottom: 0.34rem;
-    font: 600 0.88rem/1 var(--font-display);
-    letter-spacing: 0.16em;
-    color: var(--ink-muted);
-  }
-
-  .boost-scene__meta dd {
-    margin: 0;
-    font: 500 1.05rem/1.15 var(--font-body);
-    color: rgba(18, 17, 14, 0.92);
+    margin: 1.3rem 0 0;
+    max-width: 42ch;
+    font: 500 1.45rem/1.2 var(--font-body);
+    color: rgba(255, 255, 255, 0.76);
   }
 
   .boost-scene__access {
-    margin: 0.4rem 0 0;
+    margin: 1rem 0 0;
     font: 700 1.05rem/1 var(--font-display);
-    letter-spacing: 0.12em;
-    color: var(--accent);
-  }
-
-  .boost-scene__portrait-shell {
-    position: absolute;
-    inset: 0 0 0 auto;
-    width: 760px;
-  }
-
-  .boost-scene__portrait-panel,
-  .qr-scene__panel {
-    position: absolute;
-    inset: 48px 48px 48px auto;
-    width: 600px;
-    border-radius: 2rem;
-    background: linear-gradient(180deg, #d94d32 0%, #b93b25 100%);
-    box-shadow: 0 24px 80px rgba(155, 46, 26, 0.24);
+    letter-spacing: 0.16em;
+    color: #fff6ef;
   }
 
   .boost-scene__portrait {
     position: absolute;
-    right: 12px;
-    bottom: 0;
-    width: min(44%, 30rem);
-    max-height: 96%;
+    right: 16px;
+    bottom: -6px;
+    z-index: 5;
+    width: min(42.5%, 35rem);
+    max-height: 102%;
     object-fit: contain;
     object-position: bottom center;
     transform:
@@ -508,27 +532,41 @@ function getSceneTitle(value: VideoPreviewScene) {
 
   .boost-scene__speaker-tag {
     position: absolute;
-    left: 80px;
-    bottom: 78px;
-    z-index: 2;
-    display: grid;
-    gap: 0.35rem;
-    max-width: 250px;
+    left: 1210px;
+    bottom: 88px;
+    z-index: 6;
+    width: 450px;
     color: white;
   }
 
   .boost-scene__speaker-tag strong {
-    font: 600 1.4rem/1 var(--font-display);
-    letter-spacing: -0.02em;
+    display: block;
+    margin: 0 0 0.4rem;
+    font: 700 2.15rem/0.95 var(--font-display);
+    letter-spacing: -0.03em;
   }
 
   .boost-scene__speaker-tag span {
-    font: 400 0.98rem/1.15 var(--font-body);
-    color: rgba(255, 255, 255, 0.84);
+    display: block;
+    font: 400 1.05rem/1.2 var(--font-body);
+    color: rgba(255, 255, 255, 0.82);
   }
 
   .cascade-scene {
     padding: 170px 92px 92px;
+    background:
+      radial-gradient(circle at top left, rgba(216, 75, 49, 0.14), transparent 26rem),
+      linear-gradient(180deg, #f5eee2 0%, #efe3d2 100%);
+    color: #181513;
+  }
+
+  .cascade-scene__eyebrow {
+    color: rgba(24, 21, 19, 0.56);
+  }
+
+  .cascade-scene__title {
+    max-width: 10ch;
+    color: #171412;
   }
 
   .cascade-scene__grid {
@@ -539,108 +577,153 @@ function getSceneTitle(value: VideoPreviewScene) {
   }
 
   .cascade-card {
-    min-height: 220px;
-    padding: 1.2rem;
-    border-radius: 1.4rem;
-    background: rgba(255, 255, 255, 0.76);
-    border: 1px solid rgba(18, 17, 14, 0.08);
-    box-shadow: 0 14px 36px rgba(18, 15, 12, 0.06);
+    min-height: 236px;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(23, 20, 18, 0.08);
+    box-shadow: 0 18px 36px rgba(23, 20, 18, 0.08);
   }
 
   .cascade-card__date {
-    margin: 0 0 0.7rem;
-    font: 600 0.86rem/1 var(--font-display);
+    margin: 0 0 0.72rem;
+    font: 600 0.88rem/1 var(--font-display);
     letter-spacing: 0.16em;
-    color: var(--ink-muted);
+    color: rgba(23, 20, 18, 0.54);
+    text-transform: uppercase;
   }
 
   .cascade-card h3 {
     margin: 0;
-    font: 600 2rem/0.95 var(--font-display);
-    letter-spacing: -0.04em;
+    font: 700 2.15rem/0.94 var(--font-display);
+    letter-spacing: -0.05em;
+    color: #171412;
   }
 
   .site-scene {
-    display: grid;
-    place-items: center;
-    text-align: center;
-    padding: 86px;
+    background: white;
+    color: #1b1714;
   }
 
-  .site-scene__lockup {
+  .site-scene__brand {
     position: absolute;
-    top: 140px;
-    width: 260px;
+    top: 54px;
+    left: 64px;
+    width: 172px;
+  }
+
+  .site-scene__domain-row {
+    position: absolute;
+    top: 240px;
+    left: 50%;
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+    transform: translateX(-50%);
   }
 
   .site-scene__domain {
     margin: 0;
-    font: 700 clamp(7rem, 14vw, 12.8rem)/0.9 var(--font-display);
-    letter-spacing: -0.08em;
-    color: #8f8b88;
+    font: 700 8.9rem/0.84 var(--font-display);
+    letter-spacing: -0.07em;
+  }
+
+  .site-scene__domain--muted {
+    color: #8a8888;
+  }
+
+  .site-scene__domain--accent {
+    font-size: 12.5rem;
+    line-height: 0.8;
+    color: transparent;
+    -webkit-text-stroke: 8px #d84b31;
+    text-stroke: 8px #d84b31;
   }
 
   .site-scene__copy {
+    position: absolute;
+    top: 560px;
+    left: 50%;
     display: grid;
-    gap: 0.7rem;
-    margin-top: 3rem;
+    justify-items: center;
+    gap: 0.9rem;
+    transform: translateX(-50%);
+    text-align: center;
   }
 
   .site-scene__title {
     margin: 0;
-    font: 600 3.8rem/0.92 var(--font-display);
-    letter-spacing: -0.04em;
+    font: 700 4.65rem/0.9 var(--font-display);
+    letter-spacing: -0.05em;
+    color: #1c1714;
   }
 
-  .site-scene__period,
-  .site-scene__subtitle {
+  .site-scene__period {
     margin: 0;
     font: 500 2rem/1 var(--font-body);
+    color: #2c2926;
   }
 
   .site-scene__subtitle {
-    color: var(--accent);
+    margin: 0;
+    font: 600 1.25rem/1 var(--font-display);
+    letter-spacing: 0.14em;
+    color: #8a8888;
   }
 
   .qr-scene {
     display: grid;
-    grid-template-columns: 1.05fr 0.95fr;
+    grid-template-columns: 1.02fr 0.98fr;
     align-items: center;
-    padding: 86px;
+    padding: 112px 88px 88px;
+    background:
+      radial-gradient(circle at top right, rgba(216, 75, 49, 0.08), transparent 24rem),
+      linear-gradient(180deg, #fefbf6 0%, #f7f0e7 100%);
+    color: #171412;
   }
 
   .qr-scene__copy {
     position: relative;
     z-index: 2;
-    display: grid;
-    gap: 0.8rem;
     max-width: 760px;
   }
 
-  .qr-scene__subtitle,
-  .qr-scene__secondary {
-    margin: 0;
-    font: 500 1.65rem/1.05 var(--font-body);
+  .qr-scene__eyebrow {
+    color: rgba(23, 20, 18, 0.58);
   }
 
-  .qr-scene__secondary {
-    color: var(--ink-soft);
+  .qr-scene__title {
+    margin-top: 0.7rem;
+    max-width: 8ch;
+    color: #151210;
+  }
+
+  .qr-scene__secondary,
+  .qr-scene__subtitle {
+    margin: 1rem 0 0;
+    font: 500 1.6rem/1.05 var(--font-body);
+    color: rgba(23, 20, 18, 0.76);
+  }
+
+  .qr-scene__subtitle {
+    font: 700 1.35rem/1 var(--font-display);
+    letter-spacing: 0.12em;
+    color: #d84b31;
+    text-transform: uppercase;
   }
 
   .qr-scene__code-shell {
     position: relative;
-    z-index: 3;
+    z-index: 2;
     display: grid;
     place-items: center;
   }
 
   .qr-scene__code {
-    width: 460px;
-    height: 460px;
-    padding: 26px;
-    border-radius: 2rem;
+    width: 500px;
+    height: 500px;
+    padding: 24px;
     background: white;
-    box-shadow: 0 22px 72px rgba(18, 15, 12, 0.18);
+    box-shadow: 0 26px 64px rgba(32, 25, 22, 0.14);
   }
 
   .anim {
@@ -649,7 +732,7 @@ function getSceneTitle(value: VideoPreviewScene) {
     animation-iteration-count: 1;
     animation-play-state: paused;
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: transform, opacity;
+    will-change: transform, opacity, clip-path;
   }
 
   .anim--fade {
@@ -666,16 +749,29 @@ function getSceneTitle(value: VideoPreviewScene) {
     animation-delay: var(--anim-delay, 0ms);
   }
 
-  .anim--poster {
-    animation-name: previewPoster;
+  .anim--wipe {
+    animation-name: previewWipe;
   }
 
-  .anim--portrait {
-    animation-name: previewPortrait;
+  .anim--lockup {
+    animation-name: previewLockup;
+  }
+
+  .anim--grow-x {
+    animation-name: previewGrowX;
+    animation-delay: var(--anim-delay, 0ms);
+  }
+
+  .anim--backdrop {
+    animation-name: previewBackdrop;
   }
 
   .anim--panel {
     animation-name: previewPanel;
+  }
+
+  .anim--portrait {
+    animation-name: previewPortrait;
   }
 
   .anim--card {
@@ -683,8 +779,14 @@ function getSceneTitle(value: VideoPreviewScene) {
     animation-delay: var(--anim-delay, 0ms);
   }
 
-  .anim--domain {
-    animation-name: previewDomain;
+  .anim--slide-up {
+    animation-name: previewSlideUp;
+    animation-delay: var(--anim-delay, 0ms);
+  }
+
+  .anim--domain-accent {
+    animation-name: previewDomainAccent;
+    animation-delay: var(--anim-delay, 0ms);
   }
 
   .anim--qr {
@@ -692,90 +794,84 @@ function getSceneTitle(value: VideoPreviewScene) {
     animation-delay: var(--anim-delay, 0ms);
   }
 
-  .anim--wipe {
-    animation-name: previewWipe;
-  }
-
   @keyframes previewFade {
-    0%, 8% { opacity: 0; }
-    16%, 100% { opacity: 1; }
+    0%, 10% { opacity: 0; }
+    18%, 100% { opacity: 1; }
   }
 
   @keyframes previewFadeUp {
-    0%, 12% { opacity: 0; transform: translateY(42px); }
-    20%, 100% { opacity: 1; transform: translateY(0); }
+    0%, 12% { opacity: 0; transform: translateY(32px); }
+    22%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewTitle {
-    0%, 10% { opacity: 0; transform: translateY(58px) scale(0.985); letter-spacing: -0.02em; }
-    22%, 100% { opacity: 1; transform: translateY(0) scale(1); letter-spacing: -0.05em; }
-  }
-
-  @keyframes previewPoster {
-    0%, 12% { opacity: 0; transform: translateX(-60px) scale(1.04); }
-    20%, 100% { opacity: 0.18; transform: translateX(0) scale(1); }
-  }
-
-  @keyframes previewPortrait {
-    0%, 14% { opacity: 0; transform: translate(40px, 30px) scale(calc(var(--event-portrait-size, 1) * 0.94)); }
-    26%, 100% { opacity: 1; transform: translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem)) scale(var(--event-portrait-size, 1)); }
-  }
-
-  @keyframes previewPanel {
-    0%, 10% { opacity: 0; transform: translateX(84px) scaleX(0.94); }
-    20%, 100% { opacity: 1; transform: translateX(0) scaleX(1); }
-  }
-
-  @keyframes previewCard {
-    0%, 12% { opacity: 0; transform: translateY(34px) scale(0.985); }
-    22%, 100% { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
-  @keyframes previewDomain {
-    0%, 10% { opacity: 0; transform: scale(0.92); }
-    24%, 100% { opacity: 1; transform: scale(1); }
-  }
-
-  @keyframes previewQr {
-    0%, 14% { opacity: 0; transform: translateY(36px) scale(0.92); }
+    0%, 12% { opacity: 0; transform: translateY(42px) scale(0.98); }
     24%, 100% { opacity: 1; transform: translateY(0) scale(1); }
   }
 
   @keyframes previewWipe {
     0%, 8% { clip-path: inset(0 100% 0 0); }
-    20%, 100% { clip-path: inset(0 0 0 0); }
+    18%, 100% { clip-path: inset(0 0 0 0); }
   }
 
-  @media (max-width: 1480px) {
-    .video-preview-page {
+  @keyframes previewLockup {
+    0%, 10% { opacity: 0; transform: translateY(30px) scale(0.96); }
+    22%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes previewGrowX {
+    0%, 14% { transform: scaleX(0); opacity: 0; }
+    24%, 100% { transform: scaleX(1); opacity: 1; }
+  }
+
+  @keyframes previewBackdrop {
+    0%, 12% { opacity: 0; transform: scale(1.08); }
+    24%, 100% { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes previewPanel {
+    0%, 10% { opacity: 0; transform: translateX(86px); }
+    22%, 100% { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes previewPortrait {
+    0%, 14% {
+      opacity: 0;
+      transform:
+        translate(calc(var(--event-portrait-shift-x, 0rem) + 34px), calc(var(--event-portrait-shift-y, 0rem) + 22px))
+        scale(calc(var(--event-portrait-size, 1) * 0.94));
+    }
+    26%, 100% {
+      opacity: 1;
+      transform:
+        translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
+        scale(var(--event-portrait-size, 1));
+    }
+  }
+
+  @keyframes previewCard {
+    0%, 12% { opacity: 0; transform: translateY(28px); }
+    24%, 100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes previewSlideUp {
+    0%, 14% { opacity: 0; transform: translateY(24px); }
+    24%, 100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes previewDomainAccent {
+    0%, 12% { opacity: 0; transform: scale(0.88); }
+    24%, 100% { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes previewQr {
+    0%, 12% { opacity: 0; transform: translateY(30px) scale(0.92); }
+    24%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @media (max-width: 1460px) {
+    .preview-scene-page {
       grid-template-columns: 1fr;
-    }
-
-    .video-preview-page__stage {
-      overflow: auto;
-      justify-content: start;
-    }
-
-    .video-scene {
-      transform-origin: top left;
-      transform: scale(0.64);
-      margin-bottom: -389px;
-    }
-  }
-
-  @media (max-width: 800px) {
-    .video-preview-page {
-      padding: 0.8rem;
-      gap: 0.8rem;
-    }
-
-    .video-preview-page__hud {
-      padding: 1rem;
-    }
-
-    .video-scene {
-      transform: scale(0.32);
-      margin-bottom: -734px;
     }
   }
 </style>

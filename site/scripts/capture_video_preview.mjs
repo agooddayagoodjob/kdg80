@@ -16,6 +16,8 @@ const sceneArg = process.argv.find((value) => !value.startsWith('--') && value !
 const captureAll = process.argv.includes('--all') || !sceneArg;
 const shouldBuild = process.argv.includes('--build');
 const timestamps = [0, 240, 520, 940, 1460, 2200, 3200];
+const reviewFrameIndexes = [1, 2, 4, 6];
+const representativeStillMs = 1460;
 
 async function ensureDir(targetPath) {
   await fs.mkdir(targetPath, { recursive: true });
@@ -80,16 +82,19 @@ async function ensureBuiltPreview() {
 async function buildAnimatic(sceneDir, frames) {
   const contactPath = path.join(sceneDir, 'contact-sheet.webp');
   const animaticPath = path.join(sceneDir, 'animatic.webp');
-  const frameArgs = frames.map((frame) => frame.path);
+  const contactFrames = reviewFrameIndexes
+    .map((index) => frames[index])
+    .filter(Boolean)
+    .map((frame) => frame.path);
 
   await execFileAsync('montage', [
-    ...frameArgs,
+    ...contactFrames,
     '-tile',
-    '3x',
+    '2x2',
     '-geometry',
-    '640x360+28+28',
+    '960x540+18+18',
     '-background',
-    '#efe7dc',
+    '#141111',
     contactPath,
   ]);
 
@@ -111,10 +116,11 @@ async function readSceneLinks() {
 
 async function captureScene(browser, slug) {
   const sceneDir = path.join(outputRoot, slug);
+  await fs.rm(sceneDir, { recursive: true, force: true });
   await ensureDir(sceneDir);
 
   const page = await browser.newPage({
-    viewport: { width: 1600, height: 1320 },
+    viewport: { width: 2460, height: 1400 },
     deviceScaleFactor: 1,
   });
 
@@ -137,13 +143,11 @@ async function captureScene(browser, slug) {
     lastTimestamp = ms;
   }
 
-  const stillPath = path.join(sceneDir, 'still-desktop.png');
-  await captureRoot.screenshot({ path: stillPath, animations: 'disabled' });
-
-  await page.setViewportSize({ width: 430, height: 980 });
-  await page.goto(`${baseUrl}/video-preview/${slug}/`, { waitUntil: 'networkidle' });
-  const mobilePath = path.join(sceneDir, 'still-mobile.png');
-  await page.screenshot({ path: mobilePath, fullPage: true, animations: 'disabled' });
+  const stillFrame = frames.find((frame) => frame.ms === representativeStillMs) ?? frames.at(-1);
+  if (stillFrame) {
+    const stillPath = path.join(sceneDir, 'still-desktop.png');
+    await fs.copyFile(stillFrame.path, stillPath);
+  }
 
   await buildAnimatic(sceneDir, frames);
   await page.close();

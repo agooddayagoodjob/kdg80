@@ -1,0 +1,40 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'Служебный preview для отработки видеосцен фестиваля.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>{title}</title>
+  </head>
+  <body class="preview-layout">
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  body.preview-layout {
+    min-height: 100vh;
+    margin: 0;
+    background:
+      radial-gradient(circle at top left, rgba(216, 75, 49, 0.18), transparent 28rem),
+      radial-gradient(circle at 88% 10%, rgba(255, 255, 255, 0.06), transparent 24rem),
+      #100e0e;
+    color: var(--paper-strong);
+  }
+</style>

@@ -12,7 +12,8 @@ type VideoPreviewBaseScene = {
 
 export type VideoPreviewColdOpenScene = VideoPreviewBaseScene & {
   kind: 'cold-open';
-  lines: string[];
+  tagline: string[];
+  supportLine: string;
   period: string;
 };
 
@@ -179,7 +180,8 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       label: 'Cold Open',
       kind: 'cold-open',
       durationMs: 3800,
-      lines: ['80', 'ИСТОРИЙ', 'О ГЛАВНОМ', 'НЕ ТОЛЬКО О ПРОШЛОМ'],
+      tagline: ['НЕ ТОЛЬКО', 'О ПРОШЛОМ'],
+      supportLine: '43 СПИКЕРА · 50+ СОБЫТИЙ · БЕСПЛАТНО',
       period: '28 МАРТА - 19 ИЮЛЯ 2026',
     },
     ...BOOST_SCENE_SEEDS.map((seed) => createBoostScene(events, seed)),
@@ -195,7 +197,7 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       slug: 'site',
       label: 'Site CTA',
       kind: 'site',
-      durationMs: 3600,
+      durationMs: 4000,
       domain: 'KGD80.RU',
       title: '80 ИСТОРИЙ О ГЛАВНОМ',
       period: '28 МАРТА - 19 ИЮЛЯ 2026',
@@ -205,7 +207,7 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       slug: 'telegram',
       label: 'QR / Telegram',
       kind: 'qr',
-      durationMs: 3200,
+      durationMs: 5200,
       platform: 'Telegram',
       title: 'ПОЛЮБИТЬ КАЛИНИНГРАД АНОНСЫ',
       subtitle: '@kenigevents',
@@ -217,7 +219,7 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       slug: 'max',
       label: 'QR / Max',
       kind: 'qr',
-      durationMs: 3200,
+      durationMs: 5200,
       platform: 'Max',
       title: 'ПОЛЮБИТЬ КАЛИНИНГРАД АНОНСЫ',
       subtitle: 'max.ru',
