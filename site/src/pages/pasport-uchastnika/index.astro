@@ -5,9 +5,6 @@ const routeTitle = 'Паспорт участника фестиваля | 80 и
 const routeDescription = 'Печатный макет A4 с двумя A5-экземплярами паспорта участника фестиваля «80 историй о главном» к 80-летию Калининградской области.';
 const festivalPeriod = '28 марта — 19 июля 2026';
 const festivalKicker = 'К 80-летию Калининградской области';
-const stampSlots = Array.from({ length: 12 }, (_, index) => ({
-  index: index + 1,
-}));
 const qrItems = [
   {
     title: 'Telegram',
@@ -95,20 +92,13 @@ const copies = [
             </div>
 
             <section class="passport-card__utility" aria-label="Основные условия и каналы фестиваля">
-              <div class="passport-card__utility-main">
-                <section class="passport-card__cta" aria-label="Условия участия">
-                  <p class="passport-card__cta-lead">Посетите не менее 5 событий фестиваля</p>
-                  <p class="passport-card__cta-text">
-                    лекций или открытых дискуссий, чтобы получить возможность посетить спецпроекты фестиваля
-                    или получить дополнительные места на события, где закончились места.
-                  </p>
-                </section>
-
-                <section class="passport-card__identity" aria-labelledby={`passport-name-${key}`}>
-                  <p class="passport-card__identity-label" id={`passport-name-${key}`}>Фамилия, имя, отчество</p>
-                  <div class="passport-card__field-line" aria-hidden="true"></div>
-                </section>
-              </div>
+              <section class="passport-card__cta" aria-label="Условия участия">
+                <p class="passport-card__cta-lead">Посетите не менее 5 событий фестиваля</p>
+                <p class="passport-card__cta-text">
+                  лекций или открытых дискуссий, чтобы получить возможность посетить спецпроекты фестиваля
+                  или получить дополнительные места на события, где закончились места.
+                </p>
+              </section>
 
               <section class="passport-card__info" aria-labelledby={`passport-info-${key}`}>
                 <div class="passport-card__info-copy">
@@ -136,26 +126,17 @@ const copies = [
               </section>
             </section>
 
-            <section class="passport-card__stamps" aria-labelledby={`passport-stamps-${key}`}>
-              <div class="passport-card__stamps-head">
-                <div>
-                  <p class="passport-card__section-label" id={`passport-stamps-${key}`}>12 отметок посещения</p>
-                  <p class="passport-card__stamps-note">Круглый штамп и поле даты</p>
-                </div>
-              </div>
+            <section class="passport-card__identity" aria-labelledby={`passport-name-${key}`}>
+              <p class="passport-card__identity-label" id={`passport-name-${key}`}>Фамилия, имя, отчество</p>
+              <div class="passport-card__field-line" aria-hidden="true"></div>
+            </section>
 
-              <div class="passport-card__stamps-grid">
-                {stampSlots.map((slot) => (
-                  <article class="stamp-slot" aria-label={`Зона штампа ${slot.index}`}>
-                    <div class="stamp-slot__badge">{String(slot.index).padStart(2, '0')}</div>
-                    <div class="stamp-slot__seal" aria-hidden="true"></div>
-                    <div class="stamp-slot__date">
-                      <span>Дата</span>
-                      <span class="stamp-slot__date-line" aria-hidden="true"></span>
-                    </div>
-                  </article>
-                ))}
+            <section class="passport-card__stamp-area" aria-labelledby={`passport-stamps-${key}`}>
+              <div class="passport-card__stamp-area-head">
+                <p class="passport-card__section-label" id={`passport-stamps-${key}`}>Отметки посещения</p>
+                <p class="passport-card__stamp-area-note">Свободная область для штампов</p>
               </div>
+              <div class="passport-card__stamp-area-field" aria-hidden="true"></div>
             </section>
 
           </article>
@@ -452,19 +433,13 @@ const copies = [
 
   .passport-card__utility {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(42mm, 46mm);
+    grid-template-columns: minmax(0, 1fr) minmax(50mm, 58mm);
     gap: 0.65rem;
-    align-items: stretch;
-  }
-
-  .passport-card__utility-main {
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-    min-width: 0;
+    align-items: start;
   }
 
   .passport-card__cta {
+    height: 100%;
     padding: 0.84rem 0.9rem;
     border-radius: 0.95rem;
     background: var(--passport-accent-deep);
@@ -514,7 +489,7 @@ const copies = [
     text-transform: uppercase;
   }
 
-  .passport-card__stamps-note,
+  .passport-card__stamp-area-note,
   .passport-card__info-note {
     margin: 0;
     color: var(--passport-ink-soft);
@@ -528,7 +503,11 @@ const copies = [
     min-height: 1rem;
   }
 
-  .passport-card__stamps {
+  .passport-card__stamp-area {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
     margin-top: auto;
     padding: 0.72rem;
     border: 1px solid var(--passport-line);
@@ -536,75 +515,26 @@ const copies = [
     background: rgba(255, 255, 255, 0.96);
   }
 
-  .passport-card__stamps-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.5rem;
-    margin-bottom: 0.45rem;
-  }
-
-  .passport-card__stamps-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 2mm;
-  }
-
-  .stamp-slot {
+  .passport-card__stamp-area-head {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 1.4mm;
-    min-height: 38mm;
-    padding: 1.4mm 0.8mm 1.8mm;
-    border: 1px solid var(--passport-line);
-    border-radius: 3mm;
-    background: #fff;
+    gap: 0.12rem;
+    margin-bottom: 0.55rem;
   }
 
-  .stamp-slot__badge {
-    align-self: flex-start;
-    color: var(--passport-ink-muted);
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-  }
-
-  .stamp-slot__seal {
-    width: 25mm;
-    height: 25mm;
-    border: 1.4px dashed var(--passport-accent);
-    border-radius: 999px;
-    background: none;
-  }
-
-  .passport-print[data-passport-tone="mono"] .stamp-slot__seal {
-    border-color: var(--passport-accent-deep);
-  }
-
-  .stamp-slot__date {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    gap: 0.22rem;
-    color: var(--passport-ink-muted);
-    font-size: 0.58rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-  }
-
-  .stamp-slot__date-line {
+  .passport-card__stamp-area-field {
     flex: 1;
-    min-width: 8mm;
-    border-bottom: 1px solid var(--passport-line-strong);
+    min-height: 11rem;
+    border: 1px dashed var(--passport-line-strong);
+    border-radius: 0.9rem;
+    background: #fff;
   }
 
   .passport-card__info {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
-    padding: 0.76rem;
+    gap: 0.48rem;
+    padding: 0.72rem;
     border-radius: 1rem;
     background: rgba(255, 255, 255, 0.96);
     border: 1px solid var(--passport-line);
@@ -613,13 +543,13 @@ const copies = [
   .passport-card__info-copy {
     display: flex;
     flex-direction: column;
-    gap: 0.18rem;
+    gap: 0.1rem;
   }
 
   .passport-card__info-cta {
-    margin: 0.18rem 0 0;
+    margin: 0.1rem 0 0;
     color: var(--passport-accent);
-    font-size: 1rem;
+    font-size: 0.92rem;
     font-weight: 800;
     line-height: 1.05;
     text-transform: uppercase;
@@ -627,8 +557,8 @@ const copies = [
 
   .passport-card__qr-grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.55rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.42rem;
   }
 
   .passport-card__qr {
@@ -648,18 +578,18 @@ const copies = [
 
   .passport-card__qr img {
     display: block;
-    width: min(100%, 6.2rem);
+    width: min(100%, 4.6rem);
     height: auto;
   }
 
   .passport-card__qr strong {
-    font-size: 0.92rem;
+    font-size: 0.82rem;
     line-height: 1.05;
   }
 
   .passport-card__qr span {
     color: var(--passport-ink-soft);
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     line-height: 1.2;
   }
 
@@ -722,13 +652,8 @@ const copies = [
       font-size: 0.88rem;
     }
 
-    .passport-card__stamps-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .stamp-slot__seal {
-      width: 25mm;
-      height: 25mm;
+    .passport-card__stamp-area-field {
+      min-height: 10rem;
     }
   }
 
@@ -853,16 +778,13 @@ const copies = [
     }
 
     .passport-card__utility {
-      grid-template-columns: minmax(0, 1fr) 43mm;
-      gap: 3mm;
-    }
-
-    .passport-card__utility-main {
-      gap: 3mm;
+      grid-template-columns: minmax(0, 1fr) 55mm;
+      gap: 2.6mm;
     }
 
     .passport-card__identity,
-    .passport-card__info {
+    .passport-card__info,
+    .passport-card__stamp-area {
       background: rgba(0, 0, 0, 0.02);
       border-color: rgba(0, 0, 0, 0.15);
       border-radius: 2.8mm;
@@ -882,85 +804,69 @@ const copies = [
       border-bottom-width: 1px;
     }
 
-    .passport-card__stamps {
-      background: rgba(0, 0, 0, 0.02);
-      border-color: rgba(0, 0, 0, 0.15);
+    .passport-card__stamp-area {
       padding: 2.8mm;
       border-radius: 3.2mm;
     }
 
-    .passport-card__stamps-head {
+    .passport-card__stamp-area-head {
+      gap: 0.6mm;
       margin-bottom: 2mm;
     }
 
-    .passport-card__stamps-grid {
-      gap: 1.7mm;
-    }
-
-    .stamp-slot {
-      background: #fff;
-      min-height: 35mm;
-      padding: 1mm 0.4mm 1.2mm;
-      border-color: rgba(0, 0, 0, 0.18);
-      gap: 1mm;
-      border-radius: 2.4mm;
-    }
-
-    .stamp-slot__badge {
-      font-size: 0.5rem;
-    }
-
-    .stamp-slot__seal {
-      width: 25mm;
-      height: 25mm;
-      border-width: 1px;
-    }
-
-    .stamp-slot__date {
-      font-size: 0.52rem;
+    .passport-card__stamp-area-note {
+      font-size: 0.62rem;
     }
 
     .passport-card__info {
-      padding: 2.6mm 2.8mm;
-      gap: 2.2mm;
+      padding: 2.4mm 2.4mm;
+      gap: 1.8mm;
     }
 
     .passport-card__section-label {
-      font-size: 0.6rem;
+      font-size: 0.56rem;
     }
 
     .passport-card__info-cta {
-      font-size: 0.84rem;
-      margin-top: 0.4mm;
+      font-size: 0.78rem;
+      margin-top: 0.2mm;
     }
 
     .passport-card__info-note {
-      font-size: 0.66rem;
+      font-size: 0.6rem;
     }
 
     .passport-card__qr-grid {
-      gap: 2.3mm;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.8mm;
     }
 
     .passport-card__qr {
       break-inside: avoid;
       background: #fff;
       border-color: rgba(0, 0, 0, 0.2);
-      padding: 2.1mm 1.8mm;
-      gap: 1mm;
+      padding: 1.6mm 1.3mm;
+      gap: 0.8mm;
       border-radius: 2.8mm;
     }
 
     .passport-card__qr img {
-      width: min(100%, 27mm);
+      width: min(100%, 18mm);
     }
 
     .passport-card__qr strong {
-      font-size: 0.72rem;
+      font-size: 0.58rem;
     }
 
     .passport-card__qr span {
-      font-size: 0.62rem;
+      font-size: 0.5rem;
+    }
+
+    .passport-card__stamp-area-field {
+      flex: 1;
+      min-height: 82mm;
+      border-color: rgba(0, 0, 0, 0.18);
+      border-radius: 2.6mm;
     }
   }
 </style>
