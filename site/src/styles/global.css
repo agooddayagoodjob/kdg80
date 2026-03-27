@@ -69,16 +69,13 @@
   --radius-lg: 30px;
   --container: 1380px;
   --site-header-height: 68px;
-  --header-logo-width-hero: clamp(10.75rem, 48vw, 17.5rem);
-  --header-logo-width-festival: clamp(10.75rem, 48vw, 17.5rem);
-  --header-logo-ratio-hero: 541 / 126;
-  --header-logo-ratio-festival: 877 / 150;
+  --header-logo-width-hero: clamp(10rem, 25vw, 14.75rem);
+  --header-logo-width-festival: clamp(10rem, 25vw, 14.75rem);
+  --header-logo-ratio-hero: 629 / 150;
+  --header-logo-ratio-festival: 629 / 150;
   --header-logo-width: var(--header-logo-width-hero);
   --header-logo-ratio: var(--header-logo-ratio-hero);
-  --header-logo-gap: 0.6rem;
-  --header-hero-logo-pad-block: 0.16rem;
-  --header-hero-logo-pad-right: 0.45rem;
-  --header-hero-logo-offset-y: 0.12rem;
+  --header-logo-gap: 0.7rem;
   --font-body: "FavoritPro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: "Cygre", "Helvetica Neue", Arial, sans-serif;
 }
@@ -186,26 +183,9 @@ summary {
 }
 
 .site-header__logo-shell {
-  position: relative;
   display: block;
   inline-size: min(100%, var(--header-logo-width));
   aspect-ratio: var(--header-logo-ratio);
-}
-
-.site-header__logo-state {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  transition:
-    opacity 280ms ease,
-    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
-  transform-origin: left center;
-  will-change: opacity, transform;
-}
-
-.site-header[data-logo-ready="false"] .site-header__logo-state {
-  transition: none;
 }
 
 .site-header__logo img {
@@ -214,28 +194,6 @@ summary {
   block-size: 100%;
   object-fit: contain;
   object-position: left center;
-}
-
-.site-header__logo-state--hero {
-  padding-block: var(--header-hero-logo-pad-block);
-  padding-inline-end: var(--header-hero-logo-pad-right);
-  opacity: 1;
-  transform: translate3d(0, var(--header-hero-logo-offset-y), 0) scale(1);
-}
-
-.site-header__logo-state--festival {
-  opacity: 0;
-  transform: translate3d(0, 0.24rem, 0) scale(0.985);
-}
-
-.site-header[data-scrolled="true"] .site-header__logo-state--hero {
-  opacity: 0;
-  transform: translate3d(0, calc(var(--header-hero-logo-offset-y) - 0.24rem), 0) scale(0.985);
-}
-
-.site-header[data-scrolled="true"] .site-header__logo-state--festival {
-  opacity: 1;
-  transform: translate3d(0, 0, 0) scale(1);
 }
 
 .site-header__nav {
@@ -2767,9 +2725,6 @@ summary {
 
   :root {
     --header-logo-gap: clamp(1rem, 1.8vw, 1.9rem);
-    --header-hero-logo-pad-block: 0.34rem;
-    --header-hero-logo-pad-right: clamp(1.1rem, 2.2vw, 2.3rem);
-    --header-hero-logo-offset-y: 0.28rem;
   }
 
   .container {
@@ -3412,12 +3367,6 @@ summary {
 
   .event-card--special .event-card__stage {
     min-height: 13.6rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .site-header__logo-state {
-    transition: none;
   }
 }
 
@@ -4939,12 +4888,10 @@ body.registration-modal-open {
 
 @media (max-width: 759px) {
   :root {
-    --header-logo-width-festival: clamp(9rem, 40.5vw, 10.35rem);
+    --header-logo-width-festival: clamp(8.85rem, 39vw, 10rem);
     --header-logo-width-hero: var(--header-logo-width-festival);
     --header-logo-ratio-hero: var(--header-logo-ratio-festival);
-    --header-logo-gap: 0.35rem;
-    --header-hero-logo-pad-block: 0.2rem;
-    --header-hero-logo-pad-right: clamp(2.35rem, 8vw, 3.25rem);
+    --header-logo-gap: 0.42rem;
     --site-header-mobile-route-slot: 4.8rem;
   }
 
