@@ -73,7 +73,7 @@ const HALLS: HallSeed[] = [
     venueName: 'Калининградский областной историко-художественный музей',
     hallName: 'Конференц-зал',
     address: 'улица Клиническая, 21',
-    capacity: 80,
+    capacity: 200,
   },
 ];
 

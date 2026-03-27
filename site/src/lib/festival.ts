@@ -38,6 +38,11 @@ export type FestivalDialogueParticipant = {
   images: string[];
 };
 
+export type SpeakerSocialLink = {
+  platform: 'vk' | 'telegram';
+  href: string;
+};
+
 export type SpeakerShowcaseEntry = {
   name: string;
   affiliation: string;
@@ -135,6 +140,41 @@ const SPEAKER_SHOWCASE_NAME_BONUSES: Array<{ match: string; bonus: number }> = [
   { match: 'Криммель', bonus: 1.8 },
   { match: 'Марковец', bonus: 1.6 },
 ];
+const FIXED_EVENT_SLUGS: Record<string, string> = {
+  // Keep the public URL stable after the lecture title correction.
+  'Виштынецкая возвышенность: освоение с 1945 года, современность и перспективы': 'vishtynetskaya-vozvyshennost-kak-osvaivali-s-1945-goda-sovremennost-i-perspektivy',
+  'Виштынецкая возвышенность: как осваивали с 1945 года, современность и перспективы': 'vishtynetskaya-vozvyshennost-kak-osvaivali-s-1945-goda-sovremennost-i-perspektivy',
+};
+const SPEAKER_SOCIAL_LINKS_SOURCE: Array<{ names: string[]; links: SpeakerSocialLink[] }> = [
+  {
+    names: ['Игорь Селин'],
+    links: [
+      { platform: 'vk', href: 'https://vk.ru/ivsguide' },
+    ],
+  },
+  {
+    names: ['Светлана Соколова'],
+    links: [
+      { platform: 'vk', href: 'https://vk.ru/svetlana_sokolova39' },
+    ],
+  },
+  {
+    names: ['Татьяна Удовенко'],
+    links: [
+      { platform: 'telegram', href: 'https://t.me/tanja_from_koenigsberg' },
+      { platform: 'vk', href: 'https://vk.ru/tatiana_udovenko' },
+    ],
+  },
+  {
+    names: ['Андрей Левченков', 'Андрей Викторович Левченков'],
+    links: [
+      { platform: 'telegram', href: 'https://t.me/alev701' },
+    ],
+  },
+];
+const SPEAKER_SOCIAL_LINKS = new Map<string, SpeakerSocialLink[]>(
+  SPEAKER_SOCIAL_LINKS_SOURCE.flatMap((entry) => entry.names.map((name) => [normalizeLookup(name), entry.links] as const)),
+);
 
 const EVENT_IMAGE_MAP: Array<{ title: string; speaker: string; manifestKeys: string[]; alternateTitles?: string[] }> = [
   {
@@ -189,9 +229,10 @@ const EVENT_IMAGE_MAP: Array<{ title: string; speaker: string; manifestKeys: str
     alternateTitles: ['Великие учителя. Преемственность художественных поколений.'],
   },
   {
-    title: 'Виштынецкая возвышенность: как осваивали с 1945 года, современность и перспективы',
+    title: 'Виштынецкая возвышенность: освоение с 1945 года, современность и перспективы',
     speaker: 'Соколов',
     manifestKeys: ['Виштынец - Соколов Алексей'],
+    alternateTitles: ['Виштынецкая возвышенность: как осваивали с 1945 года, современность и перспективы'],
   },
   {
     title: 'Денежное обращение в послевоенный период 1945-1947',
@@ -735,7 +776,11 @@ function tokenizeLookup(value: string) {
 }
 
 function toSlug(title: string) {
-  return transliterate(title) || 'sobytiye';
+  return FIXED_EVENT_SLUGS[title] || transliterate(title) || 'sobytiye';
+}
+
+export function getSpeakerSocialLinks(speakerName: string) {
+  return SPEAKER_SOCIAL_LINKS.get(normalizeLookup(speakerName)) ?? [];
 }
 
 function parseDurationMinutes(value: string) {

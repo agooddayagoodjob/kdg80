@@ -1,5 +1,5 @@
 ---
-import { getEventTemporalState, getFestivalEventHref, type FestivalEvent } from '../lib/festival';
+import { getEventTemporalState, getFestivalEventHref, getSpeakerSocialLinks, type FestivalEvent, type SpeakerSocialLink } from '../lib/festival';
 import {
   getDialoguePortraitImage,
   getDialoguePortraitStyle,
@@ -199,6 +199,14 @@ function isLocationPlaceholder(value: string) {
     || normalized === 'площадка уточняется';
 }
 
+function getSpeakerSocialLabel(platform: SpeakerSocialLink['platform']) {
+  return platform === 'vk' ? 'VK' : 'Telegram';
+}
+
+function getSpeakerSocialAriaLabel(platform: SpeakerSocialLink['platform'], speakerName: string) {
+  return platform === 'vk' ? `Открыть ВКонтакте спикера ${speakerName}` : `Открыть Telegram спикера ${speakerName}`;
+}
+
 const dateParts = getDateParts(event.dateLabel);
 const rangeDateParts = event.kind === 'range' ? getRangeDateParts(event.dateLabel) : null;
 const isDialogueEvent = event.formatLabel.includes('Открытый диалог') && event.dialogueParticipants.length > 0;
@@ -223,6 +231,9 @@ const hasExpandableCardSummary = hasExpandableSummary(event);
 const hasSpeakerAbout = shouldShowSpeakerAbout(event);
 const useScientificLibraryVisitSchedule = usesScientificLibraryVisitSchedule(event);
 const accessLabel = event.accessLabel ?? 'Бесплатно';
+const speakerSocialLinks = !isDialogueEvent && !isSpecialEvent && event.speakerLabel
+  ? getSpeakerSocialLinks(event.speakerLabel)
+  : [];
 const metaVenue = normalizeMetaValue(event.venue);
 const metaAddress = normalizeMetaValue(event.address);
 const metaDuration = isDurationPlaceholder(event.durationLabel) ? '' : normalizeMetaValue(event.durationLabel);
@@ -392,17 +403,51 @@ const BodyTitleTag = headingLevel === 'page' ? 'h1' : 'h4';
 
       {isDialogueEvent && (
         <div class="event-card__cast">
-          {event.dialogueParticipants.map((participant) => (
+          {event.dialogueParticipants.map((participant) => {
+            const participantSocialLinks = getSpeakerSocialLinks(participant.name);
+
+            return (
             <div class="event-card__cast-item">
               <strong>{participant.name}</strong>
               {participant.affiliation && <span>{participant.affiliation}</span>}
+              {participantSocialLinks.length > 0 && (
+                <div class="event-card__speaker-socials" aria-label={`Соцсети участника ${participant.name}`}>
+                  {participantSocialLinks.map((link) => (
+                    <a
+                      class="event-card__speaker-social-link"
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      aria-label={getSpeakerSocialAriaLabel(link.platform, participant.name)}
+                    >
+                      {getSpeakerSocialLabel(link.platform)}
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {!isDialogueEvent && !isSpecialEvent && event.speakerLabel && <p class="event-card__speaker">{event.speakerLabel}</p>}
       {!isDialogueEvent && !isSpecialEvent && event.affiliation && <p class="event-card__affiliation">{event.affiliation}</p>}
+      {!isDialogueEvent && !isSpecialEvent && speakerSocialLinks.length > 0 && (
+        <div class="event-card__speaker-socials" aria-label={`Соцсети спикера ${event.speakerLabel}`}>
+          {speakerSocialLinks.map((link) => (
+            <a
+              class="event-card__speaker-social-link"
+              href={link.href}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label={getSpeakerSocialAriaLabel(link.platform, event.speakerLabel)}
+            >
+              {getSpeakerSocialLabel(link.platform)}
+            </a>
+          ))}
+        </div>
+      )}
 
       {isRangeEvent ? (
         hasExpandableCardSummary ? (

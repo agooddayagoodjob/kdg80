@@ -4,12 +4,14 @@ import { toSpeakerStripCard } from '../lib/media';
 
 interface Props {
   entries: SpeakerShowcaseEntry[];
+  allEntries?: SpeakerShowcaseEntry[];
   totalCount: number;
   loadHref: string;
 }
 
-const { entries, totalCount, loadHref } = Astro.props;
+const { entries, allEntries = entries, totalCount, loadHref } = Astro.props;
 const cards = entries.map((entry) => toSpeakerStripCard(entry));
+const allCards = allEntries.map((entry) => toSpeakerStripCard(entry));
 const remainingCount = Math.max(totalCount - cards.length, 0);
 ---
 
@@ -20,6 +22,7 @@ const remainingCount = Math.max(totalCount - cards.length, 0);
       data-speaker-poster
       data-speaker-load-url={loadHref}
       data-speaker-initial-cards={JSON.stringify(cards)}
+      data-speaker-all-cards={JSON.stringify(allCards)}
     >
       <div class="speaker-poster__masthead">
         <div class="speaker-poster__topline">
@@ -75,6 +78,7 @@ const remainingCount = Math.max(totalCount - cards.length, 0);
 
 <script is:inline>
   const speakerPoster = document.querySelector('[data-speaker-poster]');
+  const speakerLastSignatureKey = 'kgd80:speaker-strip:last-signature';
   const speakerPathSlash = String.fromCharCode(47);
   const speakerPathDoubleSlash = `${speakerPathSlash}${speakerPathSlash}`;
   const speakerTicketsRoot = `${speakerPathSlash}tickets${speakerPathSlash}`;
@@ -146,6 +150,34 @@ const remainingCount = Math.max(totalCount - cards.length, 0);
     const strip = speakerPoster.querySelector('[data-speaker-strip]');
     const button = speakerPoster.querySelector('[data-speaker-load]');
     const loadUrl = withSpeakerPreviewPrefix(speakerPoster.dataset.speakerLoadUrl);
+    const shuffle = (items) => {
+      const values = items.slice();
+
+      for (let index = values.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [values[index], values[randomIndex]] = [values[randomIndex], values[index]];
+      }
+
+      return values;
+    };
+
+    const dedupeCards = (items) => {
+      const seen = new Set();
+      return items.filter((card) => {
+        if (!card?.anchor || !card?.name) {
+          return false;
+        }
+
+        const signature = `${card.anchor}::${card.name}`;
+        if (seen.has(signature)) {
+          return false;
+        }
+
+        seen.add(signature);
+        return true;
+      });
+    };
+
     const initialCards = (() => {
       try {
         const payload = JSON.parse(speakerPoster.dataset.speakerInitialCards || '[]');
@@ -158,40 +190,24 @@ const remainingCount = Math.max(totalCount - cards.length, 0);
         return [];
       }
     })();
+    const embeddedCards = (() => {
+      try {
+        const payload = JSON.parse(speakerPoster.dataset.speakerAllCards || '[]');
+        return Array.isArray(payload)
+          ? payload
+              .map((card) => normalizeSpeakerCard(card))
+              .filter((card) => card?.name && card?.image && card?.anchor)
+          : [];
+      } catch {
+        return [];
+      }
+    })();
 
-    if (strip instanceof HTMLElement && button instanceof HTMLButtonElement && loadUrl) {
-      let loadedCards = null;
+    if (strip instanceof HTMLElement) {
+      let loadedCards = dedupeCards(embeddedCards);
       let currentCards = initialCards.slice();
       let unseenDeck = [];
       let recycleDeck = [];
-
-      const shuffle = (items) => {
-        const values = items.slice();
-
-        for (let index = values.length - 1; index > 0; index -= 1) {
-          const randomIndex = Math.floor(Math.random() * (index + 1));
-          [values[index], values[randomIndex]] = [values[randomIndex], values[index]];
-        }
-
-        return values;
-      };
-
-      const dedupeCards = (items) => {
-        const seen = new Set();
-        return items.filter((card) => {
-          if (!card?.anchor || !card?.name) {
-            return false;
-          }
-
-          const signature = `${card.anchor}::${card.name}`;
-          if (seen.has(signature)) {
-            return false;
-          }
-
-          seen.add(signature);
-          return true;
-        });
-      };
 
       const preloadCards = async (cards) => {
         await Promise.all(cards.map((card) => new Promise((resolve) => {
@@ -210,10 +226,80 @@ const remainingCount = Math.max(totalCount - cards.length, 0);
       };
 
       const setButtonLabel = (value) => {
-        button.textContent = value;
+        if (button instanceof HTMLButtonElement) {
+          button.textContent = value;
+        }
       };
 
-      const allCards = () => dedupeCards([...(loadedCards ?? []), ...initialCards]);
+      const getStoredSignature = () => {
+        try {
+          return window.localStorage.getItem(speakerLastSignatureKey) ?? '';
+        } catch {
+          return '';
+        }
+      };
+
+      const setStoredSignature = (value) => {
+        try {
+          window.localStorage.setItem(speakerLastSignatureKey, value);
+        } catch {
+          // Ignore storage failures, randomization should still work.
+        }
+      };
+
+      const allCards = () => dedupeCards(loadedCards.length ? loadedCards : initialCards);
+
+      const getCardSignature = (cards) => cards.map((card) => card.anchor).join('::');
+
+      const refreshDecks = () => {
+        const currentAnchors = new Set(currentCards.map((card) => card.anchor));
+        unseenDeck = shuffle(allCards().filter((card) => !currentAnchors.has(card.anchor)));
+        recycleDeck = [];
+      };
+
+      const getInitialCards = () => {
+        const pool = allCards();
+        const slotCount = Math.min(currentCards.length || initialCards.length || 8, pool.length);
+        const previousSignature = getStoredSignature();
+        const serverSignature = getCardSignature(initialCards);
+
+        if (slotCount === 0) {
+          return [];
+        }
+
+        if (pool.length <= slotCount) {
+          return shuffle(pool).slice(0, slotCount);
+        }
+
+        let nextCards = shuffle(pool).slice(0, slotCount);
+        let attempts = 0;
+        let nextSignature = getCardSignature(nextCards);
+
+        while (
+          attempts < 10
+          && (nextSignature === previousSignature || nextSignature === serverSignature)
+        ) {
+          nextCards = shuffle(pool).slice(0, slotCount);
+          nextSignature = getCardSignature(nextCards);
+          attempts += 1;
+        }
+
+        return nextCards;
+      };
+
+      const applyCards = (cards) => {
+        strip.replaceChildren(...cards.map((card) => createSpeakerEntry(card)));
+        currentCards = cards;
+        setStoredSignature(getCardSignature(cards));
+        refreshDecks();
+      };
+
+      const initialSelection = getInitialCards();
+      if (initialSelection.length > 0) {
+        applyCards(initialSelection);
+      } else {
+        refreshDecks();
+      }
 
       const getNextCards = () => {
         const slotCount = currentCards.length || initialCards.length || 8;
@@ -263,52 +349,54 @@ const remainingCount = Math.max(totalCount - cards.length, 0);
         return nextCards.length ? nextCards : currentCards;
       };
 
-      button.addEventListener('click', async () => {
-        if (button.disabled) {
-          return;
-        }
-
-        button.disabled = true;
-        setButtonLabel('Обновляем...');
-
-        try {
-          if (!loadedCards) {
-            const response = await fetch(loadUrl, { credentials: 'same-origin' });
-
-            if (!response.ok) {
-              throw new Error(`HTTP ${response.status}`);
-            }
-
-            const payload = await response.json();
-            loadedCards = Array.isArray(payload?.cards)
-              ? payload.cards
-                  .map((card) => normalizeSpeakerCard(card))
-                  .filter((card) => card?.name && card?.image && card?.anchor)
-              : [];
-            unseenDeck = shuffle(dedupeCards(loadedCards));
-            recycleDeck = [];
+      if (button instanceof HTMLButtonElement) {
+        button.addEventListener('click', async () => {
+          if (button.disabled) {
+            return;
           }
 
-          const nextCards = getNextCards();
-          await preloadCards(nextCards);
+          button.disabled = true;
+          setButtonLabel('Обновляем...');
 
-          strip.dataset.state = 'swapping';
-          window.setTimeout(() => {
-            strip.replaceChildren(...nextCards.map((card) => createSpeakerEntry(card)));
-            currentCards = nextCards;
-            window.requestAnimationFrame(() => {
-              delete strip.dataset.state;
-            });
-          }, 150);
-        } catch (_error) {
-          setButtonLabel('Показать ещё');
+          try {
+            if (!loadedCards.length && loadUrl) {
+              const response = await fetch(loadUrl, { credentials: 'same-origin' });
+
+              if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+              }
+
+              const payload = await response.json();
+              loadedCards = Array.isArray(payload?.cards)
+                ? dedupeCards(
+                    payload.cards
+                      .map((card) => normalizeSpeakerCard(card))
+                      .filter((card) => card?.name && card?.image && card?.anchor),
+                  )
+                : [];
+              refreshDecks();
+            }
+
+            const nextCards = getNextCards();
+            await preloadCards(nextCards);
+
+            strip.dataset.state = 'swapping';
+            window.setTimeout(() => {
+              applyCards(nextCards);
+              window.requestAnimationFrame(() => {
+                delete strip.dataset.state;
+              });
+            }, 150);
+          } catch (_error) {
+            setButtonLabel('Показать ещё');
+            button.disabled = false;
+            return;
+          }
+
           button.disabled = false;
-          return;
-        }
-
-        button.disabled = false;
-        setButtonLabel('Показать ещё');
-      });
+          setButtonLabel('Показать ещё');
+        });
+      }
     }
   }
 </script>

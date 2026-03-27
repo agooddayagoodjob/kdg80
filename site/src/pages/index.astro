@@ -437,6 +437,7 @@ const institutionHighlights = [
   'АтлантНИРО',
   'биостанция «Рыбачий» / «Фрингилла»',
   'Калининградский зоопарк',
+  'Калининградский областной историко-художественный музей',
   'музей «Фридландские ворота»',
   'БФУ им. И. Канта',
   'Музей Мирового океана',
@@ -895,7 +896,7 @@ const heroVariantsPayload = JSON.stringify(heroStoryVariants);
         </div>
       </section>
 
-      <SpeakerPoster entries={speakerShowcase} totalCount={allSpeakerShowcase.length} loadHref={speakerLoadHref} />
+      <SpeakerPoster entries={speakerShowcase} allEntries={allSpeakerShowcase} totalCount={allSpeakerShowcase.length} loadHref={speakerLoadHref} />
 
       <InterestChooser items={routeItems} />
 

@@ -2185,6 +2185,29 @@ summary {
   text-decoration-color: rgba(155, 46, 26, 0.52);
 }
 
+.event-card__speaker-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.22rem 0.5rem;
+  align-items: center;
+}
+
+.event-card__speaker-social-link {
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  line-height: 1.2;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(18, 17, 14, 0.14);
+  text-underline-offset: 0.12rem;
+}
+
+.event-card__speaker-social-link:hover,
+.event-card__speaker-social-link:focus-visible {
+  color: var(--accent-deep);
+  text-decoration-color: rgba(155, 46, 26, 0.44);
+}
+
 .event-card__service-note {
   margin: 0;
   padding: 0.78rem 0.84rem;
@@ -3085,6 +3108,10 @@ summary {
   .event-card__speaker-links {
     gap: 0.3rem 0.5rem;
     font-size: 0.78rem;
+  }
+
+  .event-card__speaker-social-link {
+    font-size: 0.75rem;
   }
 
   .event-card__meta {
