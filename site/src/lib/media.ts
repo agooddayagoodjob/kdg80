@@ -24,9 +24,9 @@ const LECTURE_EVENT_PORTRAIT_OVERRIDES: Array<{ match: string; style: string }> 
 ];
 
 const LECTURE_PORTRAIT_IMAGE_OVERRIDES: Array<{ match: string; path: string }> = [
-  { match: 'Мосиенко', path: '/generated/lecture-portraits/mosienko-evgeniy-lecture.webp' },
+  { match: 'Мосиенко', path: '/generated/lecture-portraits/sarnits-artur-lecture.webp' },
   { match: 'Конюхова', path: '/generated/lecture-portraits/tatyana-konyuhova-lecture.webp' },
-  { match: 'Сарниц', path: '/generated/lecture-portraits/sarnits-artur-lecture.webp' },
+  { match: 'Сарниц', path: '/generated/lecture-portraits/mosienko-evgeniy-lecture.webp' },
 ];
 
 const SPEAKER_STRIP_IMAGE_OVERRIDES: Array<{ match: string; path: string }> = [
@@ -146,4 +146,3 @@ export function getEventPortraitStyle(value: string, isLecture = false) {
   return EVENT_PORTRAIT_OVERRIDES.find((entry) => value.includes(entry.match))?.style ?? undefined;
 }
 import type { SpeakerShowcaseEntry } from './festival';
-

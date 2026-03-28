@@ -1,0 +1,98 @@
+---
+import PreviewLayout from '../../layouts/PreviewLayout.astro';
+import { getFestivalSlideDeckSlides } from '../../lib/festival-slide-deck';
+
+export const prerender = true;
+
+const slides = getFestivalSlideDeckSlides();
+---
+
+<PreviewLayout title="Festival Slide Deck Preview" description="Служебный индекс проекторных слайдов фестиваля.">
+  <main class="preview-index">
+    <div class="preview-index__panel">
+      <p class="preview-index__eyebrow">SLIDE DECK PREVIEW</p>
+      <h1 class="preview-index__title">Проекторные слайды фестиваля для быстрого просмотра и capture</h1>
+      <p class="preview-index__meta">{slides.length} слайдов · 16 event-пар + служебные CTA-экраны</p>
+      <ul class="preview-index__list">
+        {slides.map((slide, index) => (
+          <li>
+            <a href={`/slide-preview/${slide.slug}/`}>
+              <strong>{String(index + 1).padStart(2, '0')} · {slide.label}</strong>
+              <span>/slide-preview/{slide.slug}/</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </main>
+</PreviewLayout>
+
+<style>
+  .preview-index {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+  }
+
+  .preview-index__panel {
+    width: min(100%, 62rem);
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(22, 18, 18, 0.8);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(18px);
+  }
+
+  .preview-index__eyebrow {
+    margin: 0 0 0.9rem;
+    font: 600 0.82rem/1 var(--font-display);
+    letter-spacing: 0.2em;
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .preview-index__title {
+    margin: 0 0 0.8rem;
+    max-width: 12ch;
+    font: 700 clamp(2.4rem, 5vw, 4rem)/0.94 var(--font-display);
+    color: #fcf7ef;
+  }
+
+  .preview-index__meta {
+    margin: 0 0 1.5rem;
+    font: 500 1rem/1.3 var(--font-body);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .preview-index__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .preview-index__list a {
+    display: grid;
+    gap: 0.25rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    transition: background 180ms ease, border-color 180ms ease;
+  }
+
+  .preview-index__list a:hover {
+    background: rgba(216, 75, 49, 0.12);
+    border-color: rgba(216, 75, 49, 0.34);
+  }
+
+  .preview-index__list strong {
+    font: 600 1.15rem/1.08 var(--font-display);
+    color: #fff8f1;
+  }
+
+  .preview-index__list span {
+    font: 500 0.95rem/1.15 var(--font-body);
+    color: rgba(255, 255, 255, 0.58);
+  }
+</style>

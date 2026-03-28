@@ -1,0 +1,811 @@
+---
+import PreviewLayout from '../../layouts/PreviewLayout.astro';
+import type { FestivalSlideDeckSlide } from '../../lib/festival-slide-deck';
+import { getFestivalSlideDeckSlide, getFestivalSlideDeckSlides } from '../../lib/festival-slide-deck';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return getFestivalSlideDeckSlides().map((slide) => ({
+    params: { slide: slide.slug },
+  }));
+}
+
+const slug = Astro.params.slide ?? '';
+const slide = getFestivalSlideDeckSlide(slug);
+
+if (!slide) {
+  throw new Error(`Unknown slide deck slide: ${slug}`);
+}
+
+const allSlides = getFestivalSlideDeckSlides();
+const currentIndex = allSlides.findIndex((entry) => entry.slug === slide.slug);
+
+function toLines(value: string) {
+  return value.split('\n').filter(Boolean);
+}
+
+function isSameTitle(displayTitle: string, fullTitle: string) {
+  return displayTitle.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim() === fullTitle.replace(/\s+/g, ' ').trim();
+}
+---
+
+<PreviewLayout
+  title={`Slide Preview — ${slide.label}`}
+  description="Служебный проекторный слайд фестиваля для preview и capture."
+>
+  <main class="slide-preview-page">
+    <aside class="slide-preview-page__hud">
+      <a class="slide-preview-page__back" href="/slide-preview/">/slide-preview/</a>
+      <p class="slide-preview-page__caption">СЛАЙД</p>
+      <h1 class="slide-preview-page__title">{slide.label}</h1>
+      <p class="slide-preview-page__counter">{String(currentIndex + 1).padStart(2, '0')} / {String(allSlides.length).padStart(2, '0')}</p>
+      <nav class="slide-preview-page__nav" aria-label="Список слайдов">
+        {allSlides.map((entry, index) => (
+          <a
+            class:list={['slide-preview-page__nav-link', entry.slug === slide.slug && 'is-active']}
+            href={`/slide-preview/${entry.slug}/`}
+          >
+            <strong>{String(index + 1).padStart(2, '0')}</strong>
+            <span>{entry.label}</span>
+          </a>
+        ))}
+      </nav>
+      <p class="slide-preview-page__hint">Для capture используется только stage `1920x1080` внутри рамки.</p>
+    </aside>
+
+    <section class="slide-preview-page__stage-shell">
+      <div class={`slide-frame slide-frame--${slide.kind}`} data-capture-root>
+        {slide.kind !== 'site' && (
+          <div class="slide-frame__brand">
+            <img src="/shared-assets/logo-znanie-main.svg" alt="Знание" />
+          </div>
+        )}
+
+        {slide.kind === 'cover' && (
+          <section class="deck-cover">
+            <div class="deck-cover__grain"></div>
+            <div class="deck-cover__panel deck-cover__panel--light"></div>
+            <div class="deck-cover__panel deck-cover__panel--accent"></div>
+            <div class="deck-cover__lockup">
+              <img src="/shared-assets/logo-80-istorii-hero.svg" alt="80 историй о главном" />
+            </div>
+            <p class="deck-cover__period">{slide.period}</p>
+          </section>
+        )}
+
+        {slide.kind === 'overview' && (
+          <section class="deck-overview">
+            <div class="deck-overview__count">{slide.featuredCount}</div>
+            <div class="deck-overview__copy">
+              <h2>
+                {toLines(slide.title).map((line) => (
+                  <span>{line}</span>
+                ))}
+              </h2>
+              <div class="deck-overview__facts">
+                {slide.facts.map((fact) => (
+                  <p>{fact}</p>
+                ))}
+              </div>
+              <p class="deck-overview__footer">{slide.footer}</p>
+            </div>
+          </section>
+        )}
+
+        {slide.kind === 'event-myth' && (
+          <section class:list={['deck-event-myth', `is-${slide.align}`]}>
+            {slide.eventImage && <img class="deck-event-myth__photo" src={slide.eventImage} alt="" />}
+            <div class="deck-event-myth__backdrop"></div>
+            <div class="deck-event-myth__plate"></div>
+            <div class="deck-event-myth__copy">
+              <p class="deck-event-myth__eyebrow">{slide.eyebrow}</p>
+              <p class="deck-event-myth__label">{slide.mythLabel}</p>
+              <div class="deck-event-myth__text">
+                {toLines(slide.mythText).map((line) => (
+                  <span>{line}</span>
+                ))}
+              </div>
+              <p class="deck-event-myth__anchor">РАЗБИРАЕМ НА ФЕСТИВАЛЕ · {slide.anchorTitle}</p>
+            </div>
+          </section>
+        )}
+
+        {slide.kind === 'event-lecture' && (
+          <section class:list={['deck-event-lecture', slide.textOnlySpeaker && 'is-text-only']}>
+            {slide.eventImage && <img class="deck-event-lecture__photo" src={slide.eventImage} alt="" />}
+            <div class="deck-event-lecture__photo-veil"></div>
+            <div class="deck-event-lecture__panel"></div>
+            <div class="deck-event-lecture__copy">
+              <p class="deck-event-lecture__eyebrow">{slide.eyebrow}</p>
+              <h2>
+                {toLines(slide.displayTitle).map((line) => (
+                  <span>{line}</span>
+                ))}
+              </h2>
+              {!isSameTitle(slide.displayTitle, slide.fullTitle) && <p class="deck-event-lecture__full-title">{slide.fullTitle}</p>}
+              <p class="deck-event-lecture__support">{slide.support}</p>
+              <div class="deck-event-lecture__meta">
+                <p>{slide.dateLabel}</p>
+                <p>{slide.venue}</p>
+              </div>
+              <p class="deck-event-lecture__access">{slide.accessLabel}</p>
+            </div>
+
+            {slide.portraitImage && (
+              <img
+                class="deck-event-lecture__portrait"
+                style={slide.portraitStyle}
+                src={slide.portraitImage}
+                alt={slide.speakerName}
+              />
+            )}
+
+            <div class:list={['deck-event-lecture__speaker', slide.textOnlySpeaker && 'is-text-only']}>
+              <strong>{slide.speakerName}</strong>
+              <span>{slide.speakerRole}</span>
+            </div>
+          </section>
+        )}
+
+        {slide.kind === 'site' && (
+          <section class="deck-site">
+            <div class="deck-site__brand">
+              <img src="/shared-assets/logo-znanie-main.svg" alt="Знание" />
+            </div>
+            <div class="deck-site__domain">
+              <span class="deck-site__domain-part deck-site__domain-part--muted">KGD</span>
+              <span class="deck-site__domain-part deck-site__domain-part--accent">80</span>
+              <span class="deck-site__domain-part deck-site__domain-part--muted">.RU</span>
+            </div>
+            <div class="deck-site__festival-lockup">
+              <span>ИСТОРИЙ</span>
+              <span>О ГЛАВНОМ</span>
+            </div>
+            <p class="deck-site__period">{slide.period}</p>
+            <p class="deck-site__subtitle">{slide.subtitle}</p>
+          </section>
+        )}
+
+        {slide.kind === 'qr' && (
+          <section class="deck-qr">
+            <div class="deck-qr__copy">
+              <p class="deck-qr__platform">{slide.platform}</p>
+              <h2>
+                {toLines(slide.title).map((line) => (
+                  <span>{line}</span>
+                ))}
+              </h2>
+              <p class="deck-qr__channel">{slide.channelTitle}</p>
+              <p class="deck-qr__subtitle">{slide.subtitle}</p>
+              <p class="deck-qr__hint">{slide.href}</p>
+            </div>
+            <div class="deck-qr__box">
+              <img src={slide.qrPath} alt={`${slide.platform} QR`} />
+            </div>
+          </section>
+        )}
+      </div>
+    </section>
+  </main>
+</PreviewLayout>
+
+<style>
+  .slide-preview-page {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 18rem minmax(0, 1fr);
+    gap: 1.75rem;
+    padding: 1.5rem;
+  }
+
+  .slide-preview-page__hud {
+    align-self: start;
+    position: sticky;
+    top: 1.5rem;
+    display: grid;
+    gap: 0.85rem;
+    padding: 1.15rem;
+    max-height: calc(100vh - 3rem);
+    overflow: auto;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(22, 18, 18, 0.82);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(20px);
+  }
+
+  .slide-preview-page__back,
+  .slide-preview-page__caption,
+  .slide-preview-page__counter,
+  .slide-preview-page__hint {
+    margin: 0;
+  }
+
+  .slide-preview-page__back {
+    color: rgba(255, 255, 255, 0.72);
+    font: 500 0.88rem/1.1 var(--font-body);
+  }
+
+  .slide-preview-page__caption {
+    color: rgba(255, 255, 255, 0.56);
+    font: 600 0.72rem/1 var(--font-display);
+    letter-spacing: 0.18em;
+  }
+
+  .slide-preview-page__title {
+    margin: 0;
+    color: #fff8f1;
+    font: 700 1.6rem/0.96 var(--font-display);
+  }
+
+  .slide-preview-page__counter {
+    color: rgba(255, 255, 255, 0.68);
+    font: 500 0.95rem/1.2 var(--font-body);
+  }
+
+  .slide-preview-page__nav {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .slide-preview-page__nav-link {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: start;
+    padding: 0.7rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .slide-preview-page__nav-link.is-active {
+    border-color: rgba(216, 75, 49, 0.42);
+    background: rgba(216, 75, 49, 0.12);
+    color: #fff7ef;
+  }
+
+  .slide-preview-page__nav-link strong {
+    font: 600 0.85rem/1 var(--font-display);
+  }
+
+  .slide-preview-page__nav-link span {
+    font: 500 0.86rem/1.18 var(--font-body);
+  }
+
+  .slide-preview-page__hint {
+    color: rgba(255, 255, 255, 0.55);
+    font: 500 0.78rem/1.3 var(--font-body);
+  }
+
+  .slide-preview-page__stage-shell {
+    display: grid;
+    place-items: start center;
+    overflow: auto;
+  }
+
+  .slide-frame {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 10% 10%, rgba(216, 75, 49, 0.12), transparent 22rem),
+      linear-gradient(180deg, #f7f1e8 0%, #f1eadf 100%);
+    color: var(--ink);
+  }
+
+  .slide-frame__brand {
+    position: absolute;
+    top: 3rem;
+    left: 3.5rem;
+    z-index: 12;
+    width: 12rem;
+  }
+
+  .deck-cover {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #f7f2eb;
+  }
+
+  .deck-cover__grain {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 18%, rgba(216, 75, 49, 0.08), transparent 20rem),
+      radial-gradient(circle at 82% 12%, rgba(16, 14, 14, 0.08), transparent 18rem);
+  }
+
+  .deck-cover__panel {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+  }
+
+  .deck-cover__panel--light {
+    left: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04));
+  }
+
+  .deck-cover__panel--accent {
+    right: 0;
+    background: linear-gradient(180deg, rgba(216, 75, 49, 0.18), rgba(216, 75, 49, 0.04));
+  }
+
+  .deck-cover__lockup {
+    position: absolute;
+    inset: 14rem 15rem auto;
+  }
+
+  .deck-cover__lockup img {
+    width: 100%;
+  }
+
+  .deck-cover__period {
+    position: absolute;
+    left: 15rem;
+    bottom: 8rem;
+    margin: 0;
+    font: 500 2.8rem/1 var(--font-body);
+    letter-spacing: -0.02em;
+  }
+
+  .deck-overview {
+    position: relative;
+    display: grid;
+    grid-template-columns: 38% 1fr;
+    gap: 4rem;
+    width: 100%;
+    height: 100%;
+    padding: 8.5rem 7rem 7rem;
+  }
+
+  .deck-overview__count {
+    align-self: end;
+    color: var(--accent);
+    font: 700 23rem/0.82 var(--font-display);
+    letter-spacing: -0.06em;
+  }
+
+  .deck-overview__copy {
+    display: grid;
+    align-content: center;
+    gap: 2rem;
+  }
+
+  .deck-overview__copy h2 {
+    display: grid;
+    margin: 0;
+    font: 700 5.9rem/0.88 var(--font-display);
+    letter-spacing: -0.05em;
+  }
+
+  .deck-overview__facts {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .deck-overview__facts p,
+  .deck-overview__footer {
+    margin: 0;
+  }
+
+  .deck-overview__facts p {
+    font: 500 2rem/1.08 var(--font-body);
+  }
+
+  .deck-overview__footer {
+    color: var(--ink-soft);
+    font: 500 1.15rem/1.25 var(--font-body);
+    letter-spacing: 0.06em;
+  }
+
+  .deck-event-myth,
+  .deck-event-lecture {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .deck-event-myth__photo,
+  .deck-event-lecture__photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .deck-event-myth__backdrop {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(18, 17, 14, 0.62) 0%, rgba(18, 17, 14, 0.26) 38%, rgba(18, 17, 14, 0.14) 100%),
+      radial-gradient(circle at 88% 14%, rgba(216, 75, 49, 0.22), transparent 20rem);
+  }
+
+  .deck-event-myth__plate {
+    position: absolute;
+    top: 4rem;
+    bottom: 4rem;
+    width: 44rem;
+    background: rgba(247, 241, 232, 0.94);
+    border: 1px solid rgba(18, 17, 14, 0.08);
+    box-shadow: 0 34px 80px rgba(16, 14, 14, 0.18);
+  }
+
+  .deck-event-myth.is-right .deck-event-myth__plate,
+  .deck-event-myth.is-right .deck-event-myth__copy {
+    right: 4rem;
+  }
+
+  .deck-event-myth.is-left .deck-event-myth__plate,
+  .deck-event-myth.is-left .deck-event-myth__copy {
+    left: 4rem;
+  }
+
+  .deck-event-myth__copy {
+    position: absolute;
+    top: 5.2rem;
+    bottom: 5.2rem;
+    width: 44rem;
+    padding: 0 3.6rem 0 3.8rem;
+    display: grid;
+    align-content: start;
+  }
+
+  .deck-event-myth__eyebrow,
+  .deck-event-myth__label,
+  .deck-event-myth__anchor {
+    margin: 0;
+  }
+
+  .deck-event-myth__eyebrow {
+    color: var(--ink-soft);
+    font: 600 0.92rem/1 var(--font-display);
+    letter-spacing: 0.18em;
+  }
+
+  .deck-event-myth__label {
+    margin-top: 1.4rem;
+    color: var(--accent-deep);
+    font: 700 5.9rem/0.86 var(--font-display);
+    letter-spacing: -0.06em;
+  }
+
+  .deck-event-myth__text {
+    display: grid;
+    gap: 0.4rem;
+    margin-top: 2rem;
+  }
+
+  .deck-event-myth__text span {
+    font: 700 4.35rem/0.9 var(--font-display);
+    letter-spacing: -0.05em;
+  }
+
+  .deck-event-myth__anchor {
+    margin-top: auto;
+    color: var(--ink-soft);
+    font: 600 1.22rem/1.15 var(--font-body);
+    letter-spacing: 0.08em;
+  }
+
+  .deck-event-lecture__photo {
+    inset: 0 auto 0 0;
+    width: 63%;
+  }
+
+  .deck-event-lecture__photo-veil {
+    position: absolute;
+    inset: 0 37% 0 0;
+    background:
+      linear-gradient(90deg, rgba(18, 17, 14, 0.72) 0%, rgba(18, 17, 14, 0.44) 48%, rgba(18, 17, 14, 0.06) 100%);
+  }
+
+  .deck-event-lecture__panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 37%;
+    background: linear-gradient(180deg, #d84b31 0%, #cb452d 100%);
+  }
+
+  .deck-event-lecture__copy {
+    position: absolute;
+    top: 8rem;
+    left: 6.3rem;
+    z-index: 6;
+    display: grid;
+    width: 51rem;
+  }
+
+  .deck-event-lecture__eyebrow,
+  .deck-event-lecture__full-title,
+  .deck-event-lecture__support,
+  .deck-event-lecture__access {
+    margin: 0;
+  }
+
+  .deck-event-lecture__eyebrow {
+    max-width: 16ch;
+    color: rgba(255, 248, 241, 0.9);
+    font: 700 2.55rem/0.94 var(--font-display);
+    letter-spacing: -0.03em;
+  }
+
+  .deck-event-lecture__copy h2 {
+    display: grid;
+    gap: 0.18rem;
+    margin: 2rem 0 0;
+    color: #fff8f1;
+    font: 700 5.25rem/0.88 var(--font-display);
+    letter-spacing: -0.06em;
+  }
+
+  .deck-event-lecture__full-title {
+    max-width: 38rem;
+    margin-top: 1.4rem;
+    color: rgba(255, 248, 241, 0.82);
+    font: 500 1.45rem/1.14 var(--font-body);
+  }
+
+  .deck-event-lecture__support {
+    max-width: 40rem;
+    margin-top: 1.3rem;
+    color: rgba(255, 248, 241, 0.96);
+    font: 500 1.9rem/1.1 var(--font-body);
+  }
+
+  .deck-event-lecture__meta {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: 2.1rem;
+  }
+
+  .deck-event-lecture__meta p {
+    margin: 0;
+    color: rgba(255, 248, 241, 0.86);
+    font: 500 1.34rem/1.12 var(--font-body);
+  }
+
+  .deck-event-lecture__access {
+    margin-top: 1rem;
+    color: #fff8f1;
+    font: 700 1.34rem/1.05 var(--font-display);
+    letter-spacing: 0.06em;
+  }
+
+  .deck-event-lecture__portrait {
+    position: absolute;
+    right: 1.9rem;
+    bottom: 0;
+    z-index: 5;
+    width: var(--event-portrait-width-desktop, var(--event-portrait-width, min(34%, 31rem)));
+    max-width: 42%;
+    max-height: 92%;
+    object-fit: contain;
+    object-position: center bottom;
+    transform:
+      translate(var(--event-portrait-shift-x, 0), var(--event-portrait-shift-y, 0))
+      scale(var(--event-portrait-size, 1));
+    transform-origin: center bottom;
+  }
+
+  .deck-event-lecture__speaker {
+    position: absolute;
+    right: 3.1rem;
+    bottom: 2.5rem;
+    z-index: 7;
+    display: grid;
+    justify-items: start;
+    gap: 0.55rem;
+    width: 26rem;
+    padding: 1.25rem 1.35rem 1.15rem;
+    background: rgba(18, 17, 14, 0.76);
+    color: #fff8f1;
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.14);
+    backdrop-filter: blur(14px);
+  }
+
+  .deck-event-lecture__speaker strong,
+  .deck-event-lecture__speaker span {
+    margin: 0;
+  }
+
+  .deck-event-lecture__speaker strong {
+    font: 700 2.25rem/0.94 var(--font-display);
+    letter-spacing: -0.04em;
+  }
+
+  .deck-event-lecture__speaker span {
+    font: 500 1.05rem/1.14 var(--font-body);
+    color: rgba(255, 248, 241, 0.84);
+  }
+
+  .deck-event-lecture.is-text-only .deck-event-lecture__speaker {
+    right: 2.35rem;
+    bottom: 3rem;
+    width: 27.5rem;
+    min-height: 22rem;
+    align-content: center;
+    padding: 2.3rem 2.2rem;
+    background: rgba(18, 17, 14, 0.18);
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .deck-event-lecture.is-text-only .deck-event-lecture__speaker strong {
+    font-size: 3.15rem;
+  }
+
+  .deck-event-lecture.is-text-only .deck-event-lecture__speaker span {
+    font-size: 1.42rem;
+    line-height: 1.08;
+  }
+
+  .deck-site {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #f9f8f6;
+  }
+
+  .deck-site__brand {
+    position: absolute;
+    top: 3rem;
+    left: 3.4rem;
+    width: 12rem;
+  }
+
+  .deck-site__domain {
+    position: absolute;
+    top: 18.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: flex-end;
+    gap: 1.45rem;
+  }
+
+  .deck-site__domain-part {
+    font-family: var(--font-display);
+    font-size: 9.65rem;
+    line-height: 0.9;
+    letter-spacing: -0.07em;
+  }
+
+  .deck-site__domain-part--muted {
+    color: #8b8b8d;
+  }
+
+  .deck-site__domain-part--accent {
+    color: var(--accent);
+    font-size: 11.8rem;
+  }
+
+  .deck-site__festival-lockup {
+    position: absolute;
+    top: 32.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    justify-items: center;
+    font: 700 5.35rem/0.84 var(--font-display);
+    letter-spacing: -0.06em;
+    color: #252322;
+  }
+
+  .deck-site__period,
+  .deck-site__subtitle {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+  }
+
+  .deck-site__period {
+    top: 45rem;
+    font: 500 2.42rem/1 var(--font-body);
+    color: #2d2b2a;
+  }
+
+  .deck-site__subtitle {
+    bottom: 6.6rem;
+    font: 700 1.95rem/1 var(--font-display);
+    letter-spacing: 0.04em;
+    color: var(--accent-deep);
+  }
+
+  .deck-qr {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 32rem;
+    gap: 3.2rem;
+    width: 100%;
+    height: 100%;
+    padding: 8rem 7rem 7rem;
+    background:
+      radial-gradient(circle at 18% 18%, rgba(216, 75, 49, 0.16), transparent 22rem),
+      linear-gradient(180deg, #f7f2eb 0%, #efe7da 100%);
+  }
+
+  .deck-qr__copy {
+    display: grid;
+    align-content: start;
+  }
+
+  .deck-qr__platform,
+  .deck-qr__channel,
+  .deck-qr__subtitle,
+  .deck-qr__hint {
+    margin: 0;
+  }
+
+  .deck-qr__platform {
+    color: var(--accent);
+    font: 700 6.8rem/0.88 var(--font-display);
+    letter-spacing: -0.07em;
+  }
+
+  .deck-qr__copy h2 {
+    display: grid;
+    margin: 1.3rem 0 0;
+    font: 700 5rem/0.88 var(--font-display);
+    letter-spacing: -0.06em;
+  }
+
+  .deck-qr__channel {
+    margin-top: 2.1rem;
+    max-width: 11ch;
+    font: 700 3rem/0.94 var(--font-display);
+    letter-spacing: -0.04em;
+  }
+
+  .deck-qr__subtitle {
+    margin-top: 1.5rem;
+    color: var(--ink-soft);
+    font: 500 1.8rem/1.1 var(--font-body);
+  }
+
+  .deck-qr__hint {
+    margin-top: 2rem;
+    color: var(--ink-muted);
+    font: 500 1rem/1.2 var(--font-body);
+  }
+
+  .deck-qr__box {
+    align-self: center;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    padding: 1.8rem;
+    background: #fffdf8;
+    border: 1px solid rgba(18, 17, 14, 0.08);
+    box-shadow: 0 30px 80px rgba(18, 15, 12, 0.12);
+  }
+
+  .deck-qr__box img {
+    width: 100%;
+    height: auto;
+  }
+
+  @media (max-width: 1200px) {
+    .slide-preview-page {
+      grid-template-columns: 1fr;
+    }
+
+    .slide-preview-page__hud {
+      position: static;
+      max-height: none;
+    }
+
+    .slide-preview-page__stage-shell {
+      justify-content: start;
+    }
+  }
+</style>
