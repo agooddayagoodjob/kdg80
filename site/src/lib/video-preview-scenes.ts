@@ -105,6 +105,7 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
     detailLines: [
       'ПОЧЕМУ КАЛИНИНГРАД СТАЛ ГОРОДОМ СУМАСШЕДШИХ ВОЗМОЖНОСТЕЙ?',
     ],
+    durationMs: 7600,
   },
   {
     slug: 'ocean',
@@ -120,6 +121,7 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
       'ВЕЧНЫЙ ЗОВ И НАДЕЖДА БУДУЩЕГО ЧЕЛОВЕЧЕСТВА.',
     ],
     detailAttribution: 'Владимир Андреевич Чечко',
+    durationMs: 6800,
   },
   {
     slug: 'bridge',
@@ -128,11 +130,14 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
     eyebrow: 'ЛЕКЦИЯ · БЕСПЛАТНО ПО РЕГИСТРАЦИИ',
     shortTitle: 'МОСТЫ ВРЕМЕНИ',
     hook: 'ПРОШЛОЕ, НАСТОЯЩЕЕ, БУДУЩЕЕ',
+    mythText: 'ДВУХЪЯРУСНЫЙ МОСТ СПРОЕКТИРОВАЛ ЭЙФЕЛЬ',
     detailLabel: 'ПОСЛЕ ЛЕКЦИИ',
     detailLines: [
       'ПОЧЕМУ МОСТ ПОСТРОЕН В ДВА ЯРУСА?',
       'ЧТО В НЁМ НЕМЕЦКОЕ, А ЧТО ДОСТРОИЛИ СОВЕТСКИЕ ИНЖЕНЕРЫ?',
     ],
+    durationMs: 7200,
+    portraitStyle: '--event-portrait-size: 1.28; --event-portrait-shift-x: 0.08rem; --event-portrait-shift-y: 0.18rem; --event-portrait-width: min(43.5%, 36rem);',
   },
   {
     slug: 'future-city',
@@ -148,7 +153,8 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
       'КАКИМ МЫ РЕШИМ СДЕЛАТЬ ЕГО СЕГОДНЯ.',
     ],
     detailAttribution: 'Артур Артурович Сарниц',
-    portraitStyle: '--event-portrait-size: 1.58; --event-portrait-shift-x: -2.2rem; --event-portrait-shift-y: 0rem;',
+    portraitStyle: '--event-portrait-size: 1.72; --event-portrait-shift-x: -2.8rem; --event-portrait-shift-y: 0.14rem; --event-portrait-width: min(47.5%, 39rem);',
+    durationMs: 7000,
   },
   {
     slug: 'cinema',
@@ -163,6 +169,7 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
       'ПОЧЕМУ РЕЖИССЁРЫ ДЕСЯТИЛЕТИЯМИ ВОЗВРАЩАЛИСЬ ИМЕННО СЮДА?',
       'КАК КИНО ПОКАЗЫВАЕТ ИСЧЕЗНУВШИЙ КАЛИНИНГРАД?',
     ],
+    durationMs: 6900,
   },
 ];
 
@@ -193,7 +200,7 @@ function createBoostScene(events: FestivalEvent[], seed: BoostSceneSeed): VideoP
     eyebrow: seed.eyebrow,
     shortTitle: seed.shortTitle,
     hook: seed.hook,
-    mythLabel: seed.mythText ? 'МИФ' : undefined,
+    mythLabel: seed.mythText ? 'ПРАВДА ЛИ, ЧТО' : undefined,
     mythText: seed.mythText,
     detailLabel: seed.detailLabel,
     detailLines: seed.detailLines,
@@ -210,6 +217,7 @@ function createBoostScene(events: FestivalEvent[], seed: BoostSceneSeed): VideoP
     posterImage: event.image,
     dateLabel: event.dateLabel,
     venue: event.venue,
+    accessLabel: 'БЕСПЛАТНО ПО РЕГИСТРАЦИИ',
   };
 }
 
@@ -261,7 +269,7 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       slug: 'site',
       label: 'Site CTA',
       kind: 'site',
-      durationMs: 4000,
+      durationMs: 4400,
       domain: 'KGD80.RU',
       title: '80 ИСТОРИЙ О ГЛАВНОМ',
       period: '28 МАРТА - 19 ИЮЛЯ 2026',
@@ -271,11 +279,11 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       slug: 'telegram',
       label: 'QR / Telegram',
       kind: 'qr',
-      durationMs: 5200,
+      durationMs: 6400,
       platform: 'Telegram',
       title: 'ПОЛЮБИТЬ КАЛИНИНГРАД АНОНСЫ',
       subtitle: '@kenigevents',
-      secondary: 'ОПЕРАТИВНЫЕ АНОНСЫ СОБЫТИЙ',
+      secondary: 'ОПЕРАТИВНЫЕ АНОНСЫ ПО ФЕСТИВАЛЮ',
       qrPath: '/generated/telegram/kenigevents-qr.svg',
       href: 'https://t.me/kenigevents',
     },
@@ -283,11 +291,11 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       slug: 'max',
       label: 'QR / Max',
       kind: 'qr',
-      durationMs: 5200,
+      durationMs: 6400,
       platform: 'Max',
       title: 'ПОЛЮБИТЬ КАЛИНИНГРАД АНОНСЫ',
       subtitle: 'max.ru',
-      secondary: 'ОПЕРАТИВНЫЕ АНОНСЫ СОБЫТИЙ',
+      secondary: 'ОПЕРАТИВНЫЕ АНОНСЫ ПО ФЕСТИВАЛЮ',
       qrPath: '/generated/max/max-channel-qr.svg',
       href: 'https://max.ru/join/do_4eLW85-yK_dXcc6f2cmKp9utJuFl_hCo0cxnJ1QA',
     },

@@ -121,15 +121,14 @@ function getSceneTitle(value: VideoPreviewScene) {
               <div class="boost-scene__photo-veil"></div>
             </div>
             {scene.mythText && (
-              <div class="boost-scene__myth anim anim--myth">
+              <div class="boost-scene__myth-plate anim anim--myth-plate">
                 <p class="boost-scene__myth-label">{scene.mythLabel}</p>
                 <p class="boost-scene__myth-text">{scene.mythText}</p>
-                <div class="boost-scene__myth-strike anim anim--myth-strike"></div>
               </div>
             )}
             <div class="boost-scene__panel anim anim--panel"></div>
             <div class="boost-scene__copy">
-              <p class="boost-scene__eyebrow anim anim--boost-copy-phase">{scene.eyebrow}</p>
+              <p class="boost-scene__eyebrow anim anim--boost-lead-phase">ОБ ЭТОМ ВЫ УЗНАЕТЕ НА ЛЕКЦИИ</p>
               <div class="boost-scene__rule anim anim--boost-rule-phase"></div>
               <h2 class="boost-scene__title anim anim--boost-title-phase">{scene.shortTitle}</h2>
               <p class="boost-scene__hook anim anim--boost-hook-phase">{scene.hook}</p>
@@ -161,12 +160,7 @@ function getSceneTitle(value: VideoPreviewScene) {
                 alt={scene.speakerName}
               />
             )}
-            {!scene.portraitImage && scene.posterImage && (
-              <div class="boost-scene__fallback-visual anim anim--fallback-visual">
-                <img src={scene.posterImage} alt="" />
-              </div>
-            )}
-            <div class="boost-scene__speaker-tag anim anim--boost-meta-phase">
+            <div class:list={['boost-scene__speaker-tag', !scene.portraitImage && 'boost-scene__speaker-tag--text-only', 'anim', 'anim--boost-speaker-phase']}>
               <strong>{scene.speakerName}</strong>
               <span>{scene.speakerRole}</span>
             </div>
@@ -337,9 +331,9 @@ function getSceneTitle(value: VideoPreviewScene) {
         {scene.kind === 'qr' && (
           <div class="qr-scene">
             <div class="qr-scene__copy">
-              <p class="qr-scene__eyebrow anim anim--fade-up">{scene.platform}</p>
-              <h2 class="qr-scene__title anim anim--title" style="--anim-delay:120ms;">{scene.title}</h2>
-              <p class="qr-scene__secondary anim anim--fade-up" style="--anim-delay:300ms;">{scene.secondary}</p>
+              <p class="qr-scene__eyebrow anim anim--fade-up">{scene.secondary}</p>
+              <h2 class="qr-scene__title anim anim--title" style="--anim-delay:120ms;">{scene.platform}</h2>
+              <p class="qr-scene__channel anim anim--fade-up" style="--anim-delay:260ms;">{scene.title}</p>
               <p class="qr-scene__subtitle anim anim--fade-up" style="--anim-delay:420ms;">{scene.subtitle}</p>
             </div>
             <div class="qr-scene__code-shell anim anim--qr" style="--anim-delay:220ms;">
@@ -594,38 +588,34 @@ function getSceneTitle(value: VideoPreviewScene) {
     background: #130f10;
   }
 
-  .boost-scene__myth {
+  .boost-scene__myth-plate {
     position: absolute;
-    left: 72px;
-    top: 132px;
+    inset: 0;
     z-index: 8;
-    width: min(1040px, calc(100% - 180px));
+    display: grid;
+    align-items: center;
+    padding: 132px 92px 110px;
+    background:
+      linear-gradient(140deg, rgba(12, 10, 11, 0.96) 0%, rgba(18, 15, 16, 0.98) 62%, rgba(44, 20, 16, 0.9) 100%),
+      radial-gradient(circle at 12% 22%, rgba(216, 75, 49, 0.18), transparent 26rem);
     color: white;
     pointer-events: none;
   }
 
   .boost-scene__myth-label {
-    margin: 0 0 0.9rem;
-    font: 600 0.9rem/1 var(--font-display);
+    margin: 0 0 1.25rem;
+    font: 700 1.24rem/1 var(--font-display);
     letter-spacing: 0.18em;
-    color: rgba(255, 255, 255, 0.72);
+    color: rgba(255, 255, 255, 0.84);
     text-transform: uppercase;
   }
 
   .boost-scene__myth-text {
     margin: 0;
-    max-width: 10ch;
-    font: 700 6.2rem/0.89 var(--font-display);
+    max-width: 12ch;
+    font: 700 6.75rem/0.88 var(--font-display);
     letter-spacing: -0.06em;
     text-wrap: balance;
-  }
-
-  .boost-scene__myth-strike {
-    width: min(760px, 94%);
-    height: 8px;
-    margin-top: 1.1rem;
-    background: #d84b31;
-    transform-origin: left center;
   }
 
   .boost-scene__photo-shell {
@@ -644,14 +634,14 @@ function getSceneTitle(value: VideoPreviewScene) {
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(90deg, rgba(14, 12, 12, 0.14) 0%, rgba(14, 12, 12, 0.38) 48%, rgba(14, 12, 12, 0.82) 100%),
-      linear-gradient(180deg, rgba(14, 12, 12, 0.08) 0%, rgba(14, 12, 12, 0.52) 100%);
+      linear-gradient(90deg, rgba(14, 12, 12, 0.18) 0%, rgba(14, 12, 12, 0.42) 48%, rgba(14, 12, 12, 0.86) 100%),
+      linear-gradient(180deg, rgba(14, 12, 12, 0.14) 0%, rgba(14, 12, 12, 0.58) 100%);
   }
 
   .boost-scene__panel {
     position: absolute;
     inset: 0 0 0 auto;
-    width: 42%;
+    width: 43%;
     background:
       radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.08), transparent 24rem),
       linear-gradient(180deg, #d84b31 0%, #a82c1d 100%);
@@ -663,7 +653,7 @@ function getSceneTitle(value: VideoPreviewScene) {
     left: 72px;
     bottom: 78px;
     z-index: 4;
-    width: 850px;
+    width: 920px;
     color: white;
   }
 
@@ -671,7 +661,7 @@ function getSceneTitle(value: VideoPreviewScene) {
   .cascade-scene__eyebrow,
   .qr-scene__eyebrow {
     margin: 0;
-    font: 600 1rem/1 var(--font-display);
+    font: 700 1.12rem/1 var(--font-display);
     letter-spacing: 0.18em;
     color: rgba(255, 255, 255, 0.76);
     text-transform: uppercase;
@@ -695,13 +685,14 @@ function getSceneTitle(value: VideoPreviewScene) {
 
   .boost-scene__title {
     max-width: 7ch;
+    font-size: 6.6rem;
     text-wrap: balance;
   }
 
   .boost-scene__hook {
-    margin: 1rem 0 0;
+    margin: 1.15rem 0 0;
     max-width: 16ch;
-    font: 500 2.36rem/0.98 var(--font-body);
+    font: 500 2.18rem/1 var(--font-body);
     color: rgba(255, 255, 255, 0.88);
   }
 
@@ -742,15 +733,15 @@ function getSceneTitle(value: VideoPreviewScene) {
   }
 
   .boost-scene__meta {
-    margin: 1.1rem 0 0;
+    margin: 1rem 0 0;
     max-width: 34ch;
-    font: 500 1.56rem/1.14 var(--font-body);
+    font: 500 1.38rem/1.14 var(--font-body);
     color: rgba(255, 255, 255, 0.76);
   }
 
   .boost-scene__access {
-    margin: 1rem 0 0;
-    font: 700 1.14rem/1 var(--font-display);
+    margin: 0.7rem 0 0;
+    font: 700 1.05rem/1 var(--font-display);
     letter-spacing: 0.16em;
     color: #fff6ef;
   }
@@ -760,7 +751,7 @@ function getSceneTitle(value: VideoPreviewScene) {
     right: 16px;
     bottom: -6px;
     z-index: 5;
-    width: min(42.5%, 35rem);
+    width: var(--event-portrait-width, min(42.5%, 35rem));
     max-height: 102%;
     object-fit: contain;
     object-position: bottom center;
@@ -772,59 +763,41 @@ function getSceneTitle(value: VideoPreviewScene) {
 
   .boost-scene__speaker-tag {
     position: absolute;
-    left: 1210px;
-    bottom: 88px;
+    left: 1190px;
+    bottom: 124px;
     z-index: 6;
-    width: 450px;
+    width: 500px;
     color: white;
-  }
-
-  .boost-scene__fallback-visual {
-    position: absolute;
-    right: 72px;
-    bottom: 88px;
-    z-index: 5;
-    width: 410px;
-    height: 660px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 32px 64px rgba(10, 8, 8, 0.22);
-    opacity: 0.58;
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  .boost-scene__fallback-visual img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 72% center;
-    filter: grayscale(1) contrast(1.14) brightness(1.22);
-    transform: scale(1.18);
-    transform-origin: center center;
   }
 
   .boost-scene--no-portrait .boost-scene__speaker-tag {
     left: auto;
-    right: 84px;
-    bottom: 94px;
-    width: 470px;
+    right: 92px;
+    top: 246px;
+    bottom: auto;
+    width: 540px;
   }
 
   .boost-scene--no-portrait .boost-scene__speaker-tag strong {
-    font-size: 2.45rem;
+    font-size: 3.4rem;
   }
 
   .boost-scene__speaker-tag strong {
     display: block;
-    margin: 0 0 0.4rem;
-    font: 700 2.36rem/0.95 var(--font-display);
+    margin: 0 0 0.46rem;
+    font: 700 2.72rem/0.95 var(--font-display);
     letter-spacing: -0.03em;
   }
 
   .boost-scene__speaker-tag span {
     display: block;
-    font: 400 1.14rem/1.18 var(--font-body);
+    font: 400 1.2rem/1.18 var(--font-body);
     color: rgba(255, 255, 255, 0.82);
+  }
+
+  .boost-scene--no-portrait .boost-scene__speaker-tag span {
+    font-size: 1.42rem;
+    line-height: 1.16;
   }
 
   .cascade-scene {
@@ -968,15 +941,23 @@ function getSceneTitle(value: VideoPreviewScene) {
 
   .qr-scene__title {
     margin-top: 0.7rem;
-    max-width: 8ch;
+    max-width: 6ch;
+    font-size: 7rem;
     color: #151210;
   }
 
-  .qr-scene__secondary,
+  .qr-scene__channel,
   .qr-scene__subtitle {
     margin: 1rem 0 0;
     font: 500 1.6rem/1.05 var(--font-body);
     color: rgba(23, 20, 18, 0.76);
+  }
+
+  .qr-scene__channel {
+    max-width: 12ch;
+    font: 700 2.2rem/0.98 var(--font-display);
+    letter-spacing: -0.03em;
+    color: #171412;
   }
 
   .qr-scene__subtitle {
@@ -1339,16 +1320,12 @@ function getSceneTitle(value: VideoPreviewScene) {
     animation-name: previewPortrait;
   }
 
-  .anim--myth {
-    animation-name: previewMyth;
+  .anim--myth-plate {
+    animation-name: previewMythPlate;
   }
 
-  .anim--myth-strike {
-    animation-name: previewMythStrike;
-  }
-
-  .anim--boost-copy-phase {
-    animation-name: previewBoostCopyPhase;
+  .anim--boost-lead-phase {
+    animation-name: previewBoostLeadPhase;
   }
 
   .anim--boost-rule-phase {
@@ -1376,8 +1353,8 @@ function getSceneTitle(value: VideoPreviewScene) {
     animation-name: previewBoostMetaPhase;
   }
 
-  .anim--fallback-visual {
-    animation-name: previewFallbackVisual;
+  .anim--boost-speaker-phase {
+    animation-name: previewBoostSpeakerPhase;
   }
 
   .anim--card {
@@ -1443,12 +1420,12 @@ function getSceneTitle(value: VideoPreviewScene) {
   }
 
   @keyframes previewPanel {
-    0%, 32% {
+    0%, 24% {
       opacity: 0;
       clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
       transform: translateX(0);
     }
-    40%, 100% {
+    36%, 100% {
       opacity: 1;
       clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
       transform: translateX(0);
@@ -1456,82 +1433,67 @@ function getSceneTitle(value: VideoPreviewScene) {
   }
 
   @keyframes previewPortrait {
-    0%, 12% {
+    0%, 20% {
       opacity: 0;
       transform:
-        translate(calc(var(--event-portrait-shift-x, 0rem) + 34px), calc(var(--event-portrait-shift-y, 0rem) + 22px))
-        scale(calc(var(--event-portrait-size, 1) * 0.94));
+        translate(calc(var(--event-portrait-shift-x, 0rem) + 30px), calc(var(--event-portrait-shift-y, 0rem) + 18px))
+        scale(calc(var(--event-portrait-size, 1) * 0.86));
     }
-    26% {
-      opacity: 0.42;
+    32% {
+      opacity: 0.5;
       transform:
         translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
-        scale(var(--event-portrait-size, 1));
+        scale(calc(var(--event-portrait-size, 1) * 1.02));
     }
-    30% {
-      opacity: 0.42;
-      transform:
-        translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
-        scale(var(--event-portrait-size, 1));
-    }
-    48% {
+    44% {
       opacity: 1;
       transform:
-        translate(var(--event-portrait-shift-x, 0rem), calc(var(--event-portrait-shift-y, 0rem) - 8px))
-        scale(var(--event-portrait-size, 1));
-    }
-    72% {
-      opacity: 1;
-      transform:
-        translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
+        translate(var(--event-portrait-shift-x, 0rem), calc(var(--event-portrait-shift-y, 0rem) - 6px))
         scale(var(--event-portrait-size, 1));
     }
     100% {
       opacity: 1;
       transform:
-        translate(var(--event-portrait-shift-x, 0rem), calc(var(--event-portrait-shift-y, 0rem) - 4px))
+        translate(var(--event-portrait-shift-x, 0rem), calc(var(--event-portrait-shift-y, 0rem) - 2px))
         scale(var(--event-portrait-size, 1));
     }
   }
 
-  @keyframes previewMyth {
-    0%, 6% { opacity: 0; transform: translateY(42px); }
-    12%, 24% { opacity: 1; transform: translateY(0); }
-    32%, 100% { opacity: 0; transform: translateY(-64px); }
+  @keyframes previewMythPlate {
+    0%, 24% {
+      opacity: 1;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+      transform: translateX(0);
+    }
+    36%, 100% {
+      opacity: 1;
+      clip-path: polygon(100% 0, 100% 0, 78% 100%, 78% 100%);
+      transform: translateX(0);
+    }
   }
 
-  @keyframes previewMythStrike {
-    0%, 21% { opacity: 0; transform: scaleX(0); }
-    26% { opacity: 1; transform: scaleX(1); }
-    32%, 100% { opacity: 0; transform: scaleX(1); }
-  }
-
-  @keyframes previewBoostCopyPhase {
-    0%, 29% { opacity: 0; transform: translateY(34px); }
-    40%, 54% { opacity: 1; transform: translateY(0); }
-    64%, 100% { opacity: 0; transform: translateY(-26px); }
+  @keyframes previewBoostLeadPhase {
+    0%, 24% { opacity: 0; transform: translateY(34px); }
+    36%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewBoostRulePhase {
-    0%, 31% { opacity: 0; transform: scaleX(0); }
-    42%, 54% { opacity: 1; transform: scaleX(1); }
-    64%, 100% { opacity: 0; transform: scaleX(1); }
+    0%, 26% { opacity: 0; transform: scaleX(0); }
+    38%, 100% { opacity: 1; transform: scaleX(1); }
   }
 
   @keyframes previewBoostTitlePhase {
-    0%, 28% { opacity: 0; transform: translateY(54px) scale(1.06); }
-    40%, 54% { opacity: 1; transform: translateY(0) scale(1); }
-    64%, 100% { opacity: 0; transform: translateY(-40px) scale(0.985); }
+    0%, 24% { opacity: 0; transform: translateY(54px) scale(1.04); }
+    36%, 100% { opacity: 1; transform: translateY(0) scale(1); }
   }
 
   @keyframes previewBoostHookPhase {
     0%, 34% { opacity: 0; transform: translateY(36px); }
-    46%, 54% { opacity: 1; transform: translateY(0); }
-    64%, 100% { opacity: 0; transform: translateY(-48px); }
+    46%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewDetailCard {
-    0%, 58% { opacity: 0; transform: translateY(64px); }
+    0%, 56% { opacity: 0; transform: translateY(64px); }
     70%, 100% { opacity: 1; transform: translateY(0); }
   }
 
@@ -1541,14 +1503,13 @@ function getSceneTitle(value: VideoPreviewScene) {
   }
 
   @keyframes previewBoostMetaPhase {
-    0%, 82% { opacity: 0; transform: translateY(26px); }
-    90%, 100% { opacity: 1; transform: translateY(0); }
+    0%, 66% { opacity: 0; transform: translateY(26px); }
+    80%, 100% { opacity: 1; transform: translateY(0); }
   }
 
-  @keyframes previewFallbackVisual {
-    0%, 18% { opacity: 0; transform: translateY(40px) scale(0.94); }
-    28% { opacity: 0.18; transform: translateY(0) scale(0.98); }
-    44%, 100% { opacity: 0.58; transform: translateY(0) scale(1); }
+  @keyframes previewBoostSpeakerPhase {
+    0%, 24% { opacity: 0; transform: translateY(28px) scale(0.98); }
+    40%, 100% { opacity: 1; transform: translateY(0) scale(1); }
   }
 
   @keyframes previewCard {
