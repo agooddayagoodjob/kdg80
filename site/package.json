@@ -11,6 +11,7 @@
     "dev": "node scripts/prepare_public_assets.mjs && astro dev",
     "video:preview:dev": "node scripts/prepare_public_assets.mjs && astro dev --host 127.0.0.1 --port 4321",
     "video:preview:capture": "node scripts/capture_video_preview.mjs",
+    "video:preview:render": "node scripts/render_video_scene.mjs",
     "build": "node scripts/prepare_public_assets.mjs && astro build && node scripts/verify_public_assets.mjs",
     "preview": "node scripts/prepare_public_assets.mjs && astro preview",
     "astro": "astro",

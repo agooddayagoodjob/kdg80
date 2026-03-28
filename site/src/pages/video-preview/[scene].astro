@@ -149,9 +149,9 @@ function getSceneTitle(value: VideoPreviewScene) {
                 )}
               </div>
               <p class="boost-scene__meta anim anim--boost-meta-phase">
-                {scene.speakerName} · {scene.dateLabel} · {scene.venue}
+                {scene.dateLabel} · {scene.venue}
               </p>
-              <p class="boost-scene__access anim anim--boost-meta-phase">{scene.accessLabel}</p>
+              {scene.accessLabel && <p class="boost-scene__access anim anim--boost-meta-phase">{scene.accessLabel}</p>}
             </div>
             {scene.portraitImage && (
               <img
@@ -701,22 +701,22 @@ function getSceneTitle(value: VideoPreviewScene) {
   .boost-scene__hook {
     margin: 1rem 0 0;
     max-width: 16ch;
-    font: 500 2.2rem/0.98 var(--font-body);
+    font: 500 2.36rem/0.98 var(--font-body);
     color: rgba(255, 255, 255, 0.88);
   }
 
   .boost-scene__detail {
-    margin-top: 1.35rem;
-    width: min(780px, 100%);
-    padding: 1.1rem 1.2rem 1rem;
-    border-left: 5px solid #d84b31;
-    background: rgba(10, 9, 10, 0.56);
-    backdrop-filter: blur(12px);
+    margin-top: 1.5rem;
+    width: min(820px, 100%);
+    padding: 1.2rem 1.35rem 1.15rem;
+    border-left: 6px solid #d84b31;
+    background: rgba(10, 9, 10, 0.62);
+    backdrop-filter: blur(14px);
   }
 
   .boost-scene__detail-label {
-    margin: 0 0 0.7rem;
-    font: 600 0.88rem/1 var(--font-display);
+    margin: 0 0 0.78rem;
+    font: 600 0.98rem/1 var(--font-display);
     letter-spacing: 0.18em;
     color: rgba(255, 255, 255, 0.64);
     text-transform: uppercase;
@@ -729,7 +729,7 @@ function getSceneTitle(value: VideoPreviewScene) {
 
   .boost-scene__detail-line {
     margin: 0;
-    font: 700 1.46rem/1.08 var(--font-display);
+    font: 700 1.76rem/1.04 var(--font-display);
     letter-spacing: -0.03em;
     color: #fff9f3;
     text-wrap: balance;
@@ -737,20 +737,20 @@ function getSceneTitle(value: VideoPreviewScene) {
 
   .boost-scene__detail-attribution {
     margin: 0.85rem 0 0;
-    font: 500 1rem/1.1 var(--font-body);
+    font: 500 1.1rem/1.1 var(--font-body);
     color: rgba(255, 255, 255, 0.74);
   }
 
   .boost-scene__meta {
-    margin: 1.2rem 0 0;
-    max-width: 42ch;
-    font: 500 1.45rem/1.2 var(--font-body);
+    margin: 1.1rem 0 0;
+    max-width: 34ch;
+    font: 500 1.56rem/1.14 var(--font-body);
     color: rgba(255, 255, 255, 0.76);
   }
 
   .boost-scene__access {
     margin: 1rem 0 0;
-    font: 700 1.05rem/1 var(--font-display);
+    font: 700 1.14rem/1 var(--font-display);
     letter-spacing: 0.16em;
     color: #fff6ef;
   }
@@ -817,13 +817,13 @@ function getSceneTitle(value: VideoPreviewScene) {
   .boost-scene__speaker-tag strong {
     display: block;
     margin: 0 0 0.4rem;
-    font: 700 2.15rem/0.95 var(--font-display);
+    font: 700 2.36rem/0.95 var(--font-display);
     letter-spacing: -0.03em;
   }
 
   .boost-scene__speaker-tag span {
     display: block;
-    font: 400 1.05rem/1.2 var(--font-body);
+    font: 400 1.14rem/1.18 var(--font-body);
     color: rgba(255, 255, 255, 0.82);
   }
 

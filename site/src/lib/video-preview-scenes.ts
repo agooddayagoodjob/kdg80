@@ -34,7 +34,7 @@ export type VideoPreviewBoostScene = VideoPreviewBaseScene & {
   posterImage?: string;
   dateLabel: string;
   venue: string;
-  accessLabel: string;
+  accessLabel?: string;
 };
 
 export type VideoPreviewCascadeScene = VideoPreviewBaseScene & {
@@ -101,10 +101,9 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
     shortTitle: 'О ЧЁМ МЕЧТАЛИ',
     hook: 'КУДА СТРЕМИЛИСЬ И КУДА ПОПАЛИ',
     mythText: 'В СОВЕТСКОМ КАЛИНИНГРАДЕ ЖИЗНЬ БЫЛА СКУЧНОЙ',
-    detailLabel: 'ЛЕКЦИЯ ОТВЕЧАЕТ',
+    detailLabel: 'ПОСЛЕ ЛЕКЦИИ',
     detailLines: [
-      'КАК ДЕВУШКЕ ПОПАСТЬ В МОРЕ, ЕСЛИ ТУДА ХОДЯТ ТОЛЬКО МУЖЧИНЫ?',
-      'ПОЧЕМУ КАЛИНИНГРАД БЫЛ ГОРОДОМ СУМАСШЕДШИХ ВОЗМОЖНОСТЕЙ?',
+      'ПОЧЕМУ КАЛИНИНГРАД СТАЛ ГОРОДОМ СУМАСШЕДШИХ ВОЗМОЖНОСТЕЙ?',
     ],
   },
   {
@@ -211,7 +210,6 @@ function createBoostScene(events: FestivalEvent[], seed: BoostSceneSeed): VideoP
     posterImage: event.image,
     dateLabel: event.dateLabel,
     venue: event.venue,
-    accessLabel: 'ВСЕ МЕРОПРИЯТИЯ БЕСПЛАТНЫЕ',
   };
 }
 
