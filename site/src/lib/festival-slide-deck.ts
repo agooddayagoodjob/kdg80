@@ -115,9 +115,9 @@ const EVENT_SLIDE_SEEDS: EventSlideSeed[] = [
     displayTitle: 'КАЛИНИНГРАД 2125',
     mythText: 'КАЛИНИНГРАД —\nПЕРИФЕРИЯ БЕЗ\nБОЛЬШОГО БУДУЩЕГО',
     support: 'Каким может стать город через сто лет.',
-    portraitImageOverride: '/generated/speaker-strip/mosienko-evgeniy.webp',
+    portraitImageOverride: '/generated/speaker-strip/sarnits-artur.webp',
     portraitStyleOverride:
-      '--event-portrait-width-desktop: min(36%, 28rem); --event-portrait-size: 1.04; --event-portrait-shift-x: -0.35rem; --event-portrait-shift-y: 0rem;',
+      '--event-portrait-width-desktop: min(41%, 31rem); --event-portrait-size: 2.25; --event-portrait-shift-x: -12.5rem; --event-portrait-shift-y: 0rem;',
   },
   {
     slug: 'small-towns',
@@ -196,9 +196,9 @@ const EVENT_SLIDE_SEEDS: EventSlideSeed[] = [
     displayTitle: 'МОСТЫ\nВРЕМЕНИ',
     mythText: 'ДВУХЪЯРУСНЫЙ МОСТ\nСПРОЕКТИРОВАЛ\nЭЙФЕЛЬ',
     support: 'Прошлое, настоящее и будущее Двухъярусного моста.',
-    portraitImageOverride: '/generated/speaker-strip/sarnits-artur.webp',
+    portraitImageOverride: '/generated/speaker-strip/mosienko-evgeniy.webp',
     portraitStyleOverride:
-      '--event-portrait-width-desktop: min(41%, 31rem); --event-portrait-size: 0.9; --event-portrait-shift-x: -1.6rem; --event-portrait-shift-y: 0rem;',
+      '--event-portrait-width-desktop: min(36%, 28rem); --event-portrait-size: 1.73; --event-portrait-shift-x: -4.4rem; --event-portrait-shift-y: 0rem;',
   },
   {
     slug: 'cinema',
@@ -230,7 +230,7 @@ function createEventSlides(events: FestivalEvent[], seed: EventSlideSeed, index:
     slug: `${seed.slug}-myth`,
     label: `Миф / ${event.title}`,
     kind: 'event-myth',
-    eyebrow: 'ПРОЕКТОРНЫЙ HOOK',
+    eyebrow: '',
     mythLabel: 'ПРАВДА ЛИ, ЧТО',
     mythText: seed.mythText,
     anchorTitle: seed.displayTitle.replace(/\n/g, ' '),
