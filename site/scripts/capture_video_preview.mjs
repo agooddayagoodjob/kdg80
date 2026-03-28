@@ -15,9 +15,9 @@ const baseUrl = 'http://127.0.0.1:4321';
 const sceneArg = process.argv.find((value) => !value.startsWith('--') && value !== process.argv[1] && value !== process.argv[0]);
 const captureAll = process.argv.includes('--all') || !sceneArg;
 const shouldBuild = process.argv.includes('--build');
-const timestamps = [0, 240, 520, 940, 1460, 2200, 3200];
-const reviewFrameIndexes = [1, 2, 4, 6];
-const representativeStillMs = 1460;
+const captureRatios = [0, 0.12, 0.21, 0.32, 0.43, 0.57, 0.68, 0.8, 0.93];
+const reviewFrameIndexes = [1, 3, 5, 6];
+const representativeStillRatio = 0.43;
 
 async function ensureDir(targetPath) {
   await fs.mkdir(targetPath, { recursive: true });
@@ -42,6 +42,15 @@ async function waitForServer(url, timeoutMs = 30_000) {
   throw new Error(`Timed out waiting for preview server: ${url}`);
 }
 
+async function isServerReachable(url) {
+  try {
+    const response = await fetch(url);
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 function startDevServer() {
   const child = spawn('python3', ['-m', 'http.server', '4321'], {
     cwd: distRoot,
@@ -50,6 +59,18 @@ function startDevServer() {
 
   child.stdout.on('data', (chunk) => process.stdout.write(chunk));
   child.stderr.on('data', (chunk) => process.stderr.write(chunk));
+  return child;
+}
+
+async function ensurePreviewServer() {
+  const previewIndexUrl = `${baseUrl}/video-preview/`;
+
+  if (await isServerReachable(previewIndexUrl)) {
+    return null;
+  }
+
+  const child = startDevServer();
+  await waitForServer(previewIndexUrl);
   return child;
 }
 
@@ -81,7 +102,7 @@ async function ensureBuiltPreview() {
 
 async function buildAnimatic(sceneDir, frames) {
   const contactPath = path.join(sceneDir, 'contact-sheet.webp');
-  const animaticPath = path.join(sceneDir, 'animatic.webp');
+  const animaticPath = path.join(sceneDir, 'animatic.gif');
   const contactFrames = reviewFrameIndexes
     .map((index) => frames[index])
     .filter(Boolean)
@@ -102,7 +123,7 @@ async function buildAnimatic(sceneDir, frames) {
   for (const frame of frames) {
     animaticArgs.push('-delay', String(Math.max(8, Math.round(frame.delayMs / 10))), frame.path);
   }
-  animaticArgs.push('-loop', '0', animaticPath);
+  animaticArgs.push('-loop', '0', '-layers', 'Optimize', animaticPath);
 
   await execFileAsync('convert', animaticArgs);
 }
@@ -126,6 +147,14 @@ async function captureScene(browser, slug) {
 
   await page.goto(`${baseUrl}/video-preview/${slug}/`, { waitUntil: 'networkidle' });
   await page.waitForSelector('[data-capture-root]');
+  await page.waitForFunction(() => typeof window.__videoPreview?.restart === 'function');
+  const sceneDurationMs = await page.evaluate(() => window.__videoPreview?.durationMs ?? 5600);
+  const timestamps = [...new Set(captureRatios.map((ratio) => Math.round(sceneDurationMs * ratio)))];
+  const representativeStillMs = timestamps.reduce((closest, value) => {
+    const target = sceneDurationMs * representativeStillRatio;
+    return Math.abs(value - target) < Math.abs(closest - target) ? value : closest;
+  }, timestamps[0] ?? 0);
+
   await page.evaluate(() => window.__videoPreview?.restart?.());
 
   const captureRoot = page.locator('[data-capture-root]');
@@ -139,7 +168,8 @@ async function captureScene(browser, slug) {
     }
     const framePath = path.join(sceneDir, `frame-${String(ms).padStart(4, '0')}.png`);
     await captureRoot.screenshot({ path: framePath, animations: 'allow' });
-    frames.push({ path: framePath, ms, delayMs: waitMs || 240 });
+    const delayMs = ms === 0 ? 320 : Math.max(160, waitMs);
+    frames.push({ path: framePath, ms, delayMs });
     lastTimestamp = ms;
   }
 
@@ -154,7 +184,7 @@ async function captureScene(browser, slug) {
 }
 
 await ensureBuiltPreview();
-const devServer = startDevServer();
+const devServer = await ensurePreviewServer();
 
 try {
   await waitForServer(`${baseUrl}/video-preview/`);
@@ -174,5 +204,5 @@ try {
 
   console.log(`Saved video preview captures to ${outputRoot}`);
 } finally {
-  devServer.kill('SIGTERM');
+  devServer?.kill('SIGTERM');
 }

@@ -20,6 +20,11 @@ if (!scene) {
 
 const allScenes = getVideoPreviewScenes();
 const sitePeriodLabel = '28 марта – 19 июля 2026';
+const sequenceDreamsScene = getVideoPreviewScene('dreams');
+const sequenceFutureScene = getVideoPreviewScene('future-city');
+const sequenceCascadeScene = getVideoPreviewScene('cascade');
+const sequenceSiteScene = getVideoPreviewScene('site');
+const sequenceMaxScene = getVideoPreviewScene('max');
 
 function getSceneTitle(value: VideoPreviewScene) {
   if (value.kind === 'boost') {
@@ -36,6 +41,10 @@ function getSceneTitle(value: VideoPreviewScene) {
 
   if (value.kind === 'cascade') {
     return value.routeLabel;
+  }
+
+  if (value.kind === 'sequence') {
+    return value.title;
   }
 
   return `${value.tagline.join(' ')} ${value.period}`;
@@ -106,21 +115,43 @@ function getSceneTitle(value: VideoPreviewScene) {
         )}
 
         {scene.kind === 'boost' && (
-          <div class="boost-scene">
+          <div class:list={['boost-scene', !scene.portraitImage && 'boost-scene--no-portrait']}>
             <div class="boost-scene__photo-shell">
               {scene.posterImage && <img class="boost-scene__photo anim anim--backdrop" src={scene.posterImage} alt="" />}
               <div class="boost-scene__photo-veil"></div>
             </div>
+            {scene.mythText && (
+              <div class="boost-scene__myth anim anim--myth">
+                <p class="boost-scene__myth-label">{scene.mythLabel}</p>
+                <p class="boost-scene__myth-text">{scene.mythText}</p>
+                <div class="boost-scene__myth-strike anim anim--myth-strike"></div>
+              </div>
+            )}
             <div class="boost-scene__panel anim anim--panel"></div>
             <div class="boost-scene__copy">
-              <p class="boost-scene__eyebrow anim anim--fade-up">{scene.eyebrow}</p>
-              <div class="boost-scene__rule anim anim--grow-x" style="--anim-delay:120ms;"></div>
-              <h2 class="boost-scene__title anim anim--title" style="--anim-delay:180ms;">{scene.shortTitle}</h2>
-              <p class="boost-scene__hook anim anim--fade-up" style="--anim-delay:320ms;">{scene.hook}</p>
-              <p class="boost-scene__meta anim anim--fade-up" style="--anim-delay:450ms;">
+              <p class="boost-scene__eyebrow anim anim--boost-copy-phase">{scene.eyebrow}</p>
+              <div class="boost-scene__rule anim anim--boost-rule-phase"></div>
+              <h2 class="boost-scene__title anim anim--boost-title-phase">{scene.shortTitle}</h2>
+              <p class="boost-scene__hook anim anim--boost-hook-phase">{scene.hook}</p>
+              <div class="boost-scene__detail anim anim--detail-card">
+                <p class="boost-scene__detail-label">{scene.detailLabel}</p>
+                <div class="boost-scene__detail-lines">
+                  {scene.detailLines.map((line, index) => (
+                    <p class="boost-scene__detail-line anim anim--detail-line" style={`--anim-delay:${3660 + index * 160}ms; --anim-duration:420ms;`}>
+                      {line}
+                    </p>
+                  ))}
+                </div>
+                {scene.detailAttribution && (
+                  <p class="boost-scene__detail-attribution anim anim--detail-line" style="--anim-delay:4020ms; --anim-duration:420ms;">
+                    {scene.detailAttribution}
+                  </p>
+                )}
+              </div>
+              <p class="boost-scene__meta anim anim--boost-meta-phase">
                 {scene.speakerName} · {scene.dateLabel} · {scene.venue}
               </p>
-              <p class="boost-scene__access anim anim--fade-up" style="--anim-delay:560ms;">{scene.accessLabel}</p>
+              <p class="boost-scene__access anim anim--boost-meta-phase">{scene.accessLabel}</p>
             </div>
             {scene.portraitImage && (
               <img
@@ -130,7 +161,12 @@ function getSceneTitle(value: VideoPreviewScene) {
                 alt={scene.speakerName}
               />
             )}
-            <div class="boost-scene__speaker-tag anim anim--fade-up" style="--anim-delay:500ms;">
+            {!scene.portraitImage && scene.posterImage && (
+              <div class="boost-scene__fallback-visual anim anim--fallback-visual">
+                <img src={scene.posterImage} alt="" />
+              </div>
+            )}
+            <div class="boost-scene__speaker-tag anim anim--boost-meta-phase">
               <strong>{scene.speakerName}</strong>
               <span>{scene.speakerRole}</span>
             </div>
@@ -151,6 +187,126 @@ function getSceneTitle(value: VideoPreviewScene) {
             </div>
           </div>
         )}
+
+        {scene.kind === 'sequence' &&
+          sequenceDreamsScene?.kind === 'boost' &&
+          sequenceFutureScene?.kind === 'boost' &&
+          sequenceCascadeScene?.kind === 'cascade' &&
+          sequenceSiteScene?.kind === 'site' &&
+          sequenceMaxScene?.kind === 'qr' && (
+            <div class="sequence-scene">
+              <section
+                class="sequence-beat sequence-beat--stats anim anim--sequence-beat"
+                style="--anim-delay:0ms; --anim-duration:2600ms; --seq-enter-y:28px; --seq-exit-y:-22px; --seq-enter-scale:0.975; --seq-exit-scale:1.018;"
+              >
+                <div class="sequence-stats">
+                  <p class="sequence-stats__eyebrow">80 ИСТОРИЙ О ГЛАВНОМ</p>
+                  <h2>50+ СОБЫТИЙ</h2>
+                  <p>43 СПИКЕРА</p>
+                  <p>ВСЕ БЕСПЛАТНО</p>
+                </div>
+              </section>
+
+              <section
+                class="sequence-beat sequence-beat--event anim anim--sequence-beat"
+                style="--anim-delay:1600ms; --anim-duration:3700ms; --seq-enter-x:52px; --seq-exit-x:-58px; --seq-enter-scale:0.99; --seq-exit-scale:1.02;"
+              >
+                <img class="sequence-beat__photo" src={sequenceDreamsScene.posterImage} alt="" />
+                <div class="sequence-beat__veil"></div>
+                <div class="sequence-beat__panel"></div>
+                <div class="sequence-beat__copy">
+                  <p class="sequence-beat__eyebrow">{sequenceDreamsScene.eyebrow}</p>
+                  <h2>{sequenceDreamsScene.shortTitle}</h2>
+                  <p class="sequence-beat__hook">{sequenceDreamsScene.hook}</p>
+                  <p class="sequence-beat__detail">{sequenceDreamsScene.detailLines[0]}</p>
+                </div>
+                {sequenceDreamsScene.portraitImage && (
+                  <img
+                    class="sequence-beat__portrait"
+                    src={sequenceDreamsScene.portraitImage}
+                    style={sequenceDreamsScene.portraitStyle}
+                    alt={sequenceDreamsScene.speakerName}
+                  />
+                )}
+              </section>
+
+              <section
+                class="sequence-beat sequence-beat--event anim anim--sequence-beat"
+                style="--anim-delay:4700ms; --anim-duration:3400ms; --seq-enter-y:46px; --seq-exit-y:-34px; --seq-enter-scale:0.968; --seq-exit-scale:1.014;"
+              >
+                <img class="sequence-beat__photo" src={sequenceFutureScene.posterImage} alt="" />
+                <div class="sequence-beat__veil"></div>
+                <div class="sequence-beat__panel"></div>
+                <div class="sequence-beat__copy">
+                  <p class="sequence-beat__eyebrow">{sequenceFutureScene.eyebrow}</p>
+                  <h2>{sequenceFutureScene.shortTitle}</h2>
+                  <p class="sequence-beat__hook">{sequenceFutureScene.hook}</p>
+                  <p class="sequence-beat__detail">{sequenceFutureScene.detailLines[0]}</p>
+                </div>
+                {sequenceFutureScene.portraitImage && (
+                  <img
+                    class="sequence-beat__portrait"
+                    src={sequenceFutureScene.portraitImage}
+                    style={sequenceFutureScene.portraitStyle}
+                    alt={sequenceFutureScene.speakerName}
+                  />
+                )}
+              </section>
+
+              <section
+                class="sequence-beat sequence-beat--route anim anim--sequence-beat"
+                style="--anim-delay:7700ms; --anim-duration:3200ms; --seq-enter-x:-44px; --seq-exit-x:38px; --seq-enter-scale:0.985; --seq-exit-scale:1.012;"
+              >
+                <div class="sequence-route">
+                  <p class="sequence-route__eyebrow">МАРШРУТ ПО ФЕСТИВАЛЮ</p>
+                  <h2>ЛЕКЦИИ · ДИАЛОГИ · ВЫСТАВКИ</h2>
+                  <div class="sequence-route__grid">
+                    {sequenceCascadeScene.cards.map((card) => (
+                      <article class="sequence-route__card">
+                        <p>{card.date}</p>
+                        <h3>{card.title}</h3>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              <section
+                class="sequence-beat sequence-beat--site anim anim--sequence-beat"
+                style="--anim-delay:10300ms; --anim-duration:2500ms; --seq-enter-y:34px; --seq-exit-y:-18px; --seq-enter-scale:0.982; --seq-exit-scale:1.01;"
+              >
+                <div class="sequence-site">
+                  <div class="sequence-site__domain-row">
+                    <span class="sequence-site__domain sequence-site__domain--muted">KGD</span>
+                    <span class="sequence-site__domain sequence-site__domain--accent">80</span>
+                    <span class="sequence-site__domain sequence-site__domain--muted">.RU</span>
+                  </div>
+                  <div class="sequence-site__copy">
+                    <p class="sequence-site__title">ИСТОРИЙ<br />О ГЛАВНОМ</p>
+                    <p class="sequence-site__period">{sitePeriodLabel}</p>
+                    <p class="sequence-site__subtitle">{sequenceSiteScene.subtitle}</p>
+                  </div>
+                </div>
+              </section>
+
+              <section
+                class="sequence-beat sequence-beat--qr anim anim--sequence-beat"
+                style="--anim-delay:12300ms; --anim-duration:3700ms; --seq-enter-x:42px; --seq-exit-x:-26px; --seq-enter-scale:0.988; --seq-exit-scale:1.008;"
+              >
+                <div class="sequence-qr">
+                  <div class="sequence-qr__copy">
+                    <p class="sequence-qr__eyebrow">{sequenceMaxScene.platform}</p>
+                    <h2>{sequenceMaxScene.title}</h2>
+                    <p>{sequenceMaxScene.secondary}</p>
+                    <span>{sequenceMaxScene.subtitle}</span>
+                  </div>
+                  <div class="sequence-qr__code">
+                    <img src={sequenceMaxScene.qrPath} alt={`${sequenceMaxScene.platform} QR`} />
+                  </div>
+                </div>
+              </section>
+            </div>
+          )}
 
         {scene.kind === 'site' && (
           <div class="site-scene">
@@ -195,7 +351,7 @@ function getSceneTitle(value: VideoPreviewScene) {
     </section>
   </main>
 
-  <script is:inline define:vars={{ sceneTitle: getSceneTitle(scene) }}>
+  <script is:inline define:vars={{ sceneTitle: getSceneTitle(scene), sceneDurationMs: scene.durationMs }}>
     const root = document.querySelector('[data-video-scene]');
     const restartButton = document.querySelector('[data-preview-restart]');
     const pauseButton = document.querySelector('[data-preview-pause]');
@@ -217,11 +373,17 @@ function getSceneTitle(value: VideoPreviewScene) {
       }
     }
 
-    function restartAnimations() {
-      for (const animation of getAnimations()) {
-        animation.cancel();
-      }
+    function seekAnimations(ms = 0) {
+      const animations = getAnimations();
 
+      for (const animation of animations) {
+        animation.pause();
+        animation.currentTime = ms;
+      }
+    }
+
+    function restartAnimations() {
+      seekAnimations(0);
       requestAnimationFrame(() => {
         playAnimations();
       });
@@ -229,9 +391,11 @@ function getSceneTitle(value: VideoPreviewScene) {
 
     window.__videoPreview = {
       title: sceneTitle,
+      durationMs: sceneDurationMs,
       play: playAnimations,
       pause: pauseAnimations,
       restart: restartAnimations,
+      seek: seekAnimations,
     };
 
     restartButton?.addEventListener('click', restartAnimations);
@@ -239,7 +403,9 @@ function getSceneTitle(value: VideoPreviewScene) {
     playButton?.addEventListener('click', playAnimations);
 
     window.addEventListener('load', () => {
-      restartAnimations();
+      requestAnimationFrame(() => {
+        seekAnimations(0);
+      });
     });
   </script>
 </PreviewLayout>
@@ -345,11 +511,15 @@ function getSceneTitle(value: VideoPreviewScene) {
   .cold-open,
   .boost-scene,
   .cascade-scene,
+  .sequence-scene,
   .site-scene,
   .qr-scene {
     position: relative;
     width: 100%;
     height: 100%;
+    transform-origin: center center;
+    animation: previewScenePush var(--scene-duration) ease-out both;
+    will-change: transform;
   }
 
   .cold-open__left,
@@ -424,6 +594,40 @@ function getSceneTitle(value: VideoPreviewScene) {
     background: #130f10;
   }
 
+  .boost-scene__myth {
+    position: absolute;
+    left: 72px;
+    top: 132px;
+    z-index: 8;
+    width: min(1040px, calc(100% - 180px));
+    color: white;
+    pointer-events: none;
+  }
+
+  .boost-scene__myth-label {
+    margin: 0 0 0.9rem;
+    font: 600 0.9rem/1 var(--font-display);
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.72);
+    text-transform: uppercase;
+  }
+
+  .boost-scene__myth-text {
+    margin: 0;
+    max-width: 10ch;
+    font: 700 6.2rem/0.89 var(--font-display);
+    letter-spacing: -0.06em;
+    text-wrap: balance;
+  }
+
+  .boost-scene__myth-strike {
+    width: min(760px, 94%);
+    height: 8px;
+    margin-top: 1.1rem;
+    background: #d84b31;
+    transform-origin: left center;
+  }
+
   .boost-scene__photo-shell {
     position: absolute;
     inset: 0 34% 0 0;
@@ -459,7 +663,7 @@ function getSceneTitle(value: VideoPreviewScene) {
     left: 72px;
     bottom: 78px;
     z-index: 4;
-    width: 860px;
+    width: 850px;
     color: white;
   }
 
@@ -501,8 +705,44 @@ function getSceneTitle(value: VideoPreviewScene) {
     color: rgba(255, 255, 255, 0.88);
   }
 
+  .boost-scene__detail {
+    margin-top: 1.35rem;
+    width: min(780px, 100%);
+    padding: 1.1rem 1.2rem 1rem;
+    border-left: 5px solid #d84b31;
+    background: rgba(10, 9, 10, 0.56);
+    backdrop-filter: blur(12px);
+  }
+
+  .boost-scene__detail-label {
+    margin: 0 0 0.7rem;
+    font: 600 0.88rem/1 var(--font-display);
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.64);
+    text-transform: uppercase;
+  }
+
+  .boost-scene__detail-lines {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .boost-scene__detail-line {
+    margin: 0;
+    font: 700 1.46rem/1.08 var(--font-display);
+    letter-spacing: -0.03em;
+    color: #fff9f3;
+    text-wrap: balance;
+  }
+
+  .boost-scene__detail-attribution {
+    margin: 0.85rem 0 0;
+    font: 500 1rem/1.1 var(--font-body);
+    color: rgba(255, 255, 255, 0.74);
+  }
+
   .boost-scene__meta {
-    margin: 1.3rem 0 0;
+    margin: 1.2rem 0 0;
     max-width: 42ch;
     font: 500 1.45rem/1.2 var(--font-body);
     color: rgba(255, 255, 255, 0.76);
@@ -537,6 +777,41 @@ function getSceneTitle(value: VideoPreviewScene) {
     z-index: 6;
     width: 450px;
     color: white;
+  }
+
+  .boost-scene__fallback-visual {
+    position: absolute;
+    right: 72px;
+    bottom: 88px;
+    z-index: 5;
+    width: 410px;
+    height: 660px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 32px 64px rgba(10, 8, 8, 0.22);
+    opacity: 0.58;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .boost-scene__fallback-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 72% center;
+    filter: grayscale(1) contrast(1.14) brightness(1.22);
+    transform: scale(1.18);
+    transform-origin: center center;
+  }
+
+  .boost-scene--no-portrait .boost-scene__speaker-tag {
+    left: auto;
+    right: 84px;
+    bottom: 94px;
+    width: 470px;
+  }
+
+  .boost-scene--no-portrait .boost-scene__speaker-tag strong {
+    font-size: 2.45rem;
   }
 
   .boost-scene__speaker-tag strong {
@@ -726,8 +1001,298 @@ function getSceneTitle(value: VideoPreviewScene) {
     box-shadow: 0 26px 64px rgba(32, 25, 22, 0.14);
   }
 
+  .sequence-scene {
+    background: #130f10;
+  }
+
+  .sequence-beat {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .sequence-stats {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: 0.7rem;
+    justify-items: center;
+    background:
+      linear-gradient(90deg, #fcf8f2 0%, #fcf8f2 58%, #d84b31 58%, #d84b31 100%);
+    text-align: center;
+  }
+
+  .sequence-stats__eyebrow {
+    margin: 0 0 0.8rem;
+    font: 600 1rem/1 var(--font-display);
+    letter-spacing: 0.18em;
+    color: rgba(23, 20, 18, 0.58);
+    text-transform: uppercase;
+  }
+
+  .sequence-stats h2,
+  .sequence-stats p {
+    margin: 0;
+    font: 700 6.8rem/0.9 var(--font-display);
+    letter-spacing: -0.06em;
+    color: #16120f;
+  }
+
+  .sequence-stats p:last-child {
+    color: #d84b31;
+  }
+
+  .sequence-beat--event .sequence-beat__photo {
+    position: absolute;
+    inset: 0 34% 0 0;
+    width: 66%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .sequence-beat__veil {
+    position: absolute;
+    inset: 0 34% 0 0;
+    background:
+      linear-gradient(90deg, rgba(14, 12, 12, 0.08) 0%, rgba(14, 12, 12, 0.24) 42%, rgba(14, 12, 12, 0.76) 100%),
+      linear-gradient(180deg, rgba(14, 12, 12, 0.08) 0%, rgba(14, 12, 12, 0.48) 100%);
+  }
+
+  .sequence-beat__panel {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 42%;
+    background:
+      radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.08), transparent 24rem),
+      linear-gradient(180deg, #d84b31 0%, #b53322 100%);
+    clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .sequence-beat__copy {
+    position: absolute;
+    left: 88px;
+    bottom: 104px;
+    z-index: 2;
+    width: 760px;
+    color: white;
+  }
+
+  .sequence-beat__eyebrow,
+  .sequence-route__eyebrow,
+  .sequence-qr__eyebrow {
+    margin: 0 0 0.8rem;
+    font: 600 0.95rem/1 var(--font-display);
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.68);
+    text-transform: uppercase;
+  }
+
+  .sequence-beat__copy h2,
+  .sequence-route h2,
+  .sequence-qr h2 {
+    margin: 0;
+    font: 700 5.8rem/0.9 var(--font-display);
+    letter-spacing: -0.06em;
+    color: white;
+    text-wrap: balance;
+  }
+
+  .sequence-beat__hook,
+  .sequence-qr p {
+    margin: 1rem 0 0;
+    font: 500 2rem/0.98 var(--font-body);
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  .sequence-beat__detail {
+    margin: 1rem 0 0;
+    max-width: 28ch;
+    font: 700 1.4rem/1.08 var(--font-display);
+    color: #fff6ef;
+  }
+
+  .sequence-beat__portrait {
+    position: absolute;
+    right: 28px;
+    bottom: -6px;
+    z-index: 2;
+    width: min(42.5%, 35rem);
+    max-height: 102%;
+    object-fit: contain;
+    object-position: bottom center;
+    transform:
+      translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
+      scale(var(--event-portrait-size, 1));
+    transform-origin: bottom center;
+  }
+
+  .sequence-route {
+    position: absolute;
+    inset: 0;
+    padding: 132px 88px 88px;
+    background:
+      radial-gradient(circle at top left, rgba(216, 75, 49, 0.16), transparent 26rem),
+      linear-gradient(180deg, #f7f0e7 0%, #efe3d2 100%);
+    color: #181513;
+  }
+
+  .sequence-route__eyebrow {
+    color: rgba(24, 21, 19, 0.58);
+  }
+
+  .sequence-route h2 {
+    max-width: 12ch;
+    color: #171412;
+  }
+
+  .sequence-route__grid {
+    margin-top: 1.8rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .sequence-route__card {
+    min-height: 210px;
+    padding: 1rem 1.05rem;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 18px 36px rgba(23, 20, 18, 0.08);
+  }
+
+  .sequence-route__card p {
+    margin: 0 0 0.65rem;
+    font: 600 0.8rem/1 var(--font-display);
+    letter-spacing: 0.14em;
+    color: rgba(23, 20, 18, 0.52);
+    text-transform: uppercase;
+  }
+
+  .sequence-route__card h3 {
+    margin: 0;
+    font: 700 1.9rem/0.96 var(--font-display);
+    letter-spacing: -0.05em;
+    color: #171412;
+  }
+
+  .sequence-site {
+    position: absolute;
+    inset: 0;
+    background: white;
+    color: #1b1714;
+  }
+
+  .sequence-site__domain-row {
+    position: absolute;
+    top: 234px;
+    left: 50%;
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+    transform: translateX(-50%);
+  }
+
+  .sequence-site__domain {
+    margin: 0;
+    font: 700 8rem/0.84 var(--font-display);
+    letter-spacing: -0.07em;
+  }
+
+  .sequence-site__domain--muted {
+    color: #8a8888;
+  }
+
+  .sequence-site__domain--accent {
+    font-size: 11.7rem;
+    line-height: 0.8;
+    color: transparent;
+    -webkit-text-stroke: 8px #d84b31;
+    text-stroke: 8px #d84b31;
+  }
+
+  .sequence-site__copy {
+    position: absolute;
+    top: 532px;
+    left: 50%;
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+
+  .sequence-site__title {
+    margin: 0;
+    font: 700 4.35rem/0.9 var(--font-display);
+    letter-spacing: -0.05em;
+  }
+
+  .sequence-site__period {
+    margin: 0;
+    font: 500 1.9rem/1 var(--font-body);
+  }
+
+  .sequence-site__subtitle {
+    margin: 0;
+    font: 600 1.1rem/1 var(--font-display);
+    letter-spacing: 0.14em;
+    color: #8a8888;
+  }
+
+  .sequence-qr {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1.02fr 0.98fr;
+    align-items: center;
+    padding: 112px 88px 88px;
+    background:
+      radial-gradient(circle at top right, rgba(216, 75, 49, 0.08), transparent 24rem),
+      linear-gradient(180deg, #fefbf6 0%, #f7f0e7 100%);
+    color: #171412;
+  }
+
+  .sequence-qr__copy {
+    max-width: 760px;
+  }
+
+  .sequence-qr__eyebrow {
+    color: rgba(23, 20, 18, 0.58);
+  }
+
+  .sequence-qr h2 {
+    max-width: 8ch;
+    color: #151210;
+  }
+
+  .sequence-qr p {
+    color: rgba(23, 20, 18, 0.76);
+  }
+
+  .sequence-qr span {
+    display: inline-block;
+    margin-top: 1rem;
+    font: 700 1.35rem/1 var(--font-display);
+    letter-spacing: 0.12em;
+    color: #d84b31;
+    text-transform: uppercase;
+  }
+
+  .sequence-qr__code {
+    display: grid;
+    place-items: center;
+  }
+
+  .sequence-qr__code img {
+    width: 480px;
+    height: 480px;
+    padding: 22px;
+    background: white;
+    box-shadow: 0 26px 64px rgba(32, 25, 22, 0.14);
+  }
+
   .anim {
-    animation-duration: var(--scene-duration);
+    animation-duration: var(--anim-duration, var(--scene-duration));
     animation-fill-mode: both;
     animation-iteration-count: 1;
     animation-play-state: paused;
@@ -774,6 +1339,47 @@ function getSceneTitle(value: VideoPreviewScene) {
     animation-name: previewPortrait;
   }
 
+  .anim--myth {
+    animation-name: previewMyth;
+  }
+
+  .anim--myth-strike {
+    animation-name: previewMythStrike;
+  }
+
+  .anim--boost-copy-phase {
+    animation-name: previewBoostCopyPhase;
+  }
+
+  .anim--boost-rule-phase {
+    animation-name: previewBoostRulePhase;
+  }
+
+  .anim--boost-title-phase {
+    animation-name: previewBoostTitlePhase;
+  }
+
+  .anim--boost-hook-phase {
+    animation-name: previewBoostHookPhase;
+  }
+
+  .anim--detail-card {
+    animation-name: previewDetailCard;
+  }
+
+  .anim--detail-line {
+    animation-name: previewDetailLine;
+    animation-delay: var(--anim-delay, 0ms);
+  }
+
+  .anim--boost-meta-phase {
+    animation-name: previewBoostMetaPhase;
+  }
+
+  .anim--fallback-visual {
+    animation-name: previewFallbackVisual;
+  }
+
   .anim--card {
     animation-name: previewCard;
     animation-delay: var(--anim-delay, 0ms);
@@ -791,6 +1397,11 @@ function getSceneTitle(value: VideoPreviewScene) {
 
   .anim--qr {
     animation-name: previewQr;
+    animation-delay: var(--anim-delay, 0ms);
+  }
+
+  .anim--sequence-beat {
+    animation-name: previewSequenceBeat;
     animation-delay: var(--anim-delay, 0ms);
   }
 
@@ -825,28 +1436,119 @@ function getSceneTitle(value: VideoPreviewScene) {
   }
 
   @keyframes previewBackdrop {
-    0%, 12% { opacity: 0; transform: scale(1.08); }
-    24%, 100% { opacity: 1; transform: scale(1); }
+    0%, 8% { opacity: 0; transform: scale(1.08) translateX(0); }
+    18% { opacity: 1; transform: scale(1.03) translateX(0); }
+    62% { opacity: 1; transform: scale(1.01) translateX(-18px); }
+    100% { opacity: 1; transform: scale(1.04) translateX(-28px); }
   }
 
   @keyframes previewPanel {
-    0%, 10% { opacity: 0; transform: translateX(86px); }
-    22%, 100% { opacity: 1; transform: translateX(0); }
+    0%, 32% {
+      opacity: 0;
+      clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+      transform: translateX(0);
+    }
+    40%, 100% {
+      opacity: 1;
+      clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
+      transform: translateX(0);
+    }
   }
 
   @keyframes previewPortrait {
-    0%, 14% {
+    0%, 12% {
       opacity: 0;
       transform:
         translate(calc(var(--event-portrait-shift-x, 0rem) + 34px), calc(var(--event-portrait-shift-y, 0rem) + 22px))
         scale(calc(var(--event-portrait-size, 1) * 0.94));
     }
-    26%, 100% {
+    26% {
+      opacity: 0.42;
+      transform:
+        translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
+        scale(var(--event-portrait-size, 1));
+    }
+    30% {
+      opacity: 0.42;
+      transform:
+        translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
+        scale(var(--event-portrait-size, 1));
+    }
+    48% {
+      opacity: 1;
+      transform:
+        translate(var(--event-portrait-shift-x, 0rem), calc(var(--event-portrait-shift-y, 0rem) - 8px))
+        scale(var(--event-portrait-size, 1));
+    }
+    72% {
       opacity: 1;
       transform:
         translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
         scale(var(--event-portrait-size, 1));
     }
+    100% {
+      opacity: 1;
+      transform:
+        translate(var(--event-portrait-shift-x, 0rem), calc(var(--event-portrait-shift-y, 0rem) - 4px))
+        scale(var(--event-portrait-size, 1));
+    }
+  }
+
+  @keyframes previewMyth {
+    0%, 6% { opacity: 0; transform: translateY(42px); }
+    12%, 24% { opacity: 1; transform: translateY(0); }
+    32%, 100% { opacity: 0; transform: translateY(-64px); }
+  }
+
+  @keyframes previewMythStrike {
+    0%, 21% { opacity: 0; transform: scaleX(0); }
+    26% { opacity: 1; transform: scaleX(1); }
+    32%, 100% { opacity: 0; transform: scaleX(1); }
+  }
+
+  @keyframes previewBoostCopyPhase {
+    0%, 29% { opacity: 0; transform: translateY(34px); }
+    40%, 54% { opacity: 1; transform: translateY(0); }
+    64%, 100% { opacity: 0; transform: translateY(-26px); }
+  }
+
+  @keyframes previewBoostRulePhase {
+    0%, 31% { opacity: 0; transform: scaleX(0); }
+    42%, 54% { opacity: 1; transform: scaleX(1); }
+    64%, 100% { opacity: 0; transform: scaleX(1); }
+  }
+
+  @keyframes previewBoostTitlePhase {
+    0%, 28% { opacity: 0; transform: translateY(54px) scale(1.06); }
+    40%, 54% { opacity: 1; transform: translateY(0) scale(1); }
+    64%, 100% { opacity: 0; transform: translateY(-40px) scale(0.985); }
+  }
+
+  @keyframes previewBoostHookPhase {
+    0%, 34% { opacity: 0; transform: translateY(36px); }
+    46%, 54% { opacity: 1; transform: translateY(0); }
+    64%, 100% { opacity: 0; transform: translateY(-48px); }
+  }
+
+  @keyframes previewDetailCard {
+    0%, 58% { opacity: 0; transform: translateY(64px); }
+    70%, 100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes previewDetailLine {
+    0% { opacity: 0; transform: translateY(18px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes previewBoostMetaPhase {
+    0%, 82% { opacity: 0; transform: translateY(26px); }
+    90%, 100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes previewFallbackVisual {
+    0%, 18% { opacity: 0; transform: translateY(40px) scale(0.94); }
+    28% { opacity: 0.18; transform: translateY(0) scale(0.98); }
+    44%, 100% { opacity: 0.58; transform: translateY(0) scale(1); }
   }
 
   @keyframes previewCard {
@@ -867,6 +1569,34 @@ function getSceneTitle(value: VideoPreviewScene) {
   @keyframes previewQr {
     0%, 12% { opacity: 0; transform: translateY(30px) scale(0.92); }
     24%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes previewSequenceBeat {
+    0% {
+      opacity: 0;
+      transform:
+        translate(var(--seq-enter-x, 34px), var(--seq-enter-y, 0))
+        scale(var(--seq-enter-scale, 0.985));
+    }
+    16%, 78% {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform:
+        translate(var(--seq-exit-x, -30px), var(--seq-exit-y, 0))
+        scale(var(--seq-exit-scale, 1.01));
+    }
+  }
+
+  @keyframes previewScenePush {
+    0% {
+      transform: scale(1) translateX(0) translateY(0);
+    }
+    100% {
+      transform: scale(1.035) translateX(-10px) translateY(-4px);
+    }
   }
 
   @media (max-width: 1460px) {

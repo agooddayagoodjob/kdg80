@@ -1,7 +1,7 @@
 import { getFestivalEvents, type FestivalEvent } from './festival';
 import { getEventPortraitImage, getEventPortraitStyle } from './media';
 
-export type VideoPreviewSceneKind = 'cold-open' | 'boost' | 'cascade' | 'site' | 'qr';
+export type VideoPreviewSceneKind = 'cold-open' | 'boost' | 'cascade' | 'site' | 'qr' | 'sequence';
 
 type VideoPreviewBaseScene = {
   slug: string;
@@ -22,6 +22,11 @@ export type VideoPreviewBoostScene = VideoPreviewBaseScene & {
   eyebrow: string;
   shortTitle: string;
   hook: string;
+  mythLabel?: string;
+  mythText?: string;
+  detailLabel: string;
+  detailLines: string[];
+  detailAttribution?: string;
   speakerName: string;
   speakerRole: string;
   portraitImage: string;
@@ -59,12 +64,18 @@ export type VideoPreviewQrScene = VideoPreviewBaseScene & {
   href: string;
 };
 
+export type VideoPreviewSequenceScene = VideoPreviewBaseScene & {
+  kind: 'sequence';
+  title: string;
+};
+
 export type VideoPreviewScene =
   | VideoPreviewColdOpenScene
   | VideoPreviewBoostScene
   | VideoPreviewCascadeScene
   | VideoPreviewSiteScene
-  | VideoPreviewQrScene;
+  | VideoPreviewQrScene
+  | VideoPreviewSequenceScene;
 
 type BoostSceneSeed = {
   slug: string;
@@ -73,6 +84,12 @@ type BoostSceneSeed = {
   eyebrow: string;
   shortTitle: string;
   hook: string;
+  mythText?: string;
+  detailLabel: string;
+  detailLines: string[];
+  detailAttribution?: string;
+  durationMs?: number;
+  portraitStyle?: string;
 };
 
 const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
@@ -83,6 +100,12 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
     eyebrow: 'ЛЕКЦИЯ · БЕСПЛАТНО ПО РЕГИСТРАЦИИ',
     shortTitle: 'О ЧЁМ МЕЧТАЛИ',
     hook: 'КУДА СТРЕМИЛИСЬ И КУДА ПОПАЛИ',
+    mythText: 'В СОВЕТСКОМ КАЛИНИНГРАДЕ ЖИЗНЬ БЫЛА СКУЧНОЙ',
+    detailLabel: 'ЛЕКЦИЯ ОТВЕЧАЕТ',
+    detailLines: [
+      'КАК ДЕВУШКЕ ПОПАСТЬ В МОРЕ, ЕСЛИ ТУДА ХОДЯТ ТОЛЬКО МУЖЧИНЫ?',
+      'ПОЧЕМУ КАЛИНИНГРАД БЫЛ ГОРОДОМ СУМАСШЕДШИХ ВОЗМОЖНОСТЕЙ?',
+    ],
   },
   {
     slug: 'ocean',
@@ -91,6 +114,13 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
     eyebrow: 'ЛЕКЦИЯ · БЕСПЛАТНО ПО РЕГИСТРАЦИИ',
     shortTitle: 'ОКЕАНОЛОГИ КАЛИНИНГРАДА',
     hook: 'КАК КАЛИНИНГРАД ИЗУЧАЛ МИРОВОЙ ОКЕАН',
+    mythText: 'КАЛИНИНГРАДСКИЕ УЧЁНЫЕ ИЗУЧАЛИ ОКЕАН ТОЛЬКО РАДИ РЫБЫ',
+    detailLabel: 'ЦИТАТА',
+    detailLines: [
+      'ОКЕАН - ЭТО ХРАНИТЕЛЬ ИСТОРИИ, ДЫХАНИЕ ТЕКУЩЕГО МОМЕНТА,',
+      'ВЕЧНЫЙ ЗОВ И НАДЕЖДА БУДУЩЕГО ЧЕЛОВЕЧЕСТВА.',
+    ],
+    detailAttribution: 'Владимир Андреевич Чечко',
   },
   {
     slug: 'bridge',
@@ -99,6 +129,11 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
     eyebrow: 'ЛЕКЦИЯ · БЕСПЛАТНО ПО РЕГИСТРАЦИИ',
     shortTitle: 'МОСТЫ ВРЕМЕНИ',
     hook: 'ПРОШЛОЕ, НАСТОЯЩЕЕ, БУДУЩЕЕ',
+    detailLabel: 'ПОСЛЕ ЛЕКЦИИ',
+    detailLines: [
+      'ПОЧЕМУ МОСТ ПОСТРОЕН В ДВА ЯРУСА?',
+      'ЧТО В НЁМ НЕМЕЦКОЕ, А ЧТО ДОСТРОИЛИ СОВЕТСКИЕ ИНЖЕНЕРЫ?',
+    ],
   },
   {
     slug: 'future-city',
@@ -107,6 +142,14 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
     eyebrow: 'ЛЕКЦИЯ · БЕСПЛАТНО ПО РЕГИСТРАЦИИ',
     shortTitle: 'КАЛИНИНГРАД 2125',
     hook: 'КАКИМ МОЖЕТ СТАТЬ ГОРОД ЧЕРЕЗ СТО ЛЕТ',
+    mythText: 'КАЛИНИНГРАД - ПЕРИФЕРИЙНЫЙ ГОРОД БЕЗ БОЛЬШОГО БУДУЩЕГО',
+    detailLabel: 'ЦИТАТА',
+    detailLines: [
+      'ЧЕРЕЗ СТО ЛЕТ ГОРОД БУДЕТ ТАКИМ,',
+      'КАКИМ МЫ РЕШИМ СДЕЛАТЬ ЕГО СЕГОДНЯ.',
+    ],
+    detailAttribution: 'Артур Артурович Сарниц',
+    portraitStyle: '--event-portrait-size: 1.58; --event-portrait-shift-x: -2.2rem; --event-portrait-shift-y: 0rem;',
   },
   {
     slug: 'cinema',
@@ -115,6 +158,12 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
     eyebrow: 'ЛЕКЦИЯ · БЕСПЛАТНО ПО РЕГИСТРАЦИИ',
     shortTitle: 'КАЛИНИНГРАД В КИНО',
     hook: 'ГДЕ В РЕГИОНЕ СНИМАЛИ ХУДОЖЕСТВЕННЫЕ ФИЛЬМЫ',
+    mythText: 'В КАЛИНИНГРАДЕ СНИМАЛИ ТОЛЬКО ВОЕННЫЕ ФИЛЬМЫ',
+    detailLabel: 'ЛЕКЦИЯ ОТВЕЧАЕТ',
+    detailLines: [
+      'ПОЧЕМУ РЕЖИССЁРЫ ДЕСЯТИЛЕТИЯМИ ВОЗВРАЩАЛИСЬ ИМЕННО СЮДА?',
+      'КАК КИНО ПОКАЗЫВАЕТ ИСЧЕЗНУВШИЙ КАЛИНИНГРАД?',
+    ],
   },
 ];
 
@@ -141,14 +190,24 @@ function createBoostScene(events: FestivalEvent[], seed: BoostSceneSeed): VideoP
     slug: seed.slug,
     label: seed.label,
     kind: 'boost',
-    durationMs: 4200,
+    durationMs: seed.durationMs ?? 5600,
     eyebrow: seed.eyebrow,
     shortTitle: seed.shortTitle,
     hook: seed.hook,
+    mythLabel: seed.mythText ? 'МИФ' : undefined,
+    mythText: seed.mythText,
+    detailLabel: seed.detailLabel,
+    detailLines: seed.detailLines,
+    detailAttribution: seed.detailAttribution,
     speakerName: event.speakerLabel,
     speakerRole: event.affiliation,
     portraitImage,
-    portraitStyle: getEventPortraitStyle(event.speakerLabel, isLecture(event.formatLabel)),
+    portraitStyle: [
+      getEventPortraitStyle(event.speakerLabel, isLecture(event.formatLabel)),
+      seed.portraitStyle,
+    ]
+      .filter(Boolean)
+      .join(' '),
     posterImage: event.image,
     dateLabel: event.dateLabel,
     venue: event.venue,
@@ -192,6 +251,13 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       durationMs: 4200,
       routeLabel: 'ЧТО ЕЩЁ МОЖНО УСПЕТЬ',
       cards: cascadeCards,
+    },
+    {
+      slug: 'festival-flow',
+      label: 'Sequence / Общий ролик',
+      kind: 'sequence',
+      durationMs: 16000,
+      title: 'ОБЩИЙ РОЛИК',
     },
     {
       slug: 'site',
