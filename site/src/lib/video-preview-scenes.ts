@@ -137,7 +137,7 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
       'ЧТО В НЁМ НЕМЕЦКОЕ, А ЧТО ДОСТРОИЛИ СОВЕТСКИЕ ИНЖЕНЕРЫ?',
     ],
     durationMs: 7200,
-    portraitStyle: '--event-portrait-size: 1.28; --event-portrait-shift-x: 0.08rem; --event-portrait-shift-y: 0.18rem; --event-portrait-width: min(43.5%, 36rem);',
+    portraitStyle: '--event-portrait-size: 1.46; --event-portrait-shift-x: -0.18rem; --event-portrait-shift-y: 0.18rem; --event-portrait-width: min(45%, 37rem);',
   },
   {
     slug: 'future-city',
@@ -153,7 +153,7 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
       'КАКИМ МЫ РЕШИМ СДЕЛАТЬ ЕГО СЕГОДНЯ.',
     ],
     detailAttribution: 'Артур Артурович Сарниц',
-    portraitStyle: '--event-portrait-size: 1.72; --event-portrait-shift-x: -2.8rem; --event-portrait-shift-y: 0.14rem; --event-portrait-width: min(47.5%, 39rem);',
+    portraitStyle: '--event-portrait-size: 1.82; --event-portrait-shift-x: -3.05rem; --event-portrait-shift-y: 0.14rem; --event-portrait-width: min(48.5%, 39.5rem);',
     durationMs: 7000,
   },
   {
