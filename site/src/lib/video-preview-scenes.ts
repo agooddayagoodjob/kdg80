@@ -344,7 +344,7 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       subtitle: '@kenigevents',
       secondary: 'ОПЕРАТИВНЫЕ АНОНСЫ ПО ФЕСТИВАЛЮ',
       qrPath: '/generated/telegram/kenigevents-qr.svg',
-      href: 'https://t.me/kenigevents',
+      href: 'https://t.me/+Jhg7TZBUTNc3ZmMy',
     },
     {
       slug: 'max',
