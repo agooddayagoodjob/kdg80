@@ -12,6 +12,25 @@ const FESTIVAL_REGULATION_URL = '/docs/festival-regulation.pdf';
 const PRESS_EMAIL = 'press@kgd80.ru';
 const INVITES_EMAIL = 'info@kgd80.ru';
 const TELEGRAM_URL = 'https://t.me/kenigevents';
+const MAX_URL = 'https://max.ru/join/do_4eLW85-yK_dXcc6f2cmKp9utJuFl_hCo0cxnJ1QA';
+const announcementChannels = [
+  {
+    platform: 'Telegram',
+    title: 'Полюбить Калининград Анонсы',
+    description: 'Свежие анонсы, изменения в программе и важные напоминания.',
+    href: TELEGRAM_URL,
+    qrSrc: '/generated/telegram/kenigevents-qr.svg',
+    qrAlt: 'QR-код Telegram-канала «Полюбить Калининград Анонсы»',
+  },
+  {
+    platform: 'MAX',
+    title: 'Канал фестиваля в MAX',
+    description: 'Оперативные обновления о фестивале в отдельной ленте.',
+    href: MAX_URL,
+    qrSrc: '/generated/max/max-channel-qr.svg',
+    qrAlt: 'QR-код канала фестиваля в MAX',
+  },
+];
 ---
 
 <footer class="site-footer">
@@ -50,12 +69,42 @@ const TELEGRAM_URL = 'https://t.me/kenigevents';
       <div class="site-footer__group-body">
         <a href={`mailto:${PRESS_EMAIL}`}>{PRESS_EMAIL}</a>
         <a href={`mailto:${INVITES_EMAIL}`}>{INVITES_EMAIL}</a>
-        <a href={TELEGRAM_URL} target="_blank" rel="noreferrer">@kenigevents</a>
       </div>
-      <p class="site-footer__note">
-        Для пресс-служб и редакций здесь должен быть прямой доступ к положению фестиваля и актуальной программе,
-        а для гостей отдельный понятный контакт по приглашениям.
-      </p>
+      <section class="site-footer__channels" aria-label="Каналы оперативных обновлений">
+        <div class="site-footer__channels-copy">
+          <p class="site-footer__channels-eyebrow">Оперативные обновления</p>
+          <p class="site-footer__channels-text">
+            Свежие анонсы фестиваля, изменения в программе и важные напоминания публикуем в Telegram и MAX.
+          </p>
+        </div>
+        <div class="site-footer__channel-list">
+          {announcementChannels.map((channel) => (
+            <a
+              class="site-footer__channel"
+              href={channel.href}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${channel.platform}: ${channel.title}`}
+            >
+              <div class="site-footer__channel-copy">
+                <span class="site-footer__channel-platform">{channel.platform}</span>
+                <strong>{channel.title}</strong>
+                <span>{channel.description}</span>
+              </div>
+              <div class="site-footer__channel-code">
+                <img
+                  src={channel.qrSrc}
+                  alt={channel.qrAlt}
+                  width="112"
+                  height="112"
+                  loading="eager"
+                  decoding="sync"
+                />
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
     </details>
   </div>
   <div class="container site-footer__legal" aria-label="Служебная информация">
