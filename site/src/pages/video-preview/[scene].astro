@@ -76,7 +76,25 @@ function getMythLabelParts(text?: string) {
 }
 
 function getSceneBrand(value: VideoPreviewScene) {
-  if (value.kind === 'boost' || value.kind === 'dialogue' || value.kind === 'cascade' || value.kind === 'sequence') {
+  if (value.kind === 'dialogue') {
+    if (value.variant === 'side-strip') {
+      return {
+        kind: 'single',
+        path: '/shared-assets/logo-znanie-festival.svg',
+        alt: 'Знание, 80 историй о главном',
+        className: 'video-scene__brand--festival-graphite',
+      };
+    }
+
+    return {
+      kind: 'single',
+      path: '/shared-assets/logo-znanie-festival-master-inverse.svg',
+      alt: 'Знание, 80 историй о главном',
+      className: 'video-scene__brand--festival-master',
+    };
+  }
+
+  if (value.kind === 'boost' || value.kind === 'cascade' || value.kind === 'sequence') {
     return {
       kind: 'single',
       path: '/shared-assets/logo-znanie-festival-master-inverse.svg',
@@ -95,22 +113,22 @@ function getSceneBrand(value: VideoPreviewScene) {
 
 function getDialogueSideStripLayout(participantCount: number, titleLines: string[]) {
   const count = Math.max(2, Math.min(participantCount, 5));
-  const columnWidth = count === 2 ? 520 : count === 3 ? 340 : count === 4 ? 250 : 220;
+  const columnWidth = count === 2 ? 488 : count === 3 ? 364 : count === 4 ? 260 : 236;
   const bankWidth = columnWidth * count;
   const bankLeft = 1920 - bankWidth;
-  const copyLeft = 32;
-  const gutter = 32;
+  const copyLeft = 36;
+  const gutter = 28;
   const copyWidth = bankLeft - copyLeft - gutter;
-  const captionHeight = count === 2 ? 182 : count === 3 ? 174 : count === 4 ? 164 : 172;
-  const nameSize = count === 2 ? 2.42 : count === 3 ? 2.1 : count === 4 ? 1.9 : 1.62;
-  const roleSize = count === 2 ? 1.08 : count === 3 ? 1 : count === 4 ? 0.94 : 0.84;
-  const scaleFactor = count === 2 ? 1.02 : count === 3 ? 1.08 : count === 4 ? 1 : 0.94;
-  const shiftY = count === 2 ? 38 : count === 3 ? 14 : count === 4 ? 10 : 8;
+  const scaleFactor = count === 2 ? 0.98 : count === 3 ? 0.95 : count === 4 ? 0.92 : 0.88;
+  const shiftY = count === 2 ? -12 : count === 3 ? -8 : count === 4 ? -6 : -4;
+  const rosterColumns = count >= 4 ? 2 : 1;
   const longestLineLength = titleLines.reduce((max, line) => Math.max(max, line.replace(/\s+/g, '').length), 0);
-  const titlePenalty = longestLineLength >= 13 ? 0.42 : longestLineLength >= 11 ? 0.22 : 0;
-  const titleSize = (count === 2 ? 7.9 : count === 3 ? 7.55 : count === 4 ? 7.2 : 6.95) - titlePenalty;
-  const titleMax = count === 2 ? 6.8 : count === 3 ? 6.4 : count === 4 ? 6.1 : 5.8;
-  const subtitleSize = count === 2 ? 1.95 : count === 3 ? 1.88 : count === 4 ? 1.8 : 1.68;
+  const titlePenalty = longestLineLength >= 16 ? 1.9 : longestLineLength >= 14 ? 1.52 : longestLineLength >= 12 ? 0.82 : 0;
+  const titleSize = (count === 2 ? 7.85 : count === 3 ? 7.2 : count === 4 ? 6.7 : 6.35) - titlePenalty;
+  const titleMax = count === 2 ? 7.1 : count === 3 ? 6.4 : count === 4 ? 5.8 : 5.4;
+  const subtitleSize = count === 2 ? 1.86 : count === 3 ? 1.74 : count === 4 ? 1.62 : 1.54;
+  const rosterNameSize = count === 2 ? 1.38 : count === 3 ? 1.3 : count === 4 ? 1.18 : 1.08;
+  const rosterRoleSize = count === 2 ? 0.96 : count === 3 ? 0.92 : count === 4 ? 0.86 : 0.8;
 
   return {
     sceneStyle: [
@@ -119,14 +137,14 @@ function getDialogueSideStripLayout(participantCount: number, titleLines: string
       `--dialogue-side-bank-width:${bankWidth}px`,
       `--dialogue-side-bank-left:${bankLeft}px`,
       `--dialogue-side-copy-width:${copyWidth}px`,
-      `--dialogue-side-caption-height:${captionHeight}px`,
-      `--dialogue-side-name-size:${nameSize}rem`,
-      `--dialogue-side-role-size:${roleSize}rem`,
       `--dialogue-side-scale-factor:${scaleFactor}`,
       `--dialogue-side-shift-y:${shiftY}px`,
       `--dialogue-side-title-size:${titleSize}rem`,
       `--dialogue-side-title-max:${titleMax}ch`,
       `--dialogue-side-subtitle-size:${subtitleSize}rem`,
+      `--dialogue-side-roster-columns:${rosterColumns}`,
+      `--dialogue-side-roster-name-size:${rosterNameSize}rem`,
+      `--dialogue-side-roster-role-size:${rosterRoleSize}rem`,
     ].join('; '),
     participantsStyle: `grid-template-columns: repeat(${count}, minmax(0, ${columnWidth}px));`,
   };
@@ -305,24 +323,60 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
                   <span>{line}</span>
                 ))}
               </h2>
-              <p class="dialogue-scene__subtitle">{scene.subtitle}</p>
-              <p class="dialogue-scene__support">{scene.supportLine}</p>
-              <p class="dialogue-scene__cta">ПОСЛУШАЙ И ЗАДАЙ СВОЙ ВОПРОС</p>
-              <div class="dialogue-scene__meta">
-                {scene.availabilityLabel && (
-                  <p class:list={[
-                    'dialogue-scene__availability',
-                    scene.availabilityTone && `dialogue-scene__availability--${scene.availabilityTone}`,
-                  ]}>
-                    {scene.availabilityLabel}
-                  </p>
-                )}
-                {scene.accessLabel && <p class="dialogue-scene__access-pill">{scene.accessLabel}</p>}
-              </div>
-              <div class="dialogue-scene__schedule-block">
-                <p class="dialogue-scene__schedule">{scene.dateLabel}</p>
-                <p class="dialogue-scene__venue">{scene.venue}</p>
-              </div>
+              {scene.variant === 'side-strip' ? (
+                <>
+                  <p class="dialogue-scene__subtitle">{scene.subtitle}</p>
+                  <div class="dialogue-scene__schedule-block">
+                    <p class="dialogue-scene__schedule">{scene.dateLabel}</p>
+                    <p class="dialogue-scene__venue">{scene.venue}</p>
+                  </div>
+                  <p class="dialogue-scene__cta">ПОСЛУШАЙ И ЗАДАЙ СВОЙ ВОПРОС</p>
+                  <p class="dialogue-scene__support">{scene.supportLine}</p>
+                  <div class="dialogue-scene__meta">
+                    {scene.availabilityLabel && (
+                      <p class:list={[
+                        'dialogue-scene__availability',
+                        scene.availabilityTone && `dialogue-scene__availability--${scene.availabilityTone}`,
+                      ]}>
+                        {scene.availabilityLabel}
+                      </p>
+                    )}
+                    {scene.accessLabel && <p class="dialogue-scene__access-pill">{scene.accessLabel}</p>}
+                  </div>
+                  <div class="dialogue-scene__roster-shell">
+                    <p class="dialogue-scene__roster-label">УЧАСТНИКИ</p>
+                    <div class="dialogue-scene__roster">
+                      {scene.participants.map((participant) => (
+                        <article class="dialogue-scene__roster-item">
+                          <strong>{participant.name}</strong>
+                          <span>{participant.role}</span>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p class="dialogue-scene__subtitle">{scene.subtitle}</p>
+                  <p class="dialogue-scene__support">{scene.supportLine}</p>
+                  <p class="dialogue-scene__cta">ПОСЛУШАЙ И ЗАДАЙ СВОЙ ВОПРОС</p>
+                  <div class="dialogue-scene__meta">
+                    {scene.availabilityLabel && (
+                      <p class:list={[
+                        'dialogue-scene__availability',
+                        scene.availabilityTone && `dialogue-scene__availability--${scene.availabilityTone}`,
+                      ]}>
+                        {scene.availabilityLabel}
+                      </p>
+                    )}
+                    {scene.accessLabel && <p class="dialogue-scene__access-pill">{scene.accessLabel}</p>}
+                  </div>
+                  <div class="dialogue-scene__schedule-block">
+                    <p class="dialogue-scene__schedule">{scene.dateLabel}</p>
+                    <p class="dialogue-scene__venue">{scene.venue}</p>
+                  </div>
+                </>
+              )}
             </div>
 
             <div
@@ -344,10 +398,12 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
                       <span class="dialogue-person__monogram" aria-hidden="true">{participant.monogram}</span>
                     )}
                   </div>
-                  <div class="dialogue-person__caption">
-                    <strong>{participant.name}</strong>
-                    <span>{participant.role}</span>
-                  </div>
+                  {scene.variant !== 'side-strip' && (
+                    <div class="dialogue-person__caption">
+                      <strong>{participant.name}</strong>
+                      <span>{participant.role}</span>
+                    </div>
+                  )}
                 </article>
               ))}
             </div>
@@ -698,6 +754,14 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
   .video-scene__brand--festival-master {
     --brand-width: 356px;
     filter: drop-shadow(0 10px 22px rgba(12, 10, 10, 0.22));
+  }
+
+  .video-scene__brand--festival-graphite {
+    --brand-width: 292px;
+  }
+
+  .video-scene__brand--festival-graphite img {
+    filter: brightness(0) saturate(100%) opacity(0.9);
   }
 
   .video-scene--dialogue .video-scene__brand--festival-master {
@@ -1237,6 +1301,50 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
     text-transform: uppercase;
   }
 
+  .dialogue-scene__roster-shell {
+    margin-top: 1.66rem;
+    display: grid;
+    gap: 0.82rem;
+  }
+
+  .dialogue-scene__roster-label {
+    margin: 0;
+    font: 700 0.94rem/1 var(--font-display);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 248, 242, 0.72);
+  }
+
+  .dialogue-scene__roster {
+    display: grid;
+    gap: 0.88rem 1.2rem;
+  }
+
+  .dialogue-scene__roster-item {
+    display: grid;
+    gap: 0.26rem;
+    min-width: 0;
+  }
+
+  .dialogue-scene__roster-item strong,
+  .dialogue-scene__roster-item span {
+    display: block;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .dialogue-scene__roster-item strong {
+    font: 700 1.16rem/0.94 var(--font-display);
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    color: rgba(255, 248, 242, 0.98);
+  }
+
+  .dialogue-scene__roster-item span {
+    font: 500 0.82rem/1.1 var(--font-body);
+    color: rgba(255, 248, 242, 0.74);
+  }
+
   .dialogue-scene__participants {
     position: absolute;
     z-index: 3;
@@ -1418,26 +1526,34 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
 
   .dialogue-scene--side-strip {
     background:
-      linear-gradient(90deg, #f05b3f 0%, #d84b31 44%, #12100f 44%, #12100f 100%);
+      linear-gradient(
+        90deg,
+        #f05b3f 0%,
+        #d84b31 calc(var(--dialogue-side-bank-left, 850px) - 3rem),
+        #12100f calc(var(--dialogue-side-bank-left, 850px) - 3rem),
+        #12100f 100%
+      );
   }
 
   .dialogue-scene--side-strip .dialogue-scene__backdrop {
     background:
-      linear-gradient(135deg, #f05b3f 0%, #d84b31 44%, #bb391f 100%);
+      linear-gradient(135deg, #f05b3f 0%, #dc4e33 42%, #b5361e 100%);
   }
 
   .dialogue-scene--side-strip .dialogue-scene__accent {
-    inset: 0 0 0 auto;
-    width: 56%;
+    left: calc(var(--dialogue-side-bank-left, 850px) - 5rem);
+    width: 7rem;
     background:
-      linear-gradient(180deg, rgba(14, 12, 12, 0.04) 0%, rgba(14, 12, 12, 0.14) 100%);
+      linear-gradient(90deg, rgba(31, 22, 19, 0) 0%, rgba(31, 22, 19, 0.28) 46%, rgba(18, 16, 15, 0.88) 100%);
   }
 
   .dialogue-scene--side-strip .dialogue-scene__copy {
-    left: 32px;
-    top: 96px;
+    left: 36px;
+    top: 94px;
     width: var(--dialogue-side-copy-width, 790px);
     color: #16120f;
+    display: grid;
+    align-content: start;
   }
 
   .dialogue-scene--side-strip .dialogue-scene__eyebrow,
@@ -1450,7 +1566,7 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
   .dialogue-scene--side-strip .dialogue-scene__format {
     display: inline-flex;
     width: fit-content;
-    padding: 0.54rem 0.76rem 0.5rem;
+    padding: 0.56rem 0.8rem 0.52rem;
     background: rgba(17, 16, 14, 0.88);
     color: #fff8f2;
   }
@@ -1462,18 +1578,26 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
   }
 
   .dialogue-scene--side-strip .dialogue-scene__subtitle {
-    max-width: 10ch;
+    max-width: 12ch;
     font-size: var(--dialogue-side-subtitle-size, 1.8rem);
+    color: rgba(17, 16, 14, 0.92);
   }
 
   .dialogue-scene--side-strip .dialogue-scene__support {
     max-width: 30ch;
-    color: rgba(22, 18, 15, 0.76);
+    margin-top: 0.92rem;
+    color: rgba(22, 18, 15, 0.74);
   }
 
   .dialogue-scene--side-strip .dialogue-scene__cta,
   .dialogue-scene--side-strip .dialogue-scene__schedule {
     color: #11100e;
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__cta {
+    margin-top: 1.1rem;
+    font-size: 1.52rem;
+    line-height: 0.98;
   }
 
   .dialogue-scene--side-strip .dialogue-scene__availability {
@@ -1500,44 +1624,82 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
   }
 
   .dialogue-scene--side-strip .dialogue-person {
-    display: grid;
-    grid-template-rows: var(--dialogue-side-caption-height, 164px) minmax(0, 1fr);
+    display: block;
     min-height: 100%;
     border-left: 1px solid rgba(255, 255, 255, 0.12);
     background: #12100f;
   }
 
-  .dialogue-scene--side-strip .dialogue-person__caption {
-    order: 0;
-    min-height: var(--dialogue-side-caption-height, 164px);
-    padding: 1.04rem 0.78rem 0.94rem;
-  }
-
-  .dialogue-scene--side-strip .dialogue-person__caption strong {
-    font-size: var(--dialogue-side-name-size, 1.9rem);
-    line-height: 0.88;
-  }
-
-  .dialogue-scene--side-strip .dialogue-person__caption span {
-    font-size: var(--dialogue-side-role-size, 0.94rem);
-    line-height: 1.08;
-  }
-
   .dialogue-scene--side-strip .dialogue-person__media {
-    order: 1;
-    min-height: 0;
+    min-height: 100%;
+  }
+
+  .dialogue-scene--side-strip .dialogue-person__media::after {
+    background:
+      radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.08), transparent 34%),
+      linear-gradient(180deg, rgba(18, 16, 15, 0.08) 0%, rgba(18, 16, 15, 0.3) 62%, rgba(18, 16, 15, 0.68) 100%);
+  }
+
+  .dialogue-scene--side-strip .dialogue-person__monogram {
+    font-size: 4rem;
   }
 
   .dialogue-scene--side-strip .dialogue-person__portrait {
     top: auto;
-    bottom: -0.25rem;
+    bottom: -1.8rem;
     transform:
       translate(
         calc(-50% + var(--dialogue-portrait-x-side, var(--dialogue-portrait-x-desktop, var(--dialogue-portrait-x-mobile, 0px)))),
         calc(var(--dialogue-portrait-y-side, 0px) + var(--dialogue-side-shift-y, 0px))
       )
-      scale(calc(var(--dialogue-portrait-scale-side, 0.64) * var(--dialogue-side-scale-factor, 1)));
+      scale(calc(var(--dialogue-portrait-scale-side, 0.72) * var(--dialogue-side-scale-factor, 1)));
     transform-origin: center bottom;
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__schedule-block {
+    gap: 0.34rem;
+    margin-top: 1rem;
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__schedule {
+    font-size: 1.66rem;
+    line-height: 0.96;
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__venue {
+    max-width: 22ch;
+    font-size: 1.18rem;
+    line-height: 1.08;
+    color: rgba(17, 16, 14, 0.82);
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__meta {
+    margin-top: 1rem;
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__roster-shell {
+    margin-top: 1.7rem;
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__roster-label {
+    color: rgba(17, 16, 14, 0.68);
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__roster {
+    grid-template-columns: repeat(var(--dialogue-side-roster-columns, 1), minmax(0, 1fr));
+    gap: 0.92rem 1.3rem;
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__roster-item strong {
+    font-size: var(--dialogue-side-roster-name-size, 1.18rem);
+    line-height: 0.92;
+    color: #11100e;
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__roster-item span {
+    font-size: var(--dialogue-side-roster-role-size, 0.86rem);
+    line-height: 1.08;
+    color: rgba(17, 16, 14, 0.76);
   }
 
   .dialogue-scene--split-strip {
