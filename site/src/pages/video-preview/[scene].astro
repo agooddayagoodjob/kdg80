@@ -1299,7 +1299,7 @@ const sceneBrand = getSceneBrand(scene);
 
   .dialogue-scene--side-strip {
     background:
-      linear-gradient(90deg, #f05b3f 0%, #d84b31 60%, #12100f 60%, #12100f 100%);
+      linear-gradient(90deg, #f05b3f 0%, #d84b31 61.25%, #12100f 61.25%, #12100f 100%);
   }
 
   .dialogue-scene--side-strip .dialogue-scene__backdrop {
@@ -1309,7 +1309,7 @@ const sceneBrand = getSceneBrand(scene);
 
   .dialogue-scene--side-strip .dialogue-scene__accent {
     inset: 0 0 0 auto;
-    width: 41%;
+    width: 38.75%;
     background:
       linear-gradient(180deg, rgba(14, 12, 12, 0.04) 0%, rgba(14, 12, 12, 0.14) 100%);
   }
@@ -1317,7 +1317,7 @@ const sceneBrand = getSceneBrand(scene);
   .dialogue-scene--side-strip .dialogue-scene__copy {
     left: 34px;
     top: 28px;
-    width: 1040px;
+    width: 1048px;
     color: #16120f;
   }
 
@@ -1329,8 +1329,8 @@ const sceneBrand = getSceneBrand(scene);
   }
 
   .dialogue-scene--side-strip .dialogue-scene__title {
-    max-width: 6.7ch;
-    font-size: 6.3rem;
+    max-width: 6.1ch;
+    font-size: 6.55rem;
     color: #11100e;
   }
 
@@ -1343,10 +1343,11 @@ const sceneBrand = getSceneBrand(scene);
   }
 
   .dialogue-scene--side-strip .dialogue-scene__participants {
-    right: 0;
+    left: 1176px;
     top: 0;
     bottom: 0;
-    width: 616px;
+    right: auto;
+    width: 744px;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0;
@@ -1362,12 +1363,24 @@ const sceneBrand = getSceneBrand(scene);
 
   .dialogue-scene--side-strip .dialogue-person__caption {
     order: 0;
-    min-height: 112px;
+    min-height: 118px;
   }
 
   .dialogue-scene--side-strip .dialogue-person__media {
     order: 1;
     min-height: 0;
+  }
+
+  .dialogue-scene--side-strip .dialogue-person__portrait {
+    top: auto;
+    bottom: -0.35rem;
+    transform:
+      translate(
+        calc(-50% + var(--dialogue-portrait-x-side, var(--dialogue-portrait-x-desktop, var(--dialogue-portrait-x-mobile, 0px)))),
+        var(--dialogue-portrait-y-side, 0px)
+      )
+      scale(var(--dialogue-portrait-scale-side, var(--dialogue-portrait-scale-desktop, 0.66)));
+    transform-origin: center bottom;
   }
 
   .dialogue-scene--split-strip {

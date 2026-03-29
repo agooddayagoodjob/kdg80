@@ -58,17 +58,17 @@ const SPEAKER_STRIP_STYLE_OVERRIDES: Array<{ match: string; style: string }> = [
 ];
 
 const DIALOGUE_PORTRAIT_STYLE_OVERRIDES: Array<{ match: string; style: string }> = [
-  { match: 'Удовенко', style: '--dialogue-portrait-scale-mobile: 0.236; --dialogue-portrait-scale-desktop: 0.226; --dialogue-portrait-x-mobile: 3px; --dialogue-portrait-x-desktop: 6px;' },
-  { match: 'Сивкова', style: '--dialogue-portrait-scale-mobile: 0.222; --dialogue-portrait-scale-desktop: 0.212;' },
-  { match: 'Жадобко', style: '--dialogue-portrait-scale-mobile: 0.217; --dialogue-portrait-scale-desktop: 0.208;' },
-  { match: 'Попадин', style: '--dialogue-portrait-scale-mobile: 0.214; --dialogue-portrait-scale-desktop: 0.206;' },
-  { match: 'Литвинович', style: '--dialogue-portrait-scale-mobile: 0.219; --dialogue-portrait-scale-desktop: 0.208; --dialogue-portrait-x-mobile: -3px; --dialogue-portrait-x-desktop: -6px;' },
-  { match: 'Бойко', style: '--dialogue-portrait-scale-mobile: 0.219; --dialogue-portrait-scale-desktop: 0.208;' },
-  { match: 'Марковец', style: '--dialogue-portrait-scale-mobile: 0.221; --dialogue-portrait-scale-desktop: 0.212;' },
-  { match: 'Никитин', style: '--dialogue-portrait-scale-mobile: 0.221; --dialogue-portrait-scale-desktop: 0.21;' },
-  { match: 'Сарниц', style: '--dialogue-portrait-x-desktop: 22px;' },
-  { match: 'Долотова', style: '--dialogue-portrait-scale-mobile: 0.218; --dialogue-portrait-scale-desktop: 0.208;' },
-  { match: 'Ярцев', style: '--dialogue-portrait-scale-mobile: 0.216; --dialogue-portrait-scale-desktop: 0.206;' },
+  { match: 'Удовенко', style: '--dialogue-portrait-scale-mobile: 0.236; --dialogue-portrait-scale-desktop: 0.226; --dialogue-portrait-x-mobile: 3px; --dialogue-portrait-x-desktop: 6px; --dialogue-portrait-scale-side: 0.58; --dialogue-portrait-x-side: 10px;' },
+  { match: 'Сивкова', style: '--dialogue-portrait-scale-mobile: 0.222; --dialogue-portrait-scale-desktop: 0.212; --dialogue-portrait-scale-side: 0.58;' },
+  { match: 'Жадобко', style: '--dialogue-portrait-scale-mobile: 0.217; --dialogue-portrait-scale-desktop: 0.208; --dialogue-portrait-scale-side: 0.56;' },
+  { match: 'Попадин', style: '--dialogue-portrait-scale-mobile: 0.214; --dialogue-portrait-scale-desktop: 0.206; --dialogue-portrait-scale-side: 0.56;' },
+  { match: 'Литвинович', style: '--dialogue-portrait-scale-mobile: 0.219; --dialogue-portrait-scale-desktop: 0.208; --dialogue-portrait-x-mobile: -3px; --dialogue-portrait-x-desktop: -6px; --dialogue-portrait-scale-side: 0.58; --dialogue-portrait-x-side: -10px;' },
+  { match: 'Бойко', style: '--dialogue-portrait-scale-mobile: 0.219; --dialogue-portrait-scale-desktop: 0.208; --dialogue-portrait-scale-side: 0.56; --dialogue-portrait-x-side: 6px;' },
+  { match: 'Марковец', style: '--dialogue-portrait-scale-mobile: 0.221; --dialogue-portrait-scale-desktop: 0.212; --dialogue-portrait-scale-side: 0.61; --dialogue-portrait-x-side: -8px;' },
+  { match: 'Никитин', style: '--dialogue-portrait-scale-mobile: 0.221; --dialogue-portrait-scale-desktop: 0.21; --dialogue-portrait-scale-side: 0.53; --dialogue-portrait-x-side: 20px;' },
+  { match: 'Сарниц', style: '--dialogue-portrait-x-desktop: 22px; --dialogue-portrait-scale-side: 0.58; --dialogue-portrait-x-side: 24px;' },
+  { match: 'Долотова', style: '--dialogue-portrait-scale-mobile: 0.218; --dialogue-portrait-scale-desktop: 0.208; --dialogue-portrait-scale-side: 0.57;' },
+  { match: 'Ярцев', style: '--dialogue-portrait-scale-mobile: 0.216; --dialogue-portrait-scale-desktop: 0.206; --dialogue-portrait-scale-side: 0.56;' },
 ];
 
 export function getSpeakerCaption(value: string) {
