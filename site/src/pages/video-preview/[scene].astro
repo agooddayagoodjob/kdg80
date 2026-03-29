@@ -49,6 +49,10 @@ function getSceneTitle(value: VideoPreviewScene) {
 
   return `${value.tagline.join(' ')} ${value.period}`;
 }
+
+function getMythWords(text?: string) {
+  return text?.split(/\s+/).filter(Boolean) ?? [];
+}
 ---
 
 <PreviewLayout
@@ -122,8 +126,21 @@ function getSceneTitle(value: VideoPreviewScene) {
             </div>
             {scene.mythText && (
               <div class="boost-scene__myth-plate anim anim--myth-plate">
-                <p class="boost-scene__myth-label">{scene.mythLabel}</p>
-                <p class="boost-scene__myth-text">{scene.mythText}</p>
+                <div class="boost-scene__myth-copy">
+                  <p class="boost-scene__myth-label anim anim--myth-label" style="--anim-delay:120ms; --anim-duration:640ms;">
+                    {scene.mythLabel}
+                  </p>
+                  <p class="boost-scene__myth-text">
+                    {getMythWords(scene.mythText).map((word, index) => (
+                      <span
+                        class="boost-scene__myth-word anim anim--myth-word"
+                        style={`--anim-delay:${540 + index * 150}ms; --anim-duration:700ms;`}
+                      >
+                        {word}
+                      </span>
+                    ))}
+                  </p>
+                </div>
               </div>
             )}
             <div class="boost-scene__panel anim anim--panel"></div>
@@ -602,32 +619,44 @@ function getSceneTitle(value: VideoPreviewScene) {
 
   .boost-scene__myth-plate {
     position: absolute;
-    inset: 0 24% 0 0;
+    inset: 0;
     z-index: 8;
     display: grid;
     align-items: center;
-    padding: 132px 92px 110px;
+    padding: 128px 104px 112px 92px;
     background:
-      linear-gradient(140deg, rgba(12, 10, 11, 0.96) 0%, rgba(18, 15, 16, 0.98) 62%, rgba(44, 20, 16, 0.9) 100%),
-      radial-gradient(circle at 12% 22%, rgba(216, 75, 49, 0.18), transparent 26rem);
+      radial-gradient(circle at 76% 84%, rgba(216, 75, 49, 0.18), transparent 23rem),
+      radial-gradient(circle at 14% 22%, rgba(216, 75, 49, 0.12), transparent 24rem),
+      linear-gradient(140deg, rgba(11, 10, 11, 0.985) 0%, rgba(18, 15, 16, 0.985) 58%, rgba(33, 17, 14, 0.98) 100%);
     color: white;
     pointer-events: none;
   }
 
+  .boost-scene__myth-copy {
+    max-width: 1160px;
+  }
+
   .boost-scene__myth-label {
-    margin: 0 0 1.25rem;
-    font: 700 1.24rem/1 var(--font-display);
-    letter-spacing: 0.18em;
-    color: rgba(255, 255, 255, 0.84);
+    margin: 0 0 1.9rem;
+    font: 700 3rem/0.9 var(--font-display);
+    letter-spacing: 0.13em;
+    color: rgba(255, 255, 255, 0.92);
     text-transform: uppercase;
   }
 
   .boost-scene__myth-text {
     margin: 0;
-    max-width: 12ch;
-    font: 700 6.75rem/0.88 var(--font-display);
-    letter-spacing: -0.06em;
-    text-wrap: balance;
+    max-width: 13.4ch;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.08em 0.18em;
+    align-items: flex-start;
+    font: 700 6.85rem/0.87 var(--font-display);
+    letter-spacing: -0.055em;
+  }
+
+  .boost-scene__myth-word {
+    display: inline-block;
   }
 
   .boost-scene__photo-shell {
@@ -1369,6 +1398,16 @@ function getSceneTitle(value: VideoPreviewScene) {
     animation-name: previewMythPlate;
   }
 
+  .anim--myth-label {
+    animation-name: previewMythLabel;
+    animation-delay: var(--anim-delay, 0ms);
+  }
+
+  .anim--myth-word {
+    animation-name: previewMythWord;
+    animation-delay: var(--anim-delay, 0ms);
+  }
+
   .anim--boost-lead-phase {
     animation-name: previewBoostLeadPhase;
   }
@@ -1505,20 +1544,46 @@ function getSceneTitle(value: VideoPreviewScene) {
   }
 
   @keyframes previewMythPlate {
-    0%, 30% {
+    0%, 42% {
       opacity: 1;
       clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
       transform: translateX(0);
     }
-    46% {
+    58% {
       opacity: 1;
-      clip-path: polygon(100% 0, 100% 0, 78% 100%, 78% 100%);
+      clip-path: polygon(0 0, 100% 0, 84% 100%, 0 100%);
       transform: translateX(0);
     }
-    58%, 100% {
+    70%, 100% {
       opacity: 0;
-      clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+      clip-path: polygon(100% 0, 100% 0, 80% 100%, 80% 100%);
       transform: translateX(0);
+    }
+  }
+
+  @keyframes previewMythLabel {
+    0% {
+      opacity: 0;
+      transform: translateY(18px);
+      letter-spacing: 0.18em;
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+      letter-spacing: 0.13em;
+    }
+  }
+
+  @keyframes previewMythWord {
+    0% {
+      opacity: 0;
+      transform: translateY(28px) scale(0.985);
+      filter: blur(5px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
     }
   }
 
