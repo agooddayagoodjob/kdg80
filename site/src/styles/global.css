@@ -4817,7 +4817,8 @@ body.registration-modal-open {
 .site-footer__channels-eyebrow,
 .site-footer__channels-text,
 .site-footer__channel-copy strong,
-.site-footer__channel-copy span {
+.site-footer__channel-copy span,
+.site-footer__channel-action {
   margin: 0;
 }
 
@@ -4882,6 +4883,27 @@ body.registration-modal-open {
   color: var(--ink-soft);
   font-size: 0.85rem;
   line-height: 1.4;
+}
+
+.site-footer__channel-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: fit-content;
+  margin-top: 0.15rem;
+  padding: 0.45rem 0.72rem;
+  border-radius: 999px;
+  background: rgba(216, 75, 49, 0.1);
+  color: var(--accent-deep);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.site-footer__channel-action::after {
+  content: "↗";
+  font-size: 0.82rem;
+  line-height: 1;
 }
 
 .site-footer__channel-code {

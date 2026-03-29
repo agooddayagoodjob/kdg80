@@ -17,7 +17,7 @@ const announcementChannels = [
   {
     platform: 'Telegram',
     title: 'Полюбить Калининград Анонсы',
-    description: 'Свежие анонсы, изменения в программе и важные напоминания.',
+    description: 'Подпишитесь, чтобы первыми видеть анонсы, изменения в программе и важные напоминания.',
     href: TELEGRAM_URL,
     qrSrc: '/generated/telegram/kenigevents-qr.svg',
     qrAlt: 'QR-код Telegram-канала «Полюбить Калининград Анонсы»',
@@ -25,7 +25,7 @@ const announcementChannels = [
   {
     platform: 'MAX',
     title: 'Канал фестиваля в MAX',
-    description: 'Оперативные обновления о фестивале в отдельной ленте.',
+    description: 'Подпишитесь, чтобы получать оперативные обновления о фестивале в отдельной ленте.',
     href: MAX_URL,
     qrSrc: '/generated/max/max-channel-qr.svg',
     qrAlt: 'QR-код канала фестиваля в MAX',
@@ -72,9 +72,10 @@ const announcementChannels = [
       </div>
       <section class="site-footer__channels" aria-label="Каналы оперативных обновлений">
         <div class="site-footer__channels-copy">
-          <p class="site-footer__channels-eyebrow">Оперативные обновления</p>
+          <p class="site-footer__channels-eyebrow">Подпишитесь на анонсы</p>
           <p class="site-footer__channels-text">
-            Свежие анонсы фестиваля, изменения в программе и важные напоминания публикуем в Telegram и MAX.
+            Подписывайтесь на Telegram или MAX, чтобы не пропустить новые события, изменения в программе
+            и важные напоминания фестиваля.
           </p>
         </div>
         <div class="site-footer__channel-list">
@@ -90,6 +91,7 @@ const announcementChannels = [
                 <span class="site-footer__channel-platform">{channel.platform}</span>
                 <strong>{channel.title}</strong>
                 <span>{channel.description}</span>
+                <span class="site-footer__channel-action">Подписаться</span>
               </div>
               <div class="site-footer__channel-code">
                 <img
