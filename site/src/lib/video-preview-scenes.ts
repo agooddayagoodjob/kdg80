@@ -1,8 +1,14 @@
 import { getFestivalEvents, type FestivalEvent } from './festival';
-import { getEventPortraitImage, getEventPortraitStyle } from './media';
+import {
+  getDialoguePortraitImage,
+  getDialoguePortraitStyle,
+  getEventPortraitImage,
+  getEventPortraitStyle,
+  getSpeakerCaption,
+} from './media';
 import registrationManifest from '../data/registration-state-manifest.json';
 
-export type VideoPreviewSceneKind = 'cold-open' | 'boost' | 'cascade' | 'site' | 'qr' | 'sequence';
+export type VideoPreviewSceneKind = 'cold-open' | 'boost' | 'dialogue' | 'cascade' | 'site' | 'qr' | 'sequence';
 
 type VideoPreviewBaseScene = {
   slug: string;
@@ -33,6 +39,27 @@ export type VideoPreviewBoostScene = VideoPreviewBaseScene & {
   portraitImage: string;
   portraitStyle?: string;
   posterImage?: string;
+  dateLabel: string;
+  venue: string;
+  accessLabel?: string;
+  availabilityLabel?: string;
+  availabilityTone?: 'available' | 'low' | 'soon';
+};
+
+export type VideoPreviewDialogueScene = VideoPreviewBaseScene & {
+  kind: 'dialogue';
+  variant: 'slat-strip' | 'cutout-strip' | 'cast-wall';
+  eyebrow: string;
+  titleLines: string[];
+  subtitle: string;
+  supportLine: string;
+  participants: Array<{
+    name: string;
+    role: string;
+    image: string;
+    imageStyle?: string;
+    monogram: string;
+  }>;
   dateLabel: string;
   venue: string;
   accessLabel?: string;
@@ -75,6 +102,7 @@ export type VideoPreviewSequenceScene = VideoPreviewBaseScene & {
 export type VideoPreviewScene =
   | VideoPreviewColdOpenScene
   | VideoPreviewBoostScene
+  | VideoPreviewDialogueScene
   | VideoPreviewCascadeScene
   | VideoPreviewSiteScene
   | VideoPreviewQrScene
@@ -93,6 +121,18 @@ type BoostSceneSeed = {
   detailAttribution?: string;
   durationMs?: number;
   portraitStyle?: string;
+};
+
+type DialogueSceneSeed = {
+  slug: string;
+  label: string;
+  eventMatch: string;
+  variant: VideoPreviewDialogueScene['variant'];
+  eyebrow: string;
+  titleLines: string[];
+  subtitle: string;
+  supportLine: string;
+  durationMs?: number;
 };
 
 type RegistrationManifestItem = {
@@ -126,7 +166,7 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
     shortTitle: 'О ЧЁМ МЕЧТАЛИ',
     hook: 'КУДА СТРЕМИЛИСЬ И КУДА ПОПАЛИ',
     mythText: 'В СОВЕТСКОМ КАЛИНИНГРАДЕ ЖИЗНЬ БЫЛА СКУЧНОЙ',
-    detailLabel: 'ПОСЛЕ ЛЕКЦИИ',
+    detailLabel: 'ЛЕКТОР ОТВЕТИТ',
     detailLines: [
       'ПОЧЕМУ КАЛИНИНГРАД СТАЛ ГОРОДОМ СУМАСШЕДШИХ ВОЗМОЖНОСТЕЙ?',
     ],
@@ -156,7 +196,7 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
     shortTitle: 'МОСТЫ ВРЕМЕНИ',
     hook: 'ПРОШЛОЕ, НАСТОЯЩЕЕ, БУДУЩЕЕ',
     mythText: 'ДВУХЪЯРУСНЫЙ МОСТ СПРОЕКТИРОВАЛ ЭЙФЕЛЬ',
-    detailLabel: 'ПОСЛЕ ЛЕКЦИИ',
+    detailLabel: 'ЛЕКТОР ОТВЕТИТ',
     detailLines: [
       'ПОЧЕМУ МОСТ ПОСТРОЕН В ДВА ЯРУСА?',
       'ЧТО В НЁМ НЕМЕЦКОЕ, А ЧТО ДОСТРОИЛИ СОВЕТСКИЕ ИНЖЕНЕРЫ?',
@@ -195,6 +235,42 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
       'КАК КИНО ПОКАЗЫВАЕТ ИСЧЕЗНУВШИЙ КАЛИНИНГРАД?',
     ],
     durationMs: 8600,
+  },
+];
+
+const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
+  {
+    slug: 'public-talk-slat',
+    label: 'Public Talk / Slat Strip',
+    eventMatch: 'Как говорить о советском Калининграде без ностальгического тумана и без стыда',
+    variant: 'slat-strip',
+    eyebrow: 'ОТКРЫТЫЙ ДИАЛОГ · 4 УЧАСТНИКА',
+    titleLines: ['КАК ГОВОРИТЬ', 'О СОВЕТСКОМ', 'КАЛИНИНГРАДЕ'],
+    subtitle: 'БЕЗ НОСТАЛЬГИЧЕСКОГО ТУМАНА И БЕЗ СТЫДА',
+    supportLine: 'НЕ ОДНА ЛЕКЦИЯ, А РАЗГОВОР, ГДЕ СТОЛКНУТСЯ РАЗНЫЕ ОПТИКИ.',
+    durationMs: 5600,
+  },
+  {
+    slug: 'public-talk-cutout',
+    label: 'Public Talk / Cutout Strip',
+    eventMatch: 'Как говорить о советском Калининграде без ностальгического тумана и без стыда',
+    variant: 'cutout-strip',
+    eyebrow: 'ОТКРЫТЫЙ ДИАЛОГ · 4 УЧАСТНИКА',
+    titleLines: ['КАК ГОВОРИТЬ', 'О СОВЕТСКОМ КАЛИНИНГРАДЕ'],
+    subtitle: 'БЕЗ НОСТАЛЬГИЧЕСКОГО ТУМАНА И БЕЗ СТЫДА',
+    supportLine: 'ЖИВОЙ РАЗГОВОР, ГДЕ ВАЖНЫ НЕ ТОЛЬКО ФАКТЫ, НО И РАЗНЫЕ ИНТОНАЦИИ.',
+    durationMs: 5600,
+  },
+  {
+    slug: 'public-talk-wall',
+    label: 'Public Talk / Cast Wall',
+    eventMatch: 'Как говорить о советском Калининграде без ностальгического тумана и без стыда',
+    variant: 'cast-wall',
+    eyebrow: 'ОТКРЫТЫЙ ДИАЛОГ · 4 УЧАСТНИКА',
+    titleLines: ['КАК ГОВОРИТЬ О', 'СОВЕТСКОМ КАЛИНИНГРАДЕ'],
+    subtitle: 'БЕЗ НОСТАЛЬГИЧЕСКОГО ТУМАНА И БЕЗ СТЫДА',
+    supportLine: 'ТРИВОЖНАЯ ТЕМА, КОТОРАЯ ВЫИГРЫВАЕТ, КОГДА В КАДРЕ СРАЗУ ВИДНЫ ВСЕ ГОЛОСА.',
+    durationMs: 5600,
   },
 ];
 
@@ -241,6 +317,15 @@ function resolveAvailabilityState(event: FestivalEvent) {
   };
 }
 
+function getDialogueMonogram(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((chunk) => chunk[0]?.toUpperCase() ?? '')
+    .join('');
+}
+
 function createBoostScene(events: FestivalEvent[], seed: BoostSceneSeed): VideoPreviewBoostScene {
   const event = findEvent(events, seed.eventMatch);
   const fallbackPortrait = event.speakerImages[0] ?? '';
@@ -280,6 +365,37 @@ function createBoostScene(events: FestivalEvent[], seed: BoostSceneSeed): VideoP
   };
 }
 
+function createDialogueScene(events: FestivalEvent[], seed: DialogueSceneSeed): VideoPreviewDialogueScene {
+  const event = findEvent(events, seed.eventMatch);
+  const availabilityState = resolveAvailabilityState(event);
+
+  return {
+    slug: seed.slug,
+    label: seed.label,
+    kind: 'dialogue',
+    variant: seed.variant,
+    durationMs: seed.durationMs ?? 5600,
+    eyebrow: seed.eyebrow,
+    titleLines: seed.titleLines,
+    subtitle: seed.subtitle,
+    supportLine: seed.supportLine,
+    participants: event.dialogueParticipants
+      .slice(0, 4)
+      .map((participant) => ({
+        name: participant.name,
+        role: getSpeakerCaption(participant.affiliation),
+        image: participant.images[0] ? getDialoguePortraitImage(participant.name, participant.images[0]) : '',
+        imageStyle: getDialoguePortraitStyle(participant.name),
+        monogram: getDialogueMonogram(participant.name),
+      })),
+    dateLabel: event.dateLabel,
+    venue: event.venue || 'ПЛОЩАДКА УТОЧНЯЕТСЯ',
+    accessLabel: 'БЕСПЛАТНО ПО РЕГИСТРАЦИИ',
+    availabilityLabel: availabilityState?.label,
+    availabilityTone: availabilityState?.tone,
+  };
+}
+
 export function getVideoPreviewScenes(): VideoPreviewScene[] {
   const events = getFestivalEvents();
 
@@ -309,6 +425,7 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       period: '28 МАРТА - 19 ИЮЛЯ 2026',
     },
     ...BOOST_SCENE_SEEDS.map((seed) => createBoostScene(events, seed)),
+    ...DIALOGUE_SCENE_SEEDS.map((seed) => createDialogueScene(events, seed)),
     {
       slug: 'cascade',
       label: 'Cascade / Названия событий',

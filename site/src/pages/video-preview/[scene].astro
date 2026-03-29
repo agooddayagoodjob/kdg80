@@ -32,6 +32,10 @@ function getSceneTitle(value: VideoPreviewScene) {
     return value.shortTitle;
   }
 
+  if (value.kind === 'dialogue') {
+    return value.titleLines.join(' ');
+  }
+
   if (value.kind === 'site') {
     return value.domain;
   }
@@ -72,7 +76,7 @@ function getMythLabelParts(text?: string) {
 }
 
 function getSceneBrand(value: VideoPreviewScene) {
-  if (value.kind === 'boost' || value.kind === 'cascade' || value.kind === 'sequence') {
+  if (value.kind === 'boost' || value.kind === 'dialogue' || value.kind === 'cascade' || value.kind === 'sequence') {
     return {
       kind: 'single',
       path: '/shared-assets/logo-znanie-festival-master-inverse.svg',
@@ -188,7 +192,7 @@ const sceneBrand = getSceneBrand(scene);
             )}
             <div class="boost-scene__panel anim anim--panel"></div>
             <div class="boost-scene__copy">
-              <p class="boost-scene__eyebrow anim anim--boost-lead-phase">ОБ ЭТОМ ВЫ УЗНАЕТЕ НА ЛЕКЦИИ</p>
+              <p class="boost-scene__eyebrow anim anim--boost-lead-phase">НА ЭТОТ ВОПРОС ОТВЕТИТ ЛЕКТОР</p>
               <div class="boost-scene__rule anim anim--boost-rule-phase"></div>
               <h2 class="boost-scene__title anim anim--boost-title-phase">{scene.shortTitle}</h2>
               <p class="boost-scene__hook anim anim--boost-hook-phase">{scene.hook}</p>
@@ -235,6 +239,60 @@ const sceneBrand = getSceneBrand(scene);
             <div class:list={['boost-scene__speaker-tag', !scene.portraitImage && 'boost-scene__speaker-tag--text-only', 'anim', 'anim--boost-speaker-phase']}>
               <strong>{scene.speakerName}</strong>
               <span>{scene.speakerRole}</span>
+            </div>
+          </div>
+        )}
+
+        {scene.kind === 'dialogue' && (
+          <div class:list={['dialogue-scene', `dialogue-scene--${scene.variant}`]}>
+            <div class="dialogue-scene__backdrop"></div>
+            <div class="dialogue-scene__grain"></div>
+            <div class="dialogue-scene__accent"></div>
+
+            <div class="dialogue-scene__copy">
+              <p class="dialogue-scene__eyebrow">{scene.eyebrow}</p>
+              <h2 class="dialogue-scene__title">
+                {scene.titleLines.map((line) => (
+                  <span>{line}</span>
+                ))}
+              </h2>
+              <p class="dialogue-scene__subtitle">{scene.subtitle}</p>
+              <p class="dialogue-scene__support">{scene.supportLine}</p>
+              <div class="dialogue-scene__meta">
+                {scene.availabilityLabel && (
+                  <p class:list={[
+                    'dialogue-scene__availability',
+                    scene.availabilityTone && `dialogue-scene__availability--${scene.availabilityTone}`,
+                  ]}>
+                    {scene.availabilityLabel}
+                  </p>
+                )}
+                {scene.accessLabel && <p class="dialogue-scene__access-pill">{scene.accessLabel}</p>}
+                <p class="dialogue-scene__meta-line">{scene.dateLabel} · {scene.venue}</p>
+              </div>
+            </div>
+
+            <div class="dialogue-scene__participants" aria-label="Участники открытого диалога">
+              {scene.participants.map((participant) => (
+                <article class:list={['dialogue-person', !participant.image && 'dialogue-person--placeholder']}>
+                  <div class:list={['dialogue-person__media', !participant.image && 'dialogue-person__media--placeholder']}>
+                    {participant.image ? (
+                      <img
+                        class="dialogue-person__portrait"
+                        src={participant.image}
+                        alt={participant.name}
+                        style={participant.imageStyle}
+                      />
+                    ) : (
+                      <span class="dialogue-person__monogram" aria-hidden="true">{participant.monogram}</span>
+                    )}
+                  </div>
+                  <div class="dialogue-person__caption">
+                    <strong>{participant.name}</strong>
+                    <span>{participant.role}</span>
+                  </div>
+                </article>
+              ))}
             </div>
           </div>
         )}
@@ -585,12 +643,20 @@ const sceneBrand = getSceneBrand(scene);
     filter: drop-shadow(0 10px 22px rgba(12, 10, 10, 0.22));
   }
 
+  .video-scene--dialogue .video-scene__brand--festival-master {
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(14, 12, 12, 0.12);
+    backdrop-filter: blur(10px);
+  }
+
   .video-scene__brand--znanie {
     --brand-width: 162px;
   }
 
   .cold-open,
   .boost-scene,
+  .dialogue-scene,
   .cascade-scene,
   .sequence-scene,
   .site-scene,
@@ -938,6 +1004,380 @@ const sceneBrand = getSceneBrand(scene);
   .boost-scene--no-portrait .boost-scene__speaker-tag span {
     font-size: 1.42rem;
     line-height: 1.16;
+  }
+
+  .dialogue-scene {
+    background:
+      radial-gradient(circle at top left, rgba(216, 75, 49, 0.12), transparent 24rem),
+      linear-gradient(180deg, #120f10 0%, #191314 100%);
+    color: #fff8f2;
+  }
+
+  .dialogue-scene__backdrop,
+  .dialogue-scene__grain,
+  .dialogue-scene__accent {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .dialogue-scene__grain {
+    opacity: 0.18;
+    mix-blend-mode: screen;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.22), black 20%, black 100%);
+  }
+
+  .dialogue-scene__copy {
+    position: absolute;
+    z-index: 3;
+  }
+
+  .dialogue-scene__eyebrow {
+    margin: 0;
+    font: 700 1.08rem/1 var(--font-display);
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.68);
+    text-transform: uppercase;
+  }
+
+  .dialogue-scene__title {
+    margin: 1rem 0 0;
+    display: grid;
+    gap: 0.16rem;
+    font: 700 5.35rem/0.9 var(--font-display);
+    letter-spacing: -0.06em;
+    text-wrap: balance;
+  }
+
+  .dialogue-scene__title span {
+    display: block;
+  }
+
+  .dialogue-scene__subtitle {
+    margin: 1rem 0 0;
+    max-width: 18ch;
+    font: 700 1.72rem/1 var(--font-display);
+    letter-spacing: -0.03em;
+    color: rgba(255, 248, 242, 0.86);
+    text-wrap: balance;
+  }
+
+  .dialogue-scene__support {
+    margin: 1.3rem 0 0;
+    max-width: 36ch;
+    font: 500 1.3rem/1.15 var(--font-body);
+    color: rgba(255, 248, 242, 0.7);
+  }
+
+  .dialogue-scene__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    margin-top: 1.5rem;
+  }
+
+  .dialogue-scene__availability,
+  .dialogue-scene__access-pill {
+    margin: 0;
+    padding: 0.62rem 0.82rem 0.56rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    font: 700 0.95rem/1 var(--font-display);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .dialogue-scene__availability {
+    color: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .dialogue-scene__availability--low {
+    border-color: rgba(255, 246, 239, 0.98);
+    background: rgba(255, 246, 239, 0.98);
+    color: #b33624;
+  }
+
+  .dialogue-scene__availability--soon {
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .dialogue-scene__access-pill {
+    border-color: rgba(216, 75, 49, 0.34);
+    color: #fff6ef;
+    background: rgba(216, 75, 49, 0.18);
+  }
+
+  .dialogue-scene__meta-line {
+    margin: 0;
+    font: 500 1.15rem/1.12 var(--font-body);
+    color: rgba(255, 248, 242, 0.66);
+  }
+
+  .dialogue-scene__participants {
+    position: absolute;
+    z-index: 3;
+  }
+
+  .dialogue-person {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dialogue-person__media {
+    position: relative;
+    overflow: hidden;
+    min-height: 10rem;
+    background:
+      radial-gradient(circle at 50% 14%, rgba(255, 255, 255, 0.08), transparent 36%),
+      linear-gradient(180deg, #26211d 0%, #14110f 82%);
+  }
+
+  .dialogue-person__media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 84% 58%, rgba(17, 14, 12, 0.42), transparent 30%),
+      linear-gradient(270deg, rgba(17, 14, 12, 0.56) 0%, rgba(17, 14, 12, 0.18) 28%, rgba(17, 14, 12, 0) 62%);
+    pointer-events: none;
+  }
+
+  .dialogue-person__media--placeholder {
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(circle at top left, rgba(216, 75, 49, 0.16), transparent 12rem),
+      linear-gradient(180deg, #221c19 0%, #151110 100%);
+  }
+
+  .dialogue-person__portrait {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: auto;
+    height: auto;
+    max-width: none;
+    transform:
+      translate(
+        calc(-50% + var(--dialogue-portrait-x-desktop, var(--dialogue-portrait-x-mobile, 0px))),
+        var(--dialogue-portrait-y-desktop, 18px)
+      )
+      scale(var(--dialogue-portrait-scale-desktop, 0.214));
+    transform-origin: center top;
+    filter:
+      grayscale(1)
+      contrast(1.08)
+      brightness(0.98)
+      drop-shadow(0 0 2px rgba(249, 242, 233, 1))
+      drop-shadow(0 0 8px rgba(249, 242, 233, 0.86))
+      drop-shadow(0 0 18px rgba(249, 242, 233, 0.24))
+      drop-shadow(0 16px 24px rgba(0, 0, 0, 0.32));
+    pointer-events: none;
+  }
+
+  .dialogue-person__monogram {
+    font: 700 2.4rem/1 var(--font-display);
+    letter-spacing: -0.04em;
+    color: rgba(255, 248, 242, 0.88);
+  }
+
+  .dialogue-person__caption {
+    display: grid;
+    gap: 0.4rem;
+    padding: 1rem 1rem 1.05rem;
+  }
+
+  .dialogue-person__caption strong {
+    display: block;
+    margin: 0;
+    font: 700 1.28rem/0.98 var(--font-display);
+    letter-spacing: -0.03em;
+    color: #fff8f2;
+  }
+
+  .dialogue-person__caption span {
+    display: block;
+    margin: 0;
+    font: 400 0.92rem/1.12 var(--font-body);
+    color: rgba(255, 248, 242, 0.72);
+  }
+
+  .dialogue-scene--slat-strip .dialogue-scene__backdrop {
+    background:
+      radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.05), transparent 18rem),
+      linear-gradient(180deg, rgba(15, 12, 12, 0.94) 0%, rgba(22, 17, 18, 0.98) 100%);
+  }
+
+  .dialogue-scene--slat-strip .dialogue-scene__accent {
+    inset: 0 0 0 auto;
+    width: 46%;
+    background:
+      radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.1), transparent 18rem),
+      linear-gradient(180deg, #d84b31 0%, #af2f20 100%);
+    clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .dialogue-scene--slat-strip .dialogue-scene__copy {
+    left: 72px;
+    top: 176px;
+    width: 720px;
+  }
+
+  .dialogue-scene--slat-strip .dialogue-scene__participants {
+    right: 72px;
+    top: 132px;
+    width: 972px;
+    height: 822px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .dialogue-scene--slat-strip .dialogue-person {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    min-height: 0;
+    background: rgba(11, 10, 10, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 40px rgba(9, 8, 8, 0.26);
+  }
+
+  .dialogue-scene--slat-strip .dialogue-person__media {
+    min-height: 0;
+  }
+
+  .dialogue-scene--cutout-strip .dialogue-scene__backdrop {
+    background:
+      radial-gradient(circle at top right, rgba(216, 75, 49, 0.18), transparent 24rem),
+      linear-gradient(180deg, #120f10 0%, #181213 100%);
+  }
+
+  .dialogue-scene--cutout-strip .dialogue-scene__accent {
+    inset: auto auto 122px 84px;
+    width: 316px;
+    height: 8px;
+    background: #d84b31;
+  }
+
+  .dialogue-scene--cutout-strip .dialogue-scene__copy {
+    left: 84px;
+    top: 168px;
+    width: 1240px;
+  }
+
+  .dialogue-scene--cutout-strip .dialogue-scene__title {
+    max-width: 9.5ch;
+    font-size: 5.9rem;
+  }
+
+  .dialogue-scene--cutout-strip .dialogue-scene__participants {
+    left: 84px;
+    right: 84px;
+    bottom: 58px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .dialogue-scene--cutout-strip .dialogue-person {
+    min-height: 316px;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 40px rgba(9, 8, 8, 0.24);
+  }
+
+  .dialogue-scene--cutout-strip .dialogue-person__media {
+    min-height: 224px;
+  }
+
+  .dialogue-scene--cast-wall {
+    background:
+      linear-gradient(180deg, #f2e8da 0%, #eadbc7 100%);
+    color: #171412;
+  }
+
+  .dialogue-scene--cast-wall .dialogue-scene__backdrop {
+    background:
+      radial-gradient(circle at 18% 18%, rgba(216, 75, 49, 0.12), transparent 18rem),
+      linear-gradient(180deg, rgba(248, 241, 231, 0.92) 0%, rgba(237, 226, 210, 0.94) 100%);
+  }
+
+  .dialogue-scene--cast-wall .dialogue-scene__grain {
+    mix-blend-mode: multiply;
+    opacity: 0.08;
+  }
+
+  .dialogue-scene--cast-wall .dialogue-scene__accent {
+    inset: 0 0 0 auto;
+    width: 44%;
+    background:
+      radial-gradient(circle at 26% 18%, rgba(255, 255, 255, 0.12), transparent 16rem),
+      linear-gradient(180deg, #d84b31 0%, #af2f20 100%);
+    clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%);
+    opacity: 0.96;
+  }
+
+  .dialogue-scene--cast-wall .dialogue-scene__copy {
+    left: 84px;
+    top: 180px;
+    width: 760px;
+  }
+
+  .dialogue-scene--cast-wall .dialogue-scene__eyebrow {
+    color: rgba(23, 20, 18, 0.56);
+  }
+
+  .dialogue-scene--cast-wall .dialogue-scene__title,
+  .dialogue-scene--cast-wall .dialogue-scene__subtitle,
+  .dialogue-scene--cast-wall .dialogue-scene__support,
+  .dialogue-scene--cast-wall .dialogue-scene__meta-line {
+    color: #171412;
+  }
+
+  .dialogue-scene--cast-wall .dialogue-scene__subtitle {
+    color: rgba(23, 20, 18, 0.84);
+  }
+
+  .dialogue-scene--cast-wall .dialogue-scene__support {
+    color: rgba(23, 20, 18, 0.66);
+  }
+
+  .dialogue-scene--cast-wall .dialogue-scene__access-pill {
+    color: #fff8f2;
+  }
+
+  .dialogue-scene--cast-wall .dialogue-scene__participants {
+    right: 92px;
+    top: 154px;
+    width: 804px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .dialogue-scene--cast-wall .dialogue-person {
+    background: rgba(255, 250, 244, 0.96);
+    box-shadow: 0 22px 46px rgba(28, 20, 17, 0.12);
+  }
+
+  .dialogue-scene--cast-wall .dialogue-person__media {
+    min-height: 280px;
+  }
+
+  .dialogue-scene--cast-wall .dialogue-person__caption strong {
+    color: #171412;
+  }
+
+  .dialogue-scene--cast-wall .dialogue-person__caption span {
+    color: rgba(23, 20, 18, 0.68);
   }
 
   .cascade-scene {
