@@ -74,13 +74,16 @@ function getMythLabelParts(text?: string) {
 function getSceneBrand(value: VideoPreviewScene) {
   if (value.kind === 'boost' || value.kind === 'cascade' || value.kind === 'sequence') {
     return {
-      path: '/shared-assets/logo-festival-single.svg',
-      alt: '80 историй о главном',
-      className: 'video-scene__brand--festival',
+      kind: 'festival-combo',
+      znaniePath: '/shared-assets/logo-znanie-main-inverse.svg',
+      festivalPath: '/shared-assets/logo-festival-single-inverse.svg',
+      alt: 'Знание, 80 историй о главном',
+      className: 'video-scene__brand--festival-combo',
     };
   }
 
   return {
+    kind: 'single',
     path: '/shared-assets/logo-znanie-main.svg',
     alt: 'Знание',
     className: 'video-scene__brand--znanie',
@@ -126,7 +129,14 @@ const sceneBrand = getSceneBrand(scene);
       >
         {scene.kind !== 'site' && (
           <div class:list={['video-scene__brand', sceneBrand.className, 'anim', 'anim--fade']}>
-            <img src={sceneBrand.path} alt={sceneBrand.alt} />
+            {sceneBrand.kind === 'festival-combo' ? (
+              <div class="video-scene__brand-combo" aria-label={sceneBrand.alt}>
+                <img class="video-scene__brand-combo-znanie" src={sceneBrand.znaniePath} alt="" />
+                <img class="video-scene__brand-combo-festival" src={sceneBrand.festivalPath} alt="" />
+              </div>
+            ) : (
+              <img src={sceneBrand.path} alt={sceneBrand.alt} />
+            )}
           </div>
         )}
 
@@ -578,11 +588,25 @@ const sceneBrand = getSceneBrand(scene);
     height: auto;
   }
 
-  .video-scene__brand--festival {
-    --brand-width: 274px;
-    padding: 14px 18px 12px;
-    background: rgba(252, 248, 242, 0.94);
-    box-shadow: 0 16px 34px rgba(14, 11, 10, 0.16);
+  .video-scene__brand-combo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .video-scene__brand-combo-znanie {
+    width: 140px;
+    flex: 0 0 auto;
+  }
+
+  .video-scene__brand-combo-festival {
+    width: 196px;
+    flex: 0 0 auto;
+  }
+
+  .video-scene__brand--festival-combo {
+    --brand-width: 356px;
+    filter: drop-shadow(0 10px 22px rgba(12, 10, 10, 0.22));
   }
 
   .video-scene__brand--znanie {
