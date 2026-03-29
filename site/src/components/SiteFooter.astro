@@ -15,6 +15,7 @@ const TELEGRAM_URL = 'https://t.me/+Jhg7TZBUTNc3ZmMy';
 const MAX_URL = 'https://max.ru/join/do_4eLW85-yK_dXcc6f2cmKp9utJuFl_hCo0cxnJ1QA';
 const announcementChannels = [
   {
+    id: 'telegram',
     platform: 'Telegram',
     title: 'Полюбить Калининград Анонсы',
     description: 'Канал для быстрых уведомлений фестиваля.',
@@ -24,6 +25,7 @@ const announcementChannels = [
     qrAlt: 'QR-код Telegram-канала «Полюбить Калининград Анонсы»',
   },
   {
+    id: 'max',
     platform: 'MAX',
     title: 'Канал фестиваля в MAX',
     description: 'Отдельная лента оперативных обновлений.',
@@ -82,14 +84,52 @@ const announcementChannels = [
         <div class="site-footer__channel-list">
           {announcementChannels.map((channel) => (
             <a
-              class="site-footer__channel"
+              class={`site-footer__channel site-footer__channel--${channel.id}`}
               href={channel.href}
               target="_blank"
               rel="noreferrer"
               aria-label={`${channel.platform}: ${channel.title}`}
             >
               <div class="site-footer__channel-copy">
-                <span class="site-footer__channel-platform">{channel.platform}</span>
+                <div class="site-footer__channel-topline">
+                  <div class="site-footer__channel-header">
+                    <span class={`site-footer__channel-icon site-footer__channel-icon--${channel.id}`} aria-hidden="true">
+                      {channel.id === 'telegram' ? (
+                        <svg viewBox="0 0 16 16" focusable="false">
+                          <defs>
+                            <linearGradient id="telegram-footer-icon" x1="50%" y1="0%" x2="50%" y2="100%">
+                              <stop offset="0%" stop-color="#38AEEB"></stop>
+                              <stop offset="100%" stop-color="#279AD1"></stop>
+                            </linearGradient>
+                          </defs>
+                          <circle cx="8" cy="8" r="8" fill="url(#telegram-footer-icon)"></circle>
+                          <path
+                            fill="#fff"
+                            d="M3.17 7.84c2.62-1.1 4.36-1.82 5.24-2.16 2.5-.99 2.84-1.14 3.18-1.14.07 0 .25.03.4.15.14.12.18.2.2.26.01.07.01.28 0 .4-.14 1.36-.65 4.5-.95 6.03-.12.64-.37.86-.61.88-.52.04-.92-.33-1.42-.65-.79-.5-1.05-.68-1.82-1.16-.88-.56-.52-.75-.02-1.26.13-.13 2.32-2.12 2.35-2.3.03-.16.04-.18-.03-.25-.07-.08-.16-.06-.21-.05-.08.02-1.29.79-3.62 2.3-.36.24-.68.35-.97.35-.32-.01-.94-.17-1.4-.31-.57-.18-1.01-.27-.97-.57.02-.16.24-.31.67-.47Z"
+                          ></path>
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24" focusable="false">
+                          <defs>
+                            <linearGradient id="max-footer-icon" x1="9%" y1="86%" x2="89%" y2="14%">
+                              <stop offset="0%" stop-color="#56D7FF"></stop>
+                              <stop offset="52%" stop-color="#3655FF"></stop>
+                              <stop offset="100%" stop-color="#8B33E6"></stop>
+                            </linearGradient>
+                          </defs>
+                          <rect x="1" y="1" width="22" height="22" rx="7" fill="url(#max-footer-icon)"></rect>
+                          <path
+                            fill="#fff"
+                            d="M12.38 4.9c-4.18 0-7.56 3.13-7.56 7 0 1.95.87 3.71 2.28 4.98l-.6 3.33a.7.7 0 0 0 1.01.74l3-1.58c.6.14 1.22.22 1.87.22 4.18 0 7.57-3.13 7.57-6.99 0-3.88-3.39-7-7.57-7Z"
+                          ></path>
+                          <circle cx="12.55" cy="12.05" r="3.55" fill="url(#max-footer-icon)"></circle>
+                        </svg>
+                      )}
+                    </span>
+                    <span class="site-footer__channel-platform">{channel.platform}</span>
+                  </div>
+                  <span class="site-footer__channel-action">Подписаться</span>
+                </div>
                 <strong>{channel.title}</strong>
                 <span>{channel.description}</span>
                 <div class="site-footer__channel-benefits" aria-label={`Что приходит в ${channel.platform}`}>
@@ -97,7 +137,6 @@ const announcementChannels = [
                     <span class="site-footer__channel-benefit">{benefit}</span>
                   ))}
                 </div>
-                <span class="site-footer__channel-action">Подписаться</span>
               </div>
               <div class="site-footer__channel-code">
                 <img
