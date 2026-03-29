@@ -343,7 +343,7 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       title: 'ПОЛЮБИТЬ КАЛИНИНГРАД АНОНСЫ',
       subtitle: '@kenigevents',
       secondary: 'ОПЕРАТИВНЫЕ АНОНСЫ ПО ФЕСТИВАЛЮ',
-      qrPath: '/generated/telegram/kenigevents-qr.svg',
+      qrPath: '/generated/telegram/kenigevents-qr-stat.svg',
       href: 'https://t.me/+Jhg7TZBUTNc3ZmMy',
     },
     {

@@ -305,7 +305,7 @@ export function getFestivalSlideDeckSlides(): FestivalSlideDeckSlide[] {
       title: 'ОПЕРАТИВНЫЕ АНОНСЫ\nПО ФЕСТИВАЛЮ',
       subtitle: 'ПОДПИСЫВАЙТЕСЬ И СКАНИРУЙТЕ QR',
       channelTitle: 'ПОЛЮБИТЬ КАЛИНИНГРАД АНОНСЫ',
-      qrPath: '/generated/telegram/kenigevents-qr.svg',
+      qrPath: '/generated/telegram/kenigevents-qr-stat.svg',
       href: 'https://t.me/+Jhg7TZBUTNc3ZmMy',
     },
     {
