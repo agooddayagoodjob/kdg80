@@ -24,9 +24,9 @@ const LECTURE_EVENT_PORTRAIT_OVERRIDES: Array<{ match: string; style: string }> 
 ];
 
 const LECTURE_PORTRAIT_IMAGE_OVERRIDES: Array<{ match: string; path: string }> = [
-  { match: 'Мосиенко', path: '/generated/lecture-portraits/sarnits-artur-lecture.webp' },
+  { match: 'Мосиенко', path: '/generated/lecture-portraits/mosienko-evgeniy-lecture.webp' },
   { match: 'Конюхова', path: '/generated/lecture-portraits/tatyana-konyuhova-lecture.webp' },
-  { match: 'Сарниц', path: '/generated/lecture-portraits/mosienko-evgeniy-lecture.webp' },
+  { match: 'Сарниц', path: '/generated/lecture-portraits/sarnits-artur-lecture.webp' },
 ];
 
 const SPEAKER_STRIP_IMAGE_OVERRIDES: Array<{ match: string; path: string }> = [
