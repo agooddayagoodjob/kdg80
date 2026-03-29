@@ -74,11 +74,10 @@ function getMythLabelParts(text?: string) {
 function getSceneBrand(value: VideoPreviewScene) {
   if (value.kind === 'boost' || value.kind === 'cascade' || value.kind === 'sequence') {
     return {
-      kind: 'festival-combo',
-      znaniePath: '/shared-assets/logo-znanie-main-inverse.svg',
-      festivalPath: '/shared-assets/logo-festival-single-inverse.svg',
+      kind: 'single',
+      path: '/shared-assets/logo-znanie-festival-master-inverse.svg',
       alt: 'Знание, 80 историй о главном',
-      className: 'video-scene__brand--festival-combo',
+      className: 'video-scene__brand--festival-master',
     };
   }
 
@@ -129,14 +128,7 @@ const sceneBrand = getSceneBrand(scene);
       >
         {scene.kind !== 'site' && (
           <div class:list={['video-scene__brand', sceneBrand.className, 'anim', 'anim--fade']}>
-            {sceneBrand.kind === 'festival-combo' ? (
-              <div class="video-scene__brand-combo" aria-label={sceneBrand.alt}>
-                <img class="video-scene__brand-combo-znanie" src={sceneBrand.znaniePath} alt="" />
-                <img class="video-scene__brand-combo-festival" src={sceneBrand.festivalPath} alt="" />
-              </div>
-            ) : (
-              <img src={sceneBrand.path} alt={sceneBrand.alt} />
-            )}
+            <img src={sceneBrand.path} alt={sceneBrand.alt} />
           </div>
         )}
 
@@ -588,23 +580,7 @@ const sceneBrand = getSceneBrand(scene);
     height: auto;
   }
 
-  .video-scene__brand-combo {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-
-  .video-scene__brand-combo-znanie {
-    width: 140px;
-    flex: 0 0 auto;
-  }
-
-  .video-scene__brand-combo-festival {
-    width: 196px;
-    flex: 0 0 auto;
-  }
-
-  .video-scene__brand--festival-combo {
+  .video-scene__brand--festival-master {
     --brand-width: 356px;
     filter: drop-shadow(0 10px 22px rgba(12, 10, 10, 0.22));
   }
