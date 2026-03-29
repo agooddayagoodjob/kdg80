@@ -48,7 +48,7 @@ export type VideoPreviewBoostScene = VideoPreviewBaseScene & {
 
 export type VideoPreviewDialogueScene = VideoPreviewBaseScene & {
   kind: 'dialogue';
-  variant: 'slat-strip' | 'cutout-strip' | 'cast-wall';
+  variant: 'bottom-strip' | 'side-strip' | 'split-strip';
   eyebrow: string;
   titleLines: string[];
   subtitle: string;
@@ -241,35 +241,35 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
 const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
   {
     slug: 'public-talk-slat',
-    label: 'Public Talk / Slat Strip',
+    label: 'Public Talk / Bottom Strip',
     eventMatch: 'Как говорить о советском Калининграде без ностальгического тумана и без стыда',
-    variant: 'slat-strip',
+    variant: 'bottom-strip',
     eyebrow: 'ОТКРЫТЫЙ ДИАЛОГ · 4 УЧАСТНИКА',
     titleLines: ['КАК ГОВОРИТЬ', 'О СОВЕТСКОМ', 'КАЛИНИНГРАДЕ'],
     subtitle: 'БЕЗ НОСТАЛЬГИЧЕСКОГО ТУМАНА И БЕЗ СТЫДА',
-    supportLine: 'НЕ ОДНА ЛЕКЦИЯ, А РАЗГОВОР, ГДЕ СТОЛКНУТСЯ РАЗНЫЕ ОПТИКИ.',
+    supportLine: 'НЕ ЛЕКЦИЯ, А РАЗГОВОР, ГДЕ ВАЖНЫ НЕ ОДИН ВЫВОД, А СТОЛКНОВЕНИЕ ВЗГЛЯДОВ.',
     durationMs: 5600,
   },
   {
     slug: 'public-talk-cutout',
-    label: 'Public Talk / Cutout Strip',
+    label: 'Public Talk / Side Strip',
     eventMatch: 'Как говорить о советском Калининграде без ностальгического тумана и без стыда',
-    variant: 'cutout-strip',
+    variant: 'side-strip',
     eyebrow: 'ОТКРЫТЫЙ ДИАЛОГ · 4 УЧАСТНИКА',
-    titleLines: ['КАК ГОВОРИТЬ', 'О СОВЕТСКОМ КАЛИНИНГРАДЕ'],
+    titleLines: ['КАК ГОВОРИТЬ', 'О СОВЕТСКОМ', 'КАЛИНИНГРАДЕ'],
     subtitle: 'БЕЗ НОСТАЛЬГИЧЕСКОГО ТУМАНА И БЕЗ СТЫДА',
-    supportLine: 'ЖИВОЙ РАЗГОВОР, ГДЕ ВАЖНЫ НЕ ТОЛЬКО ФАКТЫ, НО И РАЗНЫЕ ИНТОНАЦИИ.',
+    supportLine: 'ЧЕТЫРЕ УЧАСТНИКА, ЧЕТЫРЕ ОПТИКИ, ОДНА ТРУДНАЯ ТЕМА БЕЗ ГОТОВОГО ОТВЕТА.',
     durationMs: 5600,
   },
   {
     slug: 'public-talk-wall',
-    label: 'Public Talk / Cast Wall',
+    label: 'Public Talk / Split Strip',
     eventMatch: 'Как говорить о советском Калининграде без ностальгического тумана и без стыда',
-    variant: 'cast-wall',
+    variant: 'split-strip',
     eyebrow: 'ОТКРЫТЫЙ ДИАЛОГ · 4 УЧАСТНИКА',
-    titleLines: ['КАК ГОВОРИТЬ О', 'СОВЕТСКОМ КАЛИНИНГРАДЕ'],
+    titleLines: ['КАК ГОВОРИТЬ', 'О СОВЕТСКОМ', 'КАЛИНИНГРАДЕ'],
     subtitle: 'БЕЗ НОСТАЛЬГИЧЕСКОГО ТУМАНА И БЕЗ СТЫДА',
-    supportLine: 'ТРИВОЖНАЯ ТЕМА, КОТОРАЯ ВЫИГРЫВАЕТ, КОГДА В КАДРЕ СРАЗУ ВИДНЫ ВСЕ ГОЛОСА.',
+    supportLine: 'ТЕМА СРАЗУ СЧИТЫВАЕТСЯ КАК ДИАЛОГ: СНАЧАЛА НАЗВАНИЕ, ПОТОМ УЧАСТНИКИ, ПОТОМ ПАРАМЕТРЫ.',
     durationMs: 5600,
   },
 ];
