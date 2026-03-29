@@ -127,7 +127,7 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
     detailLines: [
       'ПОЧЕМУ КАЛИНИНГРАД СТАЛ ГОРОДОМ СУМАСШЕДШИХ ВОЗМОЖНОСТЕЙ?',
     ],
-    durationMs: 7600,
+    durationMs: 9200,
   },
   {
     slug: 'ocean',
@@ -143,7 +143,7 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
       'ВЕЧНЫЙ ЗОВ И НАДЕЖДА БУДУЩЕГО ЧЕЛОВЕЧЕСТВА.',
     ],
     detailAttribution: 'Владимир Андреевич Чечко',
-    durationMs: 6800,
+    durationMs: 8600,
   },
   {
     slug: 'bridge',
@@ -158,7 +158,7 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
       'ПОЧЕМУ МОСТ ПОСТРОЕН В ДВА ЯРУСА?',
       'ЧТО В НЁМ НЕМЕЦКОЕ, А ЧТО ДОСТРОИЛИ СОВЕТСКИЕ ИНЖЕНЕРЫ?',
     ],
-    durationMs: 7200,
+    durationMs: 9000,
     portraitStyle: '--event-portrait-size: 1.46; --event-portrait-shift-x: -0.18rem; --event-portrait-shift-y: 0.18rem; --event-portrait-width: min(45%, 37rem);',
   },
   {
@@ -176,7 +176,7 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
     ],
     detailAttribution: 'Артур Артурович Сарниц',
     portraitStyle: '--event-portrait-size: 1.82; --event-portrait-shift-x: -3.05rem; --event-portrait-shift-y: 0.14rem; --event-portrait-width: min(48.5%, 39.5rem);',
-    durationMs: 7000,
+    durationMs: 9000,
   },
   {
     slug: 'cinema',
@@ -191,7 +191,7 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
       'ПОЧЕМУ РЕЖИССЁРЫ ДЕСЯТИЛЕТИЯМИ ВОЗВРАЩАЛИСЬ ИМЕННО СЮДА?',
       'КАК КИНО ПОКАЗЫВАЕТ ИСЧЕЗНУВШИЙ КАЛИНИНГРАД?',
     ],
-    durationMs: 6900,
+    durationMs: 8600,
   },
 ];
 
@@ -310,7 +310,7 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       slug: 'cascade',
       label: 'Cascade / Названия событий',
       kind: 'cascade',
-      durationMs: 4200,
+      durationMs: 5600,
       routeLabel: 'ЧТО ЕЩЁ МОЖНО УСПЕТЬ',
       cards: cascadeCards,
     },

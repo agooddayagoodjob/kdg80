@@ -18,23 +18,31 @@ const baseUrl = `http://127.0.0.1:${port}`;
 const sceneArg = args.find((value) => !value.startsWith('--'));
 const shouldBuild = args.includes('--build');
 const qualityArg = args.find((value) => value.startsWith('--quality='));
+const profileArg = args.find((value) => value.startsWith('--profile='));
 const fpsArg = args.find((value) => value.startsWith('--fps='));
 const fromArg = args.find((value) => value.startsWith('--from-ms='));
 const toArg = args.find((value) => value.startsWith('--to-ms='));
 const supersampleArg = args.find((value) => value.startsWith('--supersample='));
 const quality = qualityArg?.split('=')[1] ?? 'low';
-const defaultFps = quality === 'high' ? '60' : '30';
+const profile = profileArg?.split('=')[1] ?? 'playback-safe';
+const defaultFps = quality === 'high'
+  ? profile === 'master' ? '60' : '30'
+  : '30';
 const fps = Number(fpsArg?.split('=')[1] ?? defaultFps);
 const clipFromMs = fromArg ? Number(fromArg.split('=')[1]) : 0;
 const clipToMs = toArg ? Number(toArg.split('=')[1]) : undefined;
 const supersample = Number(supersampleArg?.split('=')[1] ?? (quality === 'high' ? '2' : '1'));
 
-if (!sceneArg) {
-  throw new Error('Usage: node scripts/render_video_scene.mjs <scene-slug> [--build] [--quality=low|high] [--fps=30|60] [--supersample=1|2|3] [--from-ms=0] [--to-ms=4000]');
-}
-
 if (!['low', 'high'].includes(quality)) {
   throw new Error(`Unsupported quality value: ${quality}`);
+}
+
+if (!['playback-safe', 'master'].includes(profile)) {
+  throw new Error(`Unsupported profile value: ${profile}`);
+}
+
+if (!sceneArg) {
+  throw new Error('Usage: node scripts/render_video_scene.mjs <scene-slug> [--build] [--quality=low|high] [--profile=playback-safe|master] [--fps=30|60] [--supersample=1|2|3] [--from-ms=0] [--to-ms=4000]');
 }
 
 if (!Number.isFinite(fps) || fps < 12 || fps > 60) {
@@ -96,6 +104,28 @@ function startPreviewServer() {
   return child;
 }
 
+function getEncodeSettings() {
+  if (profile === 'master') {
+    return {
+      h264Profile: 'high',
+      level: '4.1',
+      preset: quality === 'high' ? 'slow' : 'medium',
+      crf: quality === 'high' ? '15' : '18',
+      maxrate: quality === 'high' ? '14M' : '10M',
+      bufsize: quality === 'high' ? '28M' : '20M',
+    };
+  }
+
+  return {
+    h264Profile: 'main',
+    level: '4.0',
+    preset: quality === 'high' ? 'slow' : 'medium',
+    crf: quality === 'high' ? '16' : '19',
+    maxrate: quality === 'high' ? '8M' : '6M',
+    bufsize: quality === 'high' ? '16M' : '12M',
+  };
+}
+
 async function ensurePreviewServer() {
   const previewIndexUrl = `${baseUrl}/video-preview/`;
 
@@ -153,7 +183,8 @@ async function renderSceneVideo(browser, slug) {
   const clipSuffix = clipToMs !== undefined || clipFromMs > 0
     ? `-${String(clipFromMs).padStart(4, '0')}-${String(clipToMs ?? 0).padStart(4, '0')}`
     : '';
-  const outputPath = path.join(sceneDir, `${slug}-${quality}${clipSuffix}-render-${fps}fps.mp4`);
+  const outputPath = path.join(sceneDir, `${slug}-${profile}-${quality}${clipSuffix}-render-${fps}fps.mp4`);
+  const encodeSettings = getEncodeSettings();
 
   const page = await browser.newPage({
     viewport: { width: 2460, height: 1400 },
@@ -201,13 +232,19 @@ async function renderSceneVideo(browser, slug) {
       '-c:v',
       'libx264',
       '-profile:v',
-      'high',
+      encodeSettings.h264Profile,
       '-level',
-      '4.1',
+      encodeSettings.level,
       '-preset',
-      quality === 'high' ? 'slow' : 'medium',
+      encodeSettings.preset,
       '-crf',
-      quality === 'high' ? '15' : '18',
+      encodeSettings.crf,
+      '-maxrate',
+      encodeSettings.maxrate,
+      '-bufsize',
+      encodeSettings.bufsize,
+      '-g',
+      String(Math.max(30, fps * 2)),
       '-movflags',
       '+faststart',
       '-c:a',
