@@ -93,7 +93,49 @@ function getSceneBrand(value: VideoPreviewScene) {
   };
 }
 
+function getDialogueSideStripLayout(participantCount: number, titleLines: string[]) {
+  const count = Math.max(2, Math.min(participantCount, 5));
+  const columnWidth = count === 2 ? 520 : count === 3 ? 340 : count === 4 ? 250 : 220;
+  const bankWidth = columnWidth * count;
+  const bankLeft = 1920 - bankWidth;
+  const copyLeft = 32;
+  const gutter = 32;
+  const copyWidth = bankLeft - copyLeft - gutter;
+  const captionHeight = count === 2 ? 182 : count === 3 ? 174 : count === 4 ? 164 : 172;
+  const nameSize = count === 2 ? 2.42 : count === 3 ? 2.1 : count === 4 ? 1.9 : 1.62;
+  const roleSize = count === 2 ? 1.08 : count === 3 ? 1 : count === 4 ? 0.94 : 0.84;
+  const scaleFactor = count === 2 ? 1.02 : count === 3 ? 1.08 : count === 4 ? 1 : 0.94;
+  const shiftY = count === 2 ? 38 : count === 3 ? 14 : count === 4 ? 10 : 8;
+  const longestLineLength = titleLines.reduce((max, line) => Math.max(max, line.replace(/\s+/g, '').length), 0);
+  const titlePenalty = longestLineLength >= 13 ? 0.42 : longestLineLength >= 11 ? 0.22 : 0;
+  const titleSize = (count === 2 ? 7.9 : count === 3 ? 7.55 : count === 4 ? 7.2 : 6.95) - titlePenalty;
+  const titleMax = count === 2 ? 6.8 : count === 3 ? 6.4 : count === 4 ? 6.1 : 5.8;
+  const subtitleSize = count === 2 ? 1.95 : count === 3 ? 1.88 : count === 4 ? 1.8 : 1.68;
+
+  return {
+    sceneStyle: [
+      `--dialogue-side-columns:${count}`,
+      `--dialogue-side-column-width:${columnWidth}px`,
+      `--dialogue-side-bank-width:${bankWidth}px`,
+      `--dialogue-side-bank-left:${bankLeft}px`,
+      `--dialogue-side-copy-width:${copyWidth}px`,
+      `--dialogue-side-caption-height:${captionHeight}px`,
+      `--dialogue-side-name-size:${nameSize}rem`,
+      `--dialogue-side-role-size:${roleSize}rem`,
+      `--dialogue-side-scale-factor:${scaleFactor}`,
+      `--dialogue-side-shift-y:${shiftY}px`,
+      `--dialogue-side-title-size:${titleSize}rem`,
+      `--dialogue-side-title-max:${titleMax}ch`,
+      `--dialogue-side-subtitle-size:${subtitleSize}rem`,
+    ].join('; '),
+    participantsStyle: `grid-template-columns: repeat(${count}, minmax(0, ${columnWidth}px));`,
+  };
+}
+
 const sceneBrand = getSceneBrand(scene);
+const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === 'side-strip'
+  ? getDialogueSideStripLayout(scene.participants.length, scene.titleLines)
+  : undefined;
 ---
 
 <PreviewLayout
@@ -224,9 +266,10 @@ const sceneBrand = getSceneBrand(scene);
                   {scene.accessLabel && <p class="boost-scene__access-pill">{scene.accessLabel}</p>}
                 </div>
               )}
-              <p class="boost-scene__meta anim anim--boost-meta-phase">
-                {scene.dateLabel} · {scene.venue}
-              </p>
+              <div class="boost-scene__meta anim anim--boost-meta-phase">
+                <p class="boost-scene__schedule">{scene.dateLabel}</p>
+                <p class="boost-scene__venue">{scene.venue}</p>
+              </div>
             </div>
             {scene.portraitImage && (
               <img
@@ -244,13 +287,19 @@ const sceneBrand = getSceneBrand(scene);
         )}
 
         {scene.kind === 'dialogue' && (
-          <div class:list={['dialogue-scene', `dialogue-scene--${scene.variant}`]}>
+          <div
+            class:list={['dialogue-scene', `dialogue-scene--${scene.variant}`]}
+            style={scene.variant === 'side-strip' ? dialogueSideStripLayout?.sceneStyle : undefined}
+          >
             <div class="dialogue-scene__backdrop"></div>
             <div class="dialogue-scene__grain"></div>
             <div class="dialogue-scene__accent"></div>
 
             <div class="dialogue-scene__copy">
-              <p class="dialogue-scene__eyebrow">{scene.eyebrow}</p>
+              <div class="dialogue-scene__identity">
+                <p class="dialogue-scene__eyebrow">{scene.eyebrow}</p>
+                <p class="dialogue-scene__format">ФОРМАТ: ОТКРЫТЫЙ ДИАЛОГ</p>
+              </div>
               <h2 class="dialogue-scene__title">
                 {scene.titleLines.map((line) => (
                   <span>{line}</span>
@@ -258,6 +307,7 @@ const sceneBrand = getSceneBrand(scene);
               </h2>
               <p class="dialogue-scene__subtitle">{scene.subtitle}</p>
               <p class="dialogue-scene__support">{scene.supportLine}</p>
+              <p class="dialogue-scene__cta">ПОСЛУШАЙ И ЗАДАЙ СВОЙ ВОПРОС</p>
               <div class="dialogue-scene__meta">
                 {scene.availabilityLabel && (
                   <p class:list={[
@@ -268,11 +318,18 @@ const sceneBrand = getSceneBrand(scene);
                   </p>
                 )}
                 {scene.accessLabel && <p class="dialogue-scene__access-pill">{scene.accessLabel}</p>}
-                <p class="dialogue-scene__meta-line">{scene.dateLabel} · {scene.venue}</p>
+              </div>
+              <div class="dialogue-scene__schedule-block">
+                <p class="dialogue-scene__schedule">{scene.dateLabel}</p>
+                <p class="dialogue-scene__venue">{scene.venue}</p>
               </div>
             </div>
 
-            <div class="dialogue-scene__participants" aria-label="Участники открытого диалога">
+            <div
+              class="dialogue-scene__participants"
+              aria-label="Участники открытого диалога"
+              style={scene.variant === 'side-strip' ? dialogueSideStripLayout?.participantsStyle : undefined}
+            >
               {scene.participants.map((participant) => (
                 <article class:list={['dialogue-person', !participant.image && 'dialogue-person--placeholder']}>
                   <div class:list={['dialogue-person__media', !participant.image && 'dialogue-person__media--placeholder']}>
@@ -644,10 +701,13 @@ const sceneBrand = getSceneBrand(scene);
   }
 
   .video-scene--dialogue .video-scene__brand--festival-master {
-    padding: 14px 16px;
-    border-radius: 18px;
-    background: rgba(14, 12, 12, 0.12);
-    backdrop-filter: blur(10px);
+    --brand-width: 292px;
+    filter: none;
+  }
+
+  .video-scene--dialogue .video-scene__brand {
+    top: 24px;
+    left: 24px;
   }
 
   .video-scene__brand--znanie {
@@ -907,9 +967,24 @@ const sceneBrand = getSceneBrand(scene);
 
   .boost-scene__meta {
     margin: 1rem 0 0;
-    max-width: 34ch;
-    font: 500 1.38rem/1.14 var(--font-body);
-    color: rgba(255, 255, 255, 0.76);
+    display: grid;
+    gap: 0.24rem;
+    max-width: 36ch;
+  }
+
+  .boost-scene__schedule {
+    margin: 0;
+    font: 700 1.56rem/0.98 var(--font-display);
+    letter-spacing: -0.03em;
+    color: rgba(255, 255, 255, 0.98);
+    text-transform: uppercase;
+  }
+
+  .boost-scene__venue {
+    margin: 0;
+    font: 600 1.16rem/1.1 var(--font-body);
+    color: rgba(255, 255, 255, 0.82);
+    text-transform: uppercase;
   }
 
   .boost-scene__status-row {
@@ -1034,12 +1109,25 @@ const sceneBrand = getSceneBrand(scene);
     z-index: 3;
   }
 
+  .dialogue-scene__identity {
+    display: grid;
+    gap: 0.4rem;
+  }
+
   .dialogue-scene__eyebrow {
     margin: 0;
-    font: 700 1.08rem/1 var(--font-display);
-    letter-spacing: 0.18em;
+    font: 700 1.16rem/1 var(--font-display);
+    letter-spacing: 0.16em;
     color: rgba(255, 255, 255, 0.68);
     text-transform: uppercase;
+  }
+
+  .dialogue-scene__format {
+    margin: 0;
+    font: 700 1.18rem/1 var(--font-display);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 248, 242, 0.96);
   }
 
   .dialogue-scene__title {
@@ -1065,12 +1153,20 @@ const sceneBrand = getSceneBrand(scene);
   }
 
   .dialogue-scene__support {
-    margin: 1.3rem 0 0;
-    max-width: 34ch;
-    font: 500 1.08rem/1.16 var(--font-body);
+    margin: 1.18rem 0 0;
+    max-width: 32ch;
+    font: 500 1.02rem/1.15 var(--font-body);
     color: rgba(255, 248, 242, 0.7);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+  }
+
+  .dialogue-scene__cta {
+    margin: 1rem 0 0;
+    font: 700 1.3rem/1.02 var(--font-display);
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: rgba(255, 248, 242, 0.98);
   }
 
   .dialogue-scene__meta {
@@ -1078,16 +1174,16 @@ const sceneBrand = getSceneBrand(scene);
     flex-wrap: wrap;
     gap: 0.75rem;
     align-items: center;
-    margin-top: 1.5rem;
+    margin-top: 1.1rem;
   }
 
   .dialogue-scene__availability,
   .dialogue-scene__access-pill {
     margin: 0;
-    padding: 0.62rem 0.82rem 0.56rem;
+    padding: 0.68rem 0.9rem 0.62rem;
     border: 1px solid rgba(255, 255, 255, 0.16);
-    font: 700 0.95rem/1 var(--font-display);
-    letter-spacing: 0.16em;
+    font: 700 1.02rem/1 var(--font-display);
+    letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
@@ -1111,6 +1207,27 @@ const sceneBrand = getSceneBrand(scene);
     border-color: rgba(216, 75, 49, 0.34);
     color: #fff6ef;
     background: rgba(216, 75, 49, 0.18);
+  }
+
+  .dialogue-scene__schedule-block {
+    display: grid;
+    gap: 0.3rem;
+    margin-top: 1.04rem;
+  }
+
+  .dialogue-scene__schedule {
+    margin: 0;
+    font: 700 1.46rem/0.98 var(--font-display);
+    letter-spacing: -0.03em;
+    color: rgba(255, 248, 242, 0.98);
+    text-transform: uppercase;
+  }
+
+  .dialogue-scene__venue {
+    margin: 0;
+    font: 600 1.14rem/1.1 var(--font-body);
+    color: rgba(255, 248, 242, 0.78);
+    text-transform: uppercase;
   }
 
   .dialogue-scene__meta-line {
@@ -1191,7 +1308,7 @@ const sceneBrand = getSceneBrand(scene);
 
   .dialogue-person__caption {
     display: grid;
-    gap: 0.4rem;
+    gap: 0.48rem;
     padding: 0.82rem 0.7rem 0.88rem;
     background: #f05b3f;
   }
@@ -1199,17 +1316,19 @@ const sceneBrand = getSceneBrand(scene);
   .dialogue-person__caption strong {
     display: block;
     margin: 0;
-    font: 700 1rem/0.9 var(--font-display);
+    font: 700 1.08rem/0.9 var(--font-display);
     letter-spacing: -0.03em;
     color: #17120f;
     text-transform: uppercase;
+    overflow-wrap: anywhere;
   }
 
   .dialogue-person__caption span {
     display: block;
     margin: 0;
-    font: 500 0.68rem/1.1 var(--font-body);
+    font: 500 0.72rem/1.12 var(--font-body);
     color: rgba(23, 18, 15, 0.82);
+    overflow-wrap: anywhere;
   }
 
   .dialogue-scene--bottom-strip {
@@ -1299,63 +1418,90 @@ const sceneBrand = getSceneBrand(scene);
 
   .dialogue-scene--side-strip {
     background:
-      linear-gradient(90deg, #f05b3f 0%, #d84b31 61.25%, #12100f 61.25%, #12100f 100%);
+      linear-gradient(90deg, #f05b3f 0%, #d84b31 44%, #12100f 44%, #12100f 100%);
   }
 
   .dialogue-scene--side-strip .dialogue-scene__backdrop {
     background:
-      linear-gradient(135deg, #f05b3f 0%, #d84b31 54%, #bb391f 100%);
+      linear-gradient(135deg, #f05b3f 0%, #d84b31 44%, #bb391f 100%);
   }
 
   .dialogue-scene--side-strip .dialogue-scene__accent {
     inset: 0 0 0 auto;
-    width: 38.75%;
+    width: 56%;
     background:
       linear-gradient(180deg, rgba(14, 12, 12, 0.04) 0%, rgba(14, 12, 12, 0.14) 100%);
   }
 
   .dialogue-scene--side-strip .dialogue-scene__copy {
-    left: 34px;
-    top: 28px;
-    width: 1048px;
+    left: 32px;
+    top: 96px;
+    width: var(--dialogue-side-copy-width, 790px);
     color: #16120f;
   }
 
   .dialogue-scene--side-strip .dialogue-scene__eyebrow,
   .dialogue-scene--side-strip .dialogue-scene__subtitle,
   .dialogue-scene--side-strip .dialogue-scene__support,
-  .dialogue-scene--side-strip .dialogue-scene__meta-line {
+  .dialogue-scene--side-strip .dialogue-scene__venue {
     color: rgba(22, 18, 15, 0.82);
   }
 
+  .dialogue-scene--side-strip .dialogue-scene__format {
+    display: inline-flex;
+    width: fit-content;
+    padding: 0.54rem 0.76rem 0.5rem;
+    background: rgba(17, 16, 14, 0.88);
+    color: #fff8f2;
+  }
+
   .dialogue-scene--side-strip .dialogue-scene__title {
-    max-width: 6.1ch;
-    font-size: 6.55rem;
+    max-width: var(--dialogue-side-title-max, 6.1ch);
+    font-size: var(--dialogue-side-title-size, 7.8rem);
     color: #11100e;
   }
 
   .dialogue-scene--side-strip .dialogue-scene__subtitle {
     max-width: 10ch;
+    font-size: var(--dialogue-side-subtitle-size, 1.8rem);
   }
 
   .dialogue-scene--side-strip .dialogue-scene__support {
-    max-width: 28ch;
+    max-width: 30ch;
+    color: rgba(22, 18, 15, 0.76);
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__cta,
+  .dialogue-scene--side-strip .dialogue-scene__schedule {
+    color: #11100e;
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__availability {
+    color: #fff8f2;
+    background: rgba(17, 16, 14, 0.14);
+    border-color: rgba(17, 16, 14, 0.18);
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__access-pill {
+    color: #11100e;
+    background: rgba(255, 248, 242, 0.54);
+    border-color: rgba(17, 16, 14, 0.14);
   }
 
   .dialogue-scene--side-strip .dialogue-scene__participants {
-    left: 1176px;
+    left: var(--dialogue-side-bank-left, 850px);
     top: 0;
     bottom: 0;
     right: auto;
-    width: 744px;
+    width: var(--dialogue-side-bank-width, 1070px);
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(var(--dialogue-side-columns, 4), minmax(0, var(--dialogue-side-column-width, 268px)));
     gap: 0;
   }
 
   .dialogue-scene--side-strip .dialogue-person {
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: var(--dialogue-side-caption-height, 164px) minmax(0, 1fr);
     min-height: 100%;
     border-left: 1px solid rgba(255, 255, 255, 0.12);
     background: #12100f;
@@ -1363,7 +1509,18 @@ const sceneBrand = getSceneBrand(scene);
 
   .dialogue-scene--side-strip .dialogue-person__caption {
     order: 0;
-    min-height: 118px;
+    min-height: var(--dialogue-side-caption-height, 164px);
+    padding: 1.04rem 0.78rem 0.94rem;
+  }
+
+  .dialogue-scene--side-strip .dialogue-person__caption strong {
+    font-size: var(--dialogue-side-name-size, 1.9rem);
+    line-height: 0.88;
+  }
+
+  .dialogue-scene--side-strip .dialogue-person__caption span {
+    font-size: var(--dialogue-side-role-size, 0.94rem);
+    line-height: 1.08;
   }
 
   .dialogue-scene--side-strip .dialogue-person__media {
@@ -1373,13 +1530,13 @@ const sceneBrand = getSceneBrand(scene);
 
   .dialogue-scene--side-strip .dialogue-person__portrait {
     top: auto;
-    bottom: -0.35rem;
+    bottom: -0.25rem;
     transform:
       translate(
         calc(-50% + var(--dialogue-portrait-x-side, var(--dialogue-portrait-x-desktop, var(--dialogue-portrait-x-mobile, 0px)))),
-        var(--dialogue-portrait-y-side, 0px)
+        calc(var(--dialogue-portrait-y-side, 0px) + var(--dialogue-side-shift-y, 0px))
       )
-      scale(var(--dialogue-portrait-scale-side, var(--dialogue-portrait-scale-desktop, 0.66)));
+      scale(calc(var(--dialogue-portrait-scale-side, 0.64) * var(--dialogue-side-scale-factor, 1)));
     transform-origin: center bottom;
   }
 
