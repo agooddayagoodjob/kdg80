@@ -16,6 +16,8 @@ const sharedAssetsRoot = path.join(publicRoot, 'shared-assets');
 const festivalMediaPath = path.join(publicRoot, 'festival-media');
 const telegramPngPath = path.join(publicRoot, 'generated', 'telegram', 'kenigevents-qr.png');
 const generatedRoot = path.join(publicRoot, 'generated');
+const registrationManifestUrl = 'https://kgd80.ru/tickets/registration/states.json';
+const registrationManifestCachePath = path.join(siteRoot, 'src', 'data', 'registration-state-manifest.json');
 
 const ALLOWED_EXTENSIONS = new Set(['.webp', '.svg', '.woff2', '.otf', '.txt']);
 const EXTRA_SHARED_ASSETS = [
@@ -200,6 +202,25 @@ async function normalizeGeneratedMedia() {
   return report.join(', ');
 }
 
+async function refreshRegistrationManifestCache() {
+  try {
+    const { stdout } = await execFileAsync('curl', ['-fsSL', '--max-time', '20', registrationManifestUrl], {
+      cwd: workspaceRoot,
+    });
+    const payload = JSON.parse(stdout);
+    await ensureDir(path.dirname(registrationManifestCachePath));
+    await fs.writeFile(`${registrationManifestCachePath}.tmp`, `${JSON.stringify(payload, null, 2)}\n`, 'utf-8');
+    await fs.rename(`${registrationManifestCachePath}.tmp`, registrationManifestCachePath);
+    return 'refreshed';
+  } catch (error) {
+    if (await pathExists(registrationManifestCachePath)) {
+      console.warn(`Registration manifest refresh skipped, using cached copy: ${error instanceof Error ? error.message : String(error)}`);
+      return 'cached';
+    }
+    throw error;
+  }
+}
+
 await removeIfExists(sharedAssetsRoot);
 await removeIfExists(festivalMediaPath);
 await removeIfExists(telegramPngPath);
@@ -208,5 +229,6 @@ await copyAllowedAssets(assetsRoot, sharedAssetsRoot);
 await copyExtraAssets(EXTRA_SHARED_ASSETS);
 await prepareSpeakerStripPortraits();
 const normalizationReport = await normalizeGeneratedMedia();
+const registrationManifestStatus = await refreshRegistrationManifestCache();
 
-console.log(`Prepared public assets, regenerated speaker-strip portraits, normalized oversized media (${normalizationReport}).`);
+console.log(`Prepared public assets, regenerated speaker-strip portraits, normalized oversized media (${normalizationReport}), registration manifest ${registrationManifestStatus}.`);

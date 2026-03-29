@@ -147,10 +147,22 @@ function getSceneTitle(value: VideoPreviewScene) {
                   </p>
                 )}
               </div>
+              {(scene.availabilityLabel || scene.accessLabel) && (
+                <div class="boost-scene__status-row anim anim--boost-meta-phase">
+                  {scene.availabilityLabel && (
+                    <p class:list={[
+                      'boost-scene__availability',
+                      scene.availabilityTone && `boost-scene__availability--${scene.availabilityTone}`,
+                    ]}>
+                      {scene.availabilityLabel}
+                    </p>
+                  )}
+                  {scene.accessLabel && <p class="boost-scene__access-pill">{scene.accessLabel}</p>}
+                </div>
+              )}
               <p class="boost-scene__meta anim anim--boost-meta-phase">
                 {scene.dateLabel} · {scene.venue}
               </p>
-              {scene.accessLabel && <p class="boost-scene__access anim anim--boost-meta-phase">{scene.accessLabel}</p>}
             </div>
             {scene.portraitImage && (
               <img
@@ -739,11 +751,44 @@ function getSceneTitle(value: VideoPreviewScene) {
     color: rgba(255, 255, 255, 0.76);
   }
 
-  .boost-scene__access {
-    margin: 0.7rem 0 0;
-    font: 700 1.05rem/1 var(--font-display);
+  .boost-scene__status-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    margin-top: 1.15rem;
+  }
+
+  .boost-scene__availability,
+  .boost-scene__access-pill {
+    margin: 0;
+    padding: 0.62rem 0.82rem 0.56rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    font: 700 0.95rem/1 var(--font-display);
     letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .boost-scene__availability {
+    color: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .boost-scene__availability--low {
+    border-color: rgba(255, 246, 239, 0.98);
+    background: rgba(255, 246, 239, 0.98);
+    color: #b33624;
+  }
+
+  .boost-scene__availability--soon {
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .boost-scene__access-pill {
+    border-color: rgba(216, 75, 49, 0.34);
     color: #fff6ef;
+    background: rgba(216, 75, 49, 0.18);
   }
 
   .boost-scene__portrait {

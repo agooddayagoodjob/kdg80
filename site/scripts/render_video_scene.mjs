@@ -12,19 +12,45 @@ const siteRoot = path.resolve(__dirname, '..');
 const workspaceRoot = path.resolve(siteRoot, '..');
 const distRoot = path.join(siteRoot, 'dist');
 const outputRoot = path.join(workspaceRoot, 'test-results', 'video-preview-20260327');
-const baseUrl = 'http://127.0.0.1:4321';
 const args = process.argv.slice(2);
+const port = Number(process.env.VIDEO_PREVIEW_PORT ?? '4326');
+const baseUrl = `http://127.0.0.1:${port}`;
 const sceneArg = args.find((value) => !value.startsWith('--'));
 const shouldBuild = args.includes('--build');
+const qualityArg = args.find((value) => value.startsWith('--quality='));
 const fpsArg = args.find((value) => value.startsWith('--fps='));
-const fps = Number(fpsArg?.split('=')[1] ?? '30');
+const fromArg = args.find((value) => value.startsWith('--from-ms='));
+const toArg = args.find((value) => value.startsWith('--to-ms='));
+const supersampleArg = args.find((value) => value.startsWith('--supersample='));
+const quality = qualityArg?.split('=')[1] ?? 'low';
+const defaultFps = quality === 'high' ? '60' : '30';
+const fps = Number(fpsArg?.split('=')[1] ?? defaultFps);
+const clipFromMs = fromArg ? Number(fromArg.split('=')[1]) : 0;
+const clipToMs = toArg ? Number(toArg.split('=')[1]) : undefined;
+const supersample = Number(supersampleArg?.split('=')[1] ?? (quality === 'high' ? '2' : '1'));
 
 if (!sceneArg) {
-  throw new Error('Usage: node scripts/render_video_scene.mjs <scene-slug> [--fps=30] [--build]');
+  throw new Error('Usage: node scripts/render_video_scene.mjs <scene-slug> [--build] [--quality=low|high] [--fps=30|60] [--supersample=1|2|3] [--from-ms=0] [--to-ms=4000]');
+}
+
+if (!['low', 'high'].includes(quality)) {
+  throw new Error(`Unsupported quality value: ${quality}`);
 }
 
 if (!Number.isFinite(fps) || fps < 12 || fps > 60) {
   throw new Error(`Unsupported fps value: ${fps}`);
+}
+
+if (!Number.isFinite(supersample) || supersample < 1 || supersample > 3) {
+  throw new Error(`Unsupported supersample value: ${supersample}`);
+}
+
+if (!Number.isFinite(clipFromMs) || clipFromMs < 0) {
+  throw new Error(`Unsupported from-ms value: ${clipFromMs}`);
+}
+
+if (clipToMs !== undefined && (!Number.isFinite(clipToMs) || clipToMs <= clipFromMs)) {
+  throw new Error(`Unsupported to-ms value: ${clipToMs}`);
 }
 
 async function ensureDir(targetPath) {
@@ -60,7 +86,7 @@ async function isServerReachable(url) {
 }
 
 function startPreviewServer() {
-  const child = spawn('python3', ['-m', 'http.server', '4321'], {
+  const child = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1'], {
     cwd: distRoot,
     stdio: 'pipe',
   });
@@ -124,11 +150,14 @@ async function renderSceneVideo(browser, slug) {
   await ensureDir(sceneDir);
 
   const frameDir = await fs.mkdtemp(path.join(os.tmpdir(), `video-preview-${slug}-`));
-  const outputPath = path.join(sceneDir, `${slug}-render-${fps}fps.mp4`);
+  const clipSuffix = clipToMs !== undefined || clipFromMs > 0
+    ? `-${String(clipFromMs).padStart(4, '0')}-${String(clipToMs ?? 0).padStart(4, '0')}`
+    : '';
+  const outputPath = path.join(sceneDir, `${slug}-${quality}${clipSuffix}-render-${fps}fps.mp4`);
 
   const page = await browser.newPage({
     viewport: { width: 2460, height: 1400 },
-    deviceScaleFactor: 1,
+    deviceScaleFactor: supersample,
   });
 
   try {
@@ -137,18 +166,21 @@ async function renderSceneVideo(browser, slug) {
     await page.waitForFunction(() => typeof window.__videoPreview?.seek === 'function');
 
     const sceneDurationMs = await page.evaluate(() => window.__videoPreview?.durationMs ?? 5600);
-    const totalFrames = Math.max(2, Math.ceil((sceneDurationMs / 1000) * fps));
+    const renderStartMs = Math.min(sceneDurationMs - 1, clipFromMs);
+    const renderEndMs = clipToMs === undefined ? sceneDurationMs : Math.min(sceneDurationMs, clipToMs);
+    const renderDurationMs = Math.max(100, renderEndMs - renderStartMs);
+    const totalFrames = Math.max(2, Math.ceil((renderDurationMs / 1000) * fps));
     const captureRoot = page.locator('[data-capture-root]');
 
     for (let index = 0; index < totalFrames; index += 1) {
-      const ms = Math.min(sceneDurationMs - 1, Math.round((index * 1000) / fps));
+      const ms = Math.min(renderEndMs - 1, renderStartMs + Math.round((index * 1000) / fps));
       const framePath = path.join(frameDir, `frame-${String(index).padStart(5, '0')}.png`);
 
       await page.evaluate((timeMs) => window.__videoPreview?.seek?.(timeMs), ms);
       await flushAnimationFrame(page);
       await captureRoot.screenshot({ path: framePath, animations: 'allow' });
 
-      if (index % Math.max(1, Math.round(fps)) === 0) {
+      if (index % Math.max(1, Math.round(fps / 2)) === 0) {
         console.log(`Rendered ${slug}: ${index + 1}/${totalFrames} frames`);
       }
     }
@@ -159,16 +191,29 @@ async function renderSceneVideo(browser, slug) {
       String(fps),
       '-i',
       path.join(frameDir, 'frame-%05d.png'),
+      '-f',
+      'lavfi',
+      '-i',
+      'anullsrc=channel_layout=stereo:sample_rate=48000',
+      '-shortest',
+      '-vf',
+      'scale=1920:1080:flags=lanczos,format=yuv420p',
       '-c:v',
       'libx264',
+      '-profile:v',
+      'high',
+      '-level',
+      '4.1',
       '-preset',
-      'slow',
+      quality === 'high' ? 'slow' : 'medium',
       '-crf',
-      '17',
+      quality === 'high' ? '15' : '18',
       '-movflags',
       '+faststart',
-      '-pix_fmt',
-      'yuv420p',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '128k',
       outputPath,
     ]);
 

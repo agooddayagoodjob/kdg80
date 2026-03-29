@@ -1,5 +1,6 @@
 import { getFestivalEvents, type FestivalEvent } from './festival';
 import { getEventPortraitImage, getEventPortraitStyle } from './media';
+import registrationManifest from '../data/registration-state-manifest.json';
 
 export type VideoPreviewSceneKind = 'cold-open' | 'boost' | 'cascade' | 'site' | 'qr' | 'sequence';
 
@@ -35,6 +36,8 @@ export type VideoPreviewBoostScene = VideoPreviewBaseScene & {
   dateLabel: string;
   venue: string;
   accessLabel?: string;
+  availabilityLabel?: string;
+  availabilityTone?: 'available' | 'low' | 'soon';
 };
 
 export type VideoPreviewCascadeScene = VideoPreviewBaseScene & {
@@ -91,6 +94,25 @@ type BoostSceneSeed = {
   durationMs?: number;
   portraitStyle?: string;
 };
+
+type RegistrationManifestItem = {
+  slug: string;
+  capacity?: number;
+  seatsTaken?: number;
+  seatsLeft?: number;
+  publicState?: string;
+  registrationPublicState?: string;
+  ctaLabel?: string;
+};
+
+type RegistrationManifest = {
+  generatedAt?: string | null;
+  items?: RegistrationManifestItem[];
+};
+
+const registrationStateBySlug = new Map(
+  ((registrationManifest as RegistrationManifest).items ?? []).map((item) => [item.slug, item] as const),
+);
 
 const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
   {
@@ -185,12 +207,44 @@ function isLecture(formatLabel: string) {
   return formatLabel.toLowerCase().includes('лекц');
 }
 
+function resolveAvailabilityState(event: FestivalEvent) {
+  const registrationState = registrationStateBySlug.get(event.slug);
+
+  if (registrationState?.publicState === 'registration_soon' || event.publicRegistrationStateOverride === 'registration_soon') {
+    return {
+      label: 'РЕГИСТРАЦИЯ СКОРО',
+      tone: 'soon' as const,
+    };
+  }
+
+  if (registrationState?.publicState !== 'registration_open') {
+    return undefined;
+  }
+
+  const capacity = registrationState.capacity ?? 0;
+  const seatsLeft = registrationState.seatsLeft ?? 0;
+  const ratio = capacity > 0 ? seatsLeft / capacity : 1;
+
+  if (ratio < 0.1) {
+    return {
+      label: 'МАЛО МЕСТ',
+      tone: 'low' as const,
+    };
+  }
+
+  return {
+    label: 'ЕСТЬ МЕСТА',
+    tone: 'available' as const,
+  };
+}
+
 function createBoostScene(events: FestivalEvent[], seed: BoostSceneSeed): VideoPreviewBoostScene {
   const event = findEvent(events, seed.eventMatch);
   const fallbackPortrait = event.speakerImages[0] ?? '';
   const portraitImage = fallbackPortrait
     ? getEventPortraitImage(event.speakerLabel, fallbackPortrait, isLecture(event.formatLabel))
     : '';
+  const availabilityState = resolveAvailabilityState(event);
 
   return {
     slug: seed.slug,
@@ -218,6 +272,8 @@ function createBoostScene(events: FestivalEvent[], seed: BoostSceneSeed): VideoP
     dateLabel: event.dateLabel,
     venue: event.venue,
     accessLabel: 'БЕСПЛАТНО ПО РЕГИСТРАЦИИ',
+    availabilityLabel: availabilityState?.label,
+    availabilityTone: availabilityState?.tone,
   };
 }
 
