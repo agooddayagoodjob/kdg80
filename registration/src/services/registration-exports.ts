@@ -153,6 +153,9 @@ export function formatMaskedEventReport(
     startsAt: string;
     venueName: string;
     hallName: string;
+    capacity: number;
+    registrationLimit: number;
+    registrationLimitPercent: number;
     seatsLeft: number;
   },
   rows: EventRegistrationExportRow[],
@@ -161,7 +164,9 @@ export function formatMaskedEventReport(
     `Отчёт по событию`,
     event.title,
     `${event.venueName}, ${event.hallName}`,
-    `Осталось мест: ${event.seatsLeft}`,
+    `Вместимость зала: ${event.capacity}`,
+    `Квота регистрации: ${event.registrationLimit} (${event.registrationLimitPercent}%)`,
+    `Осталось регистрационных мест: ${event.seatsLeft}`,
     '',
   ];
 

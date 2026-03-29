@@ -1,5 +1,10 @@
 import type Database from 'better-sqlite3';
-import { derivePublicState, getCtaCopy, isDeferredPublicEvent } from '../lib/public-state';
+import { derivePublicState, deriveSeatsLeft, getCtaCopy, isDeferredPublicEvent } from '../lib/public-state';
+import {
+  computeRegistrationLimit,
+  computeRegistrationLimitPercent,
+  DEFAULT_OVERBOOKING_PERCENT,
+} from '../lib/overbooking';
 import festivalEvents from '../data/festival-events.json';
 import type {
   CatalogEventSeed,
@@ -27,10 +32,14 @@ type EventRow = {
   hall_name: string;
   address: string;
   capacity: number;
+  overbooking_percent: number;
+  registration_limit: number;
   seats_taken: number;
   registration_public_state: RegistrationPublicState;
   registration_opens_at: string | null;
 };
+
+const EVENT_OVERBOOKING_PERCENT_OVERRIDES: Record<string, number> = {};
 
 const HALLS: HallSeed[] = [
   {
@@ -73,7 +82,7 @@ const HALLS: HallSeed[] = [
     venueName: 'Калининградский областной историко-художественный музей',
     hallName: 'Конференц-зал',
     address: 'улица Клиническая, 21',
-    capacity: 200,
+    capacity: 220,
   },
 ];
 
@@ -146,10 +155,15 @@ function toCatalogSeed(event: FestivalEvent): CatalogEventSeed | null {
       hallName: event.venue,
       address: event.address,
       capacity: 0,
+      overbookingPercent: 0,
+      registrationLimit: 0,
       sourceStatus: 'needs_mapping',
       defaultPublicState: 'closed',
     };
   }
+
+  const overbookingPercent = EVENT_OVERBOOKING_PERCENT_OVERRIDES[event.slug] ?? DEFAULT_OVERBOOKING_PERCENT;
+  const registrationLimit = computeRegistrationLimit(hall.capacity, overbookingPercent);
 
   return {
     slug: event.slug,
@@ -160,6 +174,8 @@ function toCatalogSeed(event: FestivalEvent): CatalogEventSeed | null {
     hallName: hall.hallName,
     address: hall.address,
     capacity: hall.capacity,
+    overbookingPercent,
+    registrationLimit,
     sourceStatus: 'ready',
     defaultPublicState: 'soon',
   };
@@ -211,6 +227,8 @@ export function syncCatalog(db: Database.Database) {
       address,
       hall_id,
       capacity,
+      overbooking_percent,
+      registration_limit,
       registration_public_state,
       source_status,
       source_updated_at
@@ -224,6 +242,8 @@ export function syncCatalog(db: Database.Database) {
       @address,
       @hallId,
       @capacity,
+      @overbookingPercent,
+      @registrationLimit,
       @defaultPublicState,
       @sourceStatus,
       (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
@@ -237,6 +257,8 @@ export function syncCatalog(db: Database.Database) {
       address = excluded.address,
       hall_id = excluded.hall_id,
       capacity = excluded.capacity,
+      overbooking_percent = excluded.overbooking_percent,
+      registration_limit = excluded.registration_limit,
       source_status = excluded.source_status,
       source_updated_at = excluded.source_updated_at,
       updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
@@ -269,6 +291,8 @@ export function listPublicEventStates(db: Database.Database, slugs: string[] = [
       hall_name,
       address,
       capacity,
+      overbooking_percent,
+      registration_limit,
       seats_taken,
       registration_public_state,
       registration_opens_at
@@ -281,6 +305,7 @@ export function listPublicEventStates(db: Database.Database, slugs: string[] = [
     const publicState = derivePublicState(row);
     const copy = getCtaCopy(publicState);
     const hidePublicDetails = isDeferredPublicEvent(row);
+    const seatsLeft = deriveSeatsLeft(row);
 
     return {
       slug: row.slug,
@@ -291,8 +316,11 @@ export function listPublicEventStates(db: Database.Database, slugs: string[] = [
       hallName: hidePublicDetails ? '' : row.hall_name,
       address: hidePublicDetails ? '' : row.address,
       capacity: row.capacity,
+      overbookingPercent: row.overbooking_percent,
+      registrationLimit: row.registration_limit,
+      registrationLimitPercent: computeRegistrationLimitPercent(row.overbooking_percent),
       seatsTaken: row.seats_taken,
-      seatsLeft: Math.max(row.capacity - row.seats_taken, 0),
+      seatsLeft,
       publicState,
       registrationPublicState: row.registration_public_state,
       ctaLabel: copy.ctaLabel,

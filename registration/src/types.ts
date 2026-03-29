@@ -24,6 +24,8 @@ export type CatalogEventSeed = {
   hallName: string;
   address: string;
   capacity: number;
+  overbookingPercent: number;
+  registrationLimit: number;
   sourceStatus: 'ready' | 'needs_mapping';
   defaultPublicState: RegistrationPublicState;
 };
@@ -37,6 +39,9 @@ export type PublicEventStateView = {
   hallName: string;
   address: string;
   capacity: number;
+  overbookingPercent: number;
+  registrationLimit: number;
+  registrationLimitPercent: number;
   seatsTaken: number;
   seatsLeft: number;
   publicState: PublicEventCtaState;

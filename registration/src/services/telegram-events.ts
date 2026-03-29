@@ -1,5 +1,6 @@
 import type Database from 'better-sqlite3';
-import { derivePublicState } from '../lib/public-state';
+import { derivePublicState, deriveSeatsLeft } from '../lib/public-state';
+import { computeRegistrationLimitPercent } from '../lib/overbooking';
 import type { PublicEventCtaState, RegistrationPublicState } from '../types';
 
 export type TelegramEventListFilter = 'all' | 'open' | 'closed';
@@ -13,6 +14,9 @@ export type TelegramEventView = {
   hallName: string;
   address: string;
   capacity: number;
+  overbookingPercent: number;
+  registrationLimit: number;
+  registrationLimitPercent: number;
   seatsTaken: number;
   seatsLeft: number;
   registrationPublicState: RegistrationPublicState;
@@ -29,6 +33,8 @@ type EventRow = {
   hall_name: string;
   address: string;
   capacity: number;
+  overbooking_percent: number;
+  registration_limit: number;
   seats_taken: number;
   registration_public_state: RegistrationPublicState;
   registration_opens_at: string | null;
@@ -46,8 +52,11 @@ function toView(row: EventRow): TelegramEventView {
     hallName: row.hall_name,
     address: row.address,
     capacity: row.capacity,
+    overbookingPercent: row.overbooking_percent,
+    registrationLimit: row.registration_limit,
+    registrationLimitPercent: computeRegistrationLimitPercent(row.overbooking_percent),
     seatsTaken: row.seats_taken,
-    seatsLeft: Math.max(row.capacity - row.seats_taken, 0),
+    seatsLeft: deriveSeatsLeft(row),
     registrationPublicState: row.registration_public_state,
     publicState,
   };
@@ -65,6 +74,8 @@ function listAllRows(db: Database.Database) {
       hall_name,
       address,
       capacity,
+      overbooking_percent,
+      registration_limit,
       seats_taken,
       registration_public_state,
       registration_opens_at
@@ -105,6 +116,8 @@ export function getTelegramEventById(db: Database.Database, eventId: number) {
       hall_name,
       address,
       capacity,
+      overbooking_percent,
+      registration_limit,
       seats_taken,
       registration_public_state,
       registration_opens_at
@@ -128,6 +141,8 @@ export function getTelegramEventBySlug(db: Database.Database, slug: string) {
       hall_name,
       address,
       capacity,
+      overbooking_percent,
+      registration_limit,
       seats_taken,
       registration_public_state,
       registration_opens_at

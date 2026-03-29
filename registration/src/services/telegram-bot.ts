@@ -190,8 +190,10 @@ function formatEventCard(event: TelegramEventView) {
     `Площадка: ${event.venueName}`,
     `Зал: ${event.hallName}`,
     `Адрес: ${event.address}`,
-    `Мест занято: ${event.seatsTaken} из ${event.capacity}`,
-    `Осталось мест: ${event.seatsLeft}`,
+    `Вместимость зала: ${event.capacity}`,
+    `Квота регистрации: ${event.registrationLimit} (${event.registrationLimitPercent}%)`,
+    `Занято регистраций: ${event.seatsTaken} из ${event.registrationLimit}`,
+    `Осталось регистрационных мест: ${event.seatsLeft}`,
   ].join('\n');
 }
 
@@ -819,7 +821,9 @@ export function registerTelegramBot(app: FastifyInstance, deps: TelegramBotDeps)
     const [, eventIdRaw] = ctx.match;
     const event = getTelegramEventById(deps.db, Number(eventIdRaw));
     await ctx.answerCallbackQuery({
-      text: event ? `Осталось мест: ${event.seatsLeft}` : 'Событие не найдено.',
+      text: event
+        ? `Осталось регистрационных мест: ${event.seatsLeft} из ${event.registrationLimit}`
+        : 'Событие не найдено.',
       show_alert: true,
     });
   });

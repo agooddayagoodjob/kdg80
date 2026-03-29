@@ -24,6 +24,8 @@ type RegistrationNotificationRow = {
   pii_alg: string;
   title: string;
   starts_at: string;
+  capacity: number;
+  registration_limit: number;
 };
 
 function formatEventDate(isoValue: string) {
@@ -66,7 +68,9 @@ function loadRegistrationNotification(
       r.pii_iv,
       r.pii_alg,
       e.title,
-      e.starts_at
+      e.starts_at,
+      e.capacity,
+      e.registration_limit
     FROM registrations r
     INNER JOIN events e ON e.id = r.event_id
     WHERE r.id = ?
@@ -94,6 +98,8 @@ function loadRegistrationNotification(
     fullName: pii.fullName,
     title: row.title,
     startsAt: row.starts_at,
+    capacity: row.capacity,
+    registrationLimit: row.registration_limit,
   };
 }
 
@@ -101,6 +107,8 @@ function formatRegistrationCreatedMessage(payload: {
   fullName: string;
   title: string;
   startsAt: string;
+  capacity: number;
+  registrationLimit: number;
   seatsLeftAfter: number;
 }) {
   return [
@@ -108,7 +116,9 @@ function formatRegistrationCreatedMessage(payload: {
     `ФИО: ${payload.fullName}`,
     `Событие: ${payload.title}`,
     `Дата и время: ${formatEventDate(payload.startsAt)}`,
-    `Свободных мест осталось: ${payload.seatsLeftAfter}`,
+    `Вместимость зала: ${payload.capacity}`,
+    `Квота регистрации: ${payload.registrationLimit}`,
+    `Осталось регистрационных мест: ${payload.seatsLeftAfter}`,
   ].join('\n');
 }
 
@@ -197,6 +207,8 @@ export function startTelegramOutboxWorker(options: {
             fullName: notification.fullName,
             title: notification.title,
             startsAt: notification.startsAt,
+            capacity: notification.capacity,
+            registrationLimit: notification.registrationLimit,
             seatsLeftAfter: payload.seatsLeftAfter,
           });
 

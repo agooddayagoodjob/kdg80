@@ -98,6 +98,9 @@ type BoostSceneSeed = {
 type RegistrationManifestItem = {
   slug: string;
   capacity?: number;
+  overbookingPercent?: number;
+  registrationLimit?: number;
+  registrationLimitPercent?: number;
   seatsTaken?: number;
   seatsLeft?: number;
   publicState?: string;
@@ -221,7 +224,7 @@ function resolveAvailabilityState(event: FestivalEvent) {
     return undefined;
   }
 
-  const capacity = registrationState.capacity ?? 0;
+  const capacity = registrationState.registrationLimit ?? registrationState.capacity ?? 0;
   const seatsLeft = registrationState.seatsLeft ?? 0;
   const ratio = capacity > 0 ? seatsLeft / capacity : 1;
 

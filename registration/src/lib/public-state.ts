@@ -1,4 +1,5 @@
 import type { PublicEventCtaState, RegistrationPublicState } from '../types';
+import { computeRegistrationSeatsLeft } from './overbooking';
 
 type EventStateRow = {
   slug?: string;
@@ -8,6 +9,8 @@ type EventStateRow = {
   hall_name?: string;
   address?: string;
   capacity: number;
+  overbooking_percent: number;
+  registration_limit: number;
   seats_taken: number;
   registration_public_state: RegistrationPublicState;
 };
@@ -44,7 +47,7 @@ export function derivePublicState(row: EventStateRow, now = new Date()): PublicE
     return 'registration_soon';
   }
 
-  if (row.seats_taken >= row.capacity) {
+  if (row.seats_taken >= row.registration_limit) {
     return 'sold_out';
   }
 
@@ -57,6 +60,10 @@ export function derivePublicState(row: EventStateRow, now = new Date()): PublicE
   }
 
   return 'registration_soon';
+}
+
+export function deriveSeatsLeft(row: Pick<EventStateRow, 'registration_limit' | 'seats_taken'>) {
+  return computeRegistrationSeatsLeft(row.registration_limit, row.seats_taken);
 }
 
 export function getCtaCopy(publicState: PublicEventCtaState) {

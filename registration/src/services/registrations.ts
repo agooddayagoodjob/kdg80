@@ -49,7 +49,20 @@ function isBusyDatabaseError(error: unknown) {
 
 function readEventForRegistration(db: Database.Database, eventSlug: string) {
   return db.prepare(`
-    SELECT id, slug, title, starts_at, ends_at, venue_name, hall_name, address, capacity, seats_taken, registration_public_state
+    SELECT
+      id,
+      slug,
+      title,
+      starts_at,
+      ends_at,
+      venue_name,
+      hall_name,
+      address,
+      capacity,
+      overbooking_percent,
+      registration_limit,
+      seats_taken,
+      registration_public_state
     FROM events
     WHERE slug = ?
     LIMIT 1
@@ -64,6 +77,8 @@ function readEventForRegistration(db: Database.Database, eventSlug: string) {
         hall_name: string;
         address: string;
         capacity: number;
+        overbooking_percent: number;
+        registration_limit: number;
         seats_taken: number;
         registration_public_state: 'open' | 'soon' | 'closed';
       }
@@ -170,7 +185,7 @@ export async function createRegistration(payload: RegistrationPayload, deps: Reg
     SET seats_taken = seats_taken + 1,
         updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
     WHERE id = @eventId
-      AND seats_taken < capacity
+      AND seats_taken < registration_limit
       AND registration_public_state = 'open'
   `);
 
@@ -229,7 +244,7 @@ export async function createRegistration(payload: RegistrationPayload, deps: Reg
       eventId: event.id,
       publicHash,
       shortTicketId,
-      seatsLeftAfter: Math.max(event.capacity - seatsRow.seats_taken, 0),
+      seatsLeftAfter: Math.max(event.registration_limit - seatsRow.seats_taken, 0),
     };
   });
 
