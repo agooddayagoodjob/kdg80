@@ -17,7 +17,8 @@ const announcementChannels = [
   {
     platform: 'Telegram',
     title: 'Полюбить Калининград Анонсы',
-    description: 'Подпишитесь, чтобы первыми видеть анонсы, изменения в программе и важные напоминания.',
+    description: 'Канал для быстрых уведомлений фестиваля.',
+    benefits: ['Допместа', 'Спецрегистрация', 'Анонсы'],
     href: TELEGRAM_URL,
     qrSrc: '/generated/telegram/kenigevents-qr.svg',
     qrAlt: 'QR-код Telegram-канала «Полюбить Калининград Анонсы»',
@@ -25,7 +26,8 @@ const announcementChannels = [
   {
     platform: 'MAX',
     title: 'Канал фестиваля в MAX',
-    description: 'Подпишитесь, чтобы получать оперативные обновления о фестивале в отдельной ленте.',
+    description: 'Отдельная лента оперативных обновлений.',
+    benefits: ['Допместа', 'Спецрегистрация', 'Анонсы'],
     href: MAX_URL,
     qrSrc: '/generated/max/max-channel-qr.svg',
     qrAlt: 'QR-код канала фестиваля в MAX',
@@ -74,8 +76,7 @@ const announcementChannels = [
         <div class="site-footer__channels-copy">
           <p class="site-footer__channels-eyebrow">Подпишитесь на анонсы</p>
           <p class="site-footer__channels-text">
-            Подписывайтесь на Telegram или MAX, чтобы не пропустить новые события, изменения в программе
-            и важные напоминания фестиваля.
+            Ловите дополнительные места на регистрацию, способы попасть на спецмероприятия и срочные обновления фестиваля.
           </p>
         </div>
         <div class="site-footer__channel-list">
@@ -91,6 +92,11 @@ const announcementChannels = [
                 <span class="site-footer__channel-platform">{channel.platform}</span>
                 <strong>{channel.title}</strong>
                 <span>{channel.description}</span>
+                <div class="site-footer__channel-benefits" aria-label={`Что приходит в ${channel.platform}`}>
+                  {channel.benefits.map((benefit) => (
+                    <span class="site-footer__channel-benefit">{benefit}</span>
+                  ))}
+                </div>
                 <span class="site-footer__channel-action">Подписаться</span>
               </div>
               <div class="site-footer__channel-code">
@@ -102,6 +108,7 @@ const announcementChannels = [
                   loading="eager"
                   decoding="sync"
                 />
+                <span class="site-footer__channel-code-caption">Сканируйте QR</span>
               </div>
             </a>
           ))}
