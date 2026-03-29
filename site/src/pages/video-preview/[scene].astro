@@ -25,6 +25,7 @@ const sequenceFutureScene = getVideoPreviewScene('future-city');
 const sequenceCascadeScene = getVideoPreviewScene('cascade');
 const sequenceSiteScene = getVideoPreviewScene('site');
 const sequenceMaxScene = getVideoPreviewScene('max');
+const boostMythLabelParts = scene.kind === 'boost' ? getMythLabelParts(scene.mythLabel) : { lead: '', accent: '' };
 
 function getSceneTitle(value: VideoPreviewScene) {
   if (value.kind === 'boost') {
@@ -53,6 +54,40 @@ function getSceneTitle(value: VideoPreviewScene) {
 function getMythWords(text?: string) {
   return text?.split(/\s+/).filter(Boolean) ?? [];
 }
+
+function getMythLabelParts(text?: string) {
+  const words = text?.trim().split(/\s+/).filter(Boolean) ?? [];
+  if (!words.length) {
+    return { lead: '', accent: '' };
+  }
+
+  if (words.length === 1) {
+    return { lead: words[0], accent: '' };
+  }
+
+  return {
+    lead: words.slice(0, -1).join(' '),
+    accent: words.at(-1) ?? '',
+  };
+}
+
+function getSceneBrand(value: VideoPreviewScene) {
+  if (value.kind === 'boost' || value.kind === 'cascade' || value.kind === 'sequence') {
+    return {
+      path: '/shared-assets/logo-festival-single.svg',
+      alt: '80 историй о главном',
+      className: 'video-scene__brand--festival',
+    };
+  }
+
+  return {
+    path: '/shared-assets/logo-znanie-main.svg',
+    alt: 'Знание',
+    className: 'video-scene__brand--znanie',
+  };
+}
+
+const sceneBrand = getSceneBrand(scene);
 ---
 
 <PreviewLayout
@@ -90,8 +125,8 @@ function getMythWords(text?: string) {
         style={`--scene-duration:${scene.durationMs}ms;`}
       >
         {scene.kind !== 'site' && (
-          <div class="video-scene__brand anim anim--fade">
-            <img src="/shared-assets/logo-znanie-main.svg" alt="Знание" />
+          <div class:list={['video-scene__brand', sceneBrand.className, 'anim', 'anim--fade']}>
+            <img src={sceneBrand.path} alt={sceneBrand.alt} />
           </div>
         )}
 
@@ -128,7 +163,13 @@ function getMythWords(text?: string) {
               <div class="boost-scene__myth-plate anim anim--myth-plate">
                 <div class="boost-scene__myth-copy">
                   <p class="boost-scene__myth-label anim anim--myth-label" style="--anim-delay:120ms; --anim-duration:640ms;">
-                    {scene.mythLabel}
+                    <span>{boostMythLabelParts.lead}</span>
+                    {boostMythLabelParts.accent && (
+                      <>
+                        {' '}
+                        <span class="boost-scene__myth-label-accent">{boostMythLabelParts.accent}</span>
+                      </>
+                    )}
                   </p>
                   <p class="boost-scene__myth-text">
                     {getMythWords(scene.mythText).map((word, index) => (
@@ -528,7 +569,24 @@ function getMythWords(text?: string) {
     top: 48px;
     left: 58px;
     z-index: 10;
-    width: 162px;
+    width: var(--brand-width, 162px);
+  }
+
+  .video-scene__brand img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .video-scene__brand--festival {
+    --brand-width: 274px;
+    padding: 14px 18px 12px;
+    background: rgba(252, 248, 242, 0.94);
+    box-shadow: 0 16px 34px rgba(14, 11, 10, 0.16);
+  }
+
+  .video-scene__brand--znanie {
+    --brand-width: 162px;
   }
 
   .cold-open,
@@ -642,6 +700,10 @@ function getMythWords(text?: string) {
     letter-spacing: 0.13em;
     color: rgba(255, 255, 255, 0.92);
     text-transform: uppercase;
+  }
+
+  .boost-scene__myth-label-accent {
+    color: #d84b31;
   }
 
   .boost-scene__myth-text {
@@ -1544,19 +1606,19 @@ function getMythWords(text?: string) {
   }
 
   @keyframes previewMythPlate {
-    0%, 42% {
+    0%, 34% {
       opacity: 1;
       clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
       transform: translateX(0);
     }
-    58% {
+    48% {
       opacity: 1;
-      clip-path: polygon(0 0, 100% 0, 84% 100%, 0 100%);
+      clip-path: polygon(0 0, 100% 0, 82% 100%, 0 100%);
       transform: translateX(0);
     }
-    70%, 100% {
+    60%, 100% {
       opacity: 0;
-      clip-path: polygon(100% 0, 100% 0, 80% 100%, 80% 100%);
+      clip-path: polygon(100% 0, 100% 0, 78% 100%, 78% 100%);
       transform: translateX(0);
     }
   }
