@@ -165,7 +165,7 @@ const sceneBrand = getSceneBrand(scene);
               <div class="boost-scene__myth-plate anim anim--myth-plate">
                 <div class="boost-scene__myth-copy">
                   <p class="boost-scene__myth-label anim anim--myth-label" style="--anim-delay:120ms; --anim-duration:640ms;">
-                    <span>{boostMythLabelParts.lead}</span>
+                    <span class="boost-scene__myth-label-lead">{boostMythLabelParts.lead}</span>
                     {boostMythLabelParts.accent && (
                       <>
                         {' '}
@@ -702,8 +702,12 @@ const sceneBrand = getSceneBrand(scene);
     text-transform: uppercase;
   }
 
-  .boost-scene__myth-label-accent {
+  .boost-scene__myth-label-lead {
     color: #d84b31;
+  }
+
+  .boost-scene__myth-label-accent {
+    color: rgba(255, 255, 255, 0.96);
   }
 
   .boost-scene__myth-text {

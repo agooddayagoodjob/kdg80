@@ -30,6 +30,10 @@ const EXTRA_SHARED_ASSETS = [
     destinationPath: path.join(sharedAssetsRoot, 'logo-znanie-festival.svg'),
   },
   {
+    sourcePath: path.join(assetsRoot, 'logo-znanie-festival-master-inverse.svg'),
+    destinationPath: path.join(sharedAssetsRoot, 'logo-znanie-festival-master-inverse.svg'),
+  },
+  {
     sourcePath: path.join(sourceDataRoot, 'logo-80-istorii-hero.svg'),
     destinationPath: path.join(sharedAssetsRoot, 'logo-80-istorii-hero.svg'),
   },
