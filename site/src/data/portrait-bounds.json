@@ -717,34 +717,34 @@
     "slices": {
       "head": {
         "y": 0.2198,
-        "visibleLeft": 0.3569,
-        "visibleRight": 0.6903,
-        "coverage": 0.3333
+        "visibleLeft": 0.3141,
+        "visibleRight": 0.9675,
+        "coverage": 0.6534
       },
       "shoulder": {
         "y": 0.3399,
-        "visibleLeft": 0.3097,
-        "visibleRight": 0.7275,
-        "coverage": 0.4177
+        "visibleLeft": 0.0195,
+        "visibleRight": 0.9675,
+        "coverage": 0.9481
       },
       "chest": {
         "y": 0.4803,
-        "visibleLeft": 0.1237,
-        "visibleRight": 0.8927,
-        "coverage": 0.769
+        "visibleLeft": 0.0195,
+        "visibleRight": 0.9659,
+        "coverage": 0.9464
       },
       "waist": {
         "y": 0.6201,
-        "visibleLeft": 0.0815,
-        "visibleRight": 0.9292,
-        "coverage": 0.8476
+        "visibleLeft": 0.0195,
+        "visibleRight": 0.9675,
+        "coverage": 0.9481
       }
     },
-    "width": 1398,
+    "width": 1232,
     "height": 1524,
-    "visibleLeft": 0.0172,
+    "visibleLeft": 0.0195,
     "visibleTop": 0.0157,
-    "visibleRight": 0.9828,
+    "visibleRight": 0.9805,
     "visibleBottom": 1
   },
   "/generated/speaker-strip/perkusov-nikolay.webp": {
