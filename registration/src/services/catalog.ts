@@ -50,6 +50,13 @@ const HALLS: HallSeed[] = [
     capacity: 80,
   },
   {
+    code: 'chekhov-library-reading-room',
+    venueName: 'Центральная городская библиотека им. А. П. Чехова',
+    hallName: 'Читальный зал',
+    address: 'Московский пр-т, 39',
+    capacity: 80,
+  },
+  {
     code: 'icae-hall',
     venueName: 'ИЦАЭ, КГТУ',
     hallName: 'Зал, 2 этаж',
@@ -112,24 +119,28 @@ function matchHall(event: FestivalEvent) {
     return HALLS[0];
   }
 
-  if (venue.includes('ицаэ') || venue.includes('кгту')) {
+  if (venue.includes('чехов') && venue.includes('библиот')) {
     return HALLS[1];
   }
 
-  if (venue.includes('третьяков')) {
+  if (venue.includes('ицаэ') || venue.includes('кгту')) {
     return HALLS[2];
   }
 
-  if (venue.includes('фридланд')) {
+  if (venue.includes('третьяков')) {
     return HALLS[3];
   }
 
-  if (venue.includes('мирового океана')) {
+  if (venue.includes('фридланд')) {
     return HALLS[4];
   }
 
-  if (venue.includes('историко') || venue.includes('клиническ')) {
+  if (venue.includes('мирового океана')) {
     return HALLS[5];
+  }
+
+  if (venue.includes('историко') || venue.includes('клиническ')) {
+    return HALLS[6];
   }
 
   return null;
