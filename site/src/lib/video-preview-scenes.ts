@@ -292,7 +292,7 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     titleLines: ['Как говорить', 'о советском', 'Калининграде'],
     subtitle: 'без ностальгического тумана\nи без стыда',
     supportLine: '',
-    durationMs: 5600,
+    durationMs: 7600,
   },
   {
     slug: 'public-talk-cutout',
@@ -303,7 +303,7 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     titleLines: ['Как говорить', 'о советском', 'Калининграде'],
     subtitle: 'без ностальгического тумана\nи без стыда',
     supportLine: '',
-    durationMs: 5600,
+    durationMs: 7600,
   },
   {
     slug: 'public-talk-wall',
@@ -314,7 +314,7 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     titleLines: ['Как говорить', 'о советском', 'Калининграде'],
     subtitle: 'без ностальгического тумана\nи без стыда',
     supportLine: '',
-    durationMs: 5600,
+    durationMs: 7600,
   },
   {
     slug: 'dialogue-opening-side',
@@ -325,7 +325,7 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     titleLines: ['Открытие', 'фестиваля'],
     subtitle: '«80 историй о главном»',
     supportLine: '',
-    durationMs: 5600,
+    durationMs: 7600,
   },
   {
     slug: 'dialogue-tourists-side',
@@ -336,7 +336,7 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     titleLines: ['Калининградская', 'область глазами', 'туристов:'],
     subtitle: 'тогда и сейчас',
     supportLine: '',
-    durationMs: 5600,
+    durationMs: 7600,
   },
   {
     slug: 'dialogue-habits-side',
@@ -347,7 +347,7 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     titleLines: ['Привычки', 'калининградцев /', 'Ты настоящий', 'калининградец, если... /'],
     subtitle: 'Калининградцы глазами гостей',
     supportLine: '',
-    durationMs: 5600,
+    durationMs: 7600,
   },
   {
     slug: 'dialogue-soviet-side',
@@ -358,7 +358,7 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     titleLines: ['Как говорить', 'о советском', 'Калининграде'],
     subtitle: 'без ностальгического тумана\nи без стыда',
     supportLine: 'Четыре участника о прошлом региона без ностальгии, стыда и удобных крайностей.',
-    durationMs: 5600,
+    durationMs: 7600,
   },
   {
     slug: 'dialogue-city-garden-side',
@@ -369,7 +369,7 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     titleLines: ['Калининград', 'город сад', 'или микрорайон'],
     subtitle: 'для проживания у моря',
     supportLine: '',
-    durationMs: 5600,
+    durationMs: 7600,
   },
 ];
 

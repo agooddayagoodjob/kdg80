@@ -59,6 +59,22 @@ function getMythWords(text?: string) {
   return text?.split(/\s+/).filter(Boolean) ?? [];
 }
 
+function getDialogueTitleWords(text: string) {
+  const tokens = text.trim().split(/\s+/).filter(Boolean);
+  const words: string[] = [];
+
+  for (const token of tokens) {
+    if (token === '/' && words.length) {
+      words[words.length - 1] = `${words[words.length - 1]} /`;
+      continue;
+    }
+
+    words.push(token);
+  }
+
+  return words;
+}
+
 function getMythLabelParts(text?: string) {
   const words = text?.trim().split(/\s+/).filter(Boolean) ?? [];
   if (!words.length) {
@@ -374,32 +390,44 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
                 </p>
               </div>
               <h2 class="dialogue-scene__title">
-                {scene.titleLines.map((line, index) => (
-                  <span class:list={['anim', 'anim--dialogue-title-line']} style={getAnimStyle(280 + index * 110, 780)}>
-                    {line}
-                  </span>
-                ))}
+                {scene.titleLines.map((line, index) => {
+                  const lineDelay = 360 + index * 240;
+                  const words = getDialogueTitleWords(line);
+
+                  return (
+                    <span class:list={['dialogue-scene__title-line', 'anim', 'anim--dialogue-title-line']} style={getAnimStyle(lineDelay, 1240)}>
+                      {words.map((word, wordIndex) => (
+                        <span
+                          class:list={['dialogue-scene__title-word', 'anim', 'anim--dialogue-title-word']}
+                          style={getAnimStyle(lineDelay + 180 + wordIndex * 90, 760)}
+                        >
+                          {word}
+                        </span>
+                      ))}
+                    </span>
+                  );
+                })}
               </h2>
               {scene.variant === 'side-strip' ? (
                 <>
-                  <div class:list={['dialogue-scene__schedule-block', 'anim', 'anim--dialogue-schedule-phase']} style={getAnimStyle(660, 760)}>
+                  <div class:list={['dialogue-scene__schedule-block', 'anim', 'anim--dialogue-schedule-phase']} style={getAnimStyle(1560, 920)}>
                     <p class="dialogue-scene__schedule">{scene.dateLabel}</p>
                     {scene.venue && <p class="dialogue-scene__venue">{scene.venue}</p>}
                   </div>
                   {scene.subtitle && (
-                    <p class:list={['dialogue-scene__subtitle', 'anim', 'anim--dialogue-subtitle-phase']} style={getAnimStyle(900, 720)}>
+                    <p class:list={['dialogue-scene__subtitle', 'anim', 'anim--dialogue-subtitle-phase']} style={getAnimStyle(1960, 920)}>
                       {scene.subtitle}
                     </p>
                   )}
-                  <p class:list={['dialogue-scene__cta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(1120, 640)}>
+                  <p class:list={['dialogue-scene__cta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(2500, 760)}>
                     ПОСЛУШАЙ И ЗАДАЙ СВОЙ ВОПРОС
                   </p>
                   {scene.supportLine && (
-                    <p class:list={['dialogue-scene__support', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(1260, 680)}>
+                    <p class:list={['dialogue-scene__support', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(2660, 820)}>
                       {scene.supportLine}
                     </p>
                   )}
-                  <div class:list={['dialogue-scene__meta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(1400, 640)}>
+                  <div class:list={['dialogue-scene__meta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(2860, 820)}>
                     {scene.availabilityLabel && (
                       <p class:list={[
                         'dialogue-scene__availability',
@@ -411,12 +439,12 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
                     {scene.accessLabel && <p class="dialogue-scene__access-pill">{scene.accessLabel}</p>}
                   </div>
                   <div class="dialogue-scene__roster-shell">
-                    <p class:list={['dialogue-scene__roster-label', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(1560, 620)}>
+                    <p class:list={['dialogue-scene__roster-label', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(3120, 720)}>
                       УЧАСТНИКИ
                     </p>
                     <div class="dialogue-scene__roster">
                       {scene.participants.map((participant, index) => (
-                        <article class:list={['dialogue-scene__roster-item', 'anim', 'anim--dialogue-roster-item']} style={getAnimStyle(1640 + index * 70, 580)}>
+                        <article class:list={['dialogue-scene__roster-item', 'anim', 'anim--dialogue-roster-item']} style={getAnimStyle(3260 + index * 45, 720)}>
                           <strong>{participant.name}</strong>
                           <span>{participant.role}</span>
                         </article>
@@ -427,19 +455,19 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
               ) : (
                 <>
                   {scene.subtitle && (
-                    <p class:list={['dialogue-scene__subtitle', 'anim', 'anim--dialogue-subtitle-phase']} style={getAnimStyle(820, 720)}>
+                    <p class:list={['dialogue-scene__subtitle', 'anim', 'anim--dialogue-subtitle-phase']} style={getAnimStyle(1740, 920)}>
                       {scene.subtitle}
                     </p>
                   )}
                   {scene.supportLine && (
-                    <p class:list={['dialogue-scene__support', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(980, 680)}>
+                    <p class:list={['dialogue-scene__support', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(1980, 820)}>
                       {scene.supportLine}
                     </p>
                   )}
-                  <p class:list={['dialogue-scene__cta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(1120, 640)}>
+                  <p class:list={['dialogue-scene__cta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(2280, 760)}>
                     ПОСЛУШАЙ И ЗАДАЙ СВОЙ ВОПРОС
                   </p>
-                  <div class:list={['dialogue-scene__meta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(1260, 640)}>
+                  <div class:list={['dialogue-scene__meta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(2480, 820)}>
                     {scene.availabilityLabel && (
                       <p class:list={[
                         'dialogue-scene__availability',
@@ -450,7 +478,7 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
                     )}
                     {scene.accessLabel && <p class="dialogue-scene__access-pill">{scene.accessLabel}</p>}
                   </div>
-                  <div class:list={['dialogue-scene__schedule-block', 'anim', 'anim--dialogue-schedule-phase']} style={getAnimStyle(700, 760)}>
+                  <div class:list={['dialogue-scene__schedule-block', 'anim', 'anim--dialogue-schedule-phase']} style={getAnimStyle(1460, 920)}>
                     <p class="dialogue-scene__schedule">{scene.dateLabel}</p>
                     <p class="dialogue-scene__venue">{scene.venue}</p>
                   </div>
@@ -461,12 +489,15 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
             <div
               class:list={['dialogue-scene__participants', 'anim', 'anim--dialogue-bank']}
               aria-label="Участники открытого диалога"
-              style={scene.variant === 'side-strip' ? dialogueSideStripLayout?.participantsStyle : undefined}
+              style={[
+                scene.variant === 'side-strip' ? dialogueSideStripLayout?.participantsStyle : undefined,
+                getAnimStyle(1420, 1360),
+              ].filter(Boolean).join('; ')}
             >
               {scene.participants.map((participant, index) => (
                 <article
                   class:list={['dialogue-person', !participant.image && 'dialogue-person--placeholder', 'anim', 'anim--dialogue-participant']}
-                  style={getAnimStyle(780 + index * 70, 820)}
+                  style={getAnimStyle(1600 + index * 45, 1160)}
                 >
                   <div class:list={['dialogue-person__media', !participant.image && 'dialogue-person__media--placeholder']}>
                     {participant.image ? (
@@ -1292,8 +1323,15 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
     text-wrap: balance;
   }
 
-  .dialogue-scene__title span {
-    display: block;
+  .dialogue-scene__title-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.18ch;
+    align-items: flex-end;
+  }
+
+  .dialogue-scene__title-word {
+    display: inline-block;
   }
 
   .dialogue-scene__subtitle {
@@ -2547,7 +2585,13 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
   .anim--dialogue-title-line {
     animation-name: previewDialogueTitleLine;
     animation-delay: var(--anim-delay, 0ms);
-    animation-duration: var(--anim-duration, 780ms);
+    animation-duration: var(--anim-duration, 1240ms);
+  }
+
+  .anim--dialogue-title-word {
+    animation-name: previewDialogueTitleWord;
+    animation-delay: var(--anim-delay, 0ms);
+    animation-duration: var(--anim-duration, 760ms);
   }
 
   .anim--dialogue-schedule-phase {
@@ -2768,10 +2812,10 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
   }
 
   @keyframes previewDialogueBackdrop {
-    0%, 8% { opacity: 0; transform: scale(1.018) translateX(0); }
-    20% { opacity: 1; transform: scale(1.008) translateX(0); }
-    72% { opacity: 1; transform: scale(1.002) translateX(-4px); }
-    100% { opacity: 1; transform: scale(1.008) translateX(-8px); }
+    0%, 6% { opacity: 0; transform: scale(1.024) translateX(0); }
+    18% { opacity: 1; transform: scale(1.012) translateX(0); }
+    78% { opacity: 1; transform: scale(1.004) translateX(-5px); }
+    100% { opacity: 1; transform: scale(1.008) translateX(-9px); }
   }
 
   @keyframes previewDialogueGrain {
@@ -2783,24 +2827,26 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
     0% {
       opacity: 0;
       clip-path: inset(0 100% 0 0);
-      transform: translateX(18px);
+      transform: scaleX(1.03);
     }
     100% {
       opacity: 1;
       clip-path: inset(0 0 0 0);
-      transform: translateX(0);
+      transform: scaleX(1);
     }
   }
 
   @keyframes previewDialogueKicker {
     0% {
       opacity: 0;
-      transform: translateY(18px);
+      transform: translateY(12px);
+      filter: blur(6px);
       letter-spacing: 0.18em;
     }
     100% {
       opacity: 1;
       transform: translateY(0);
+      filter: blur(0);
       letter-spacing: 0.14em;
     }
   }
@@ -2809,9 +2855,9 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
     0% {
       opacity: 0;
       clip-path: inset(0 0 100% 0);
-      transform: translateY(28px);
+      transform: translateY(18px);
     }
-    62% {
+    58% {
       opacity: 1;
       clip-path: inset(0 0 0 0);
       transform: translateY(0);
@@ -2820,51 +2866,78 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
       opacity: 1;
       clip-path: inset(0 0 0 0);
       transform: translateY(0);
+    }
+  }
+
+  @keyframes previewDialogueTitleWord {
+    0% {
+      opacity: 0;
+      transform: translateY(18px) scale(0.992);
+      filter: blur(8px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
     }
   }
 
   @keyframes previewDialogueSchedulePhase {
     0% {
       opacity: 0;
-      transform: translateY(28px) scale(0.988);
+      transform: translateY(16px);
+      filter: blur(6px);
+      clip-path: inset(0 0 48% 0);
     }
-    70% {
+    72% {
       opacity: 1;
-      transform: translateY(0) scale(1.008);
+      transform: translateY(0);
+      filter: blur(0);
+      clip-path: inset(0 0 0 0);
     }
     100% {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: translateY(0);
+      filter: blur(0);
+      clip-path: inset(0 0 0 0);
     }
   }
 
   @keyframes previewDialogueSubtitlePhase {
     0% {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(12px);
+      filter: blur(8px);
+      clip-path: inset(0 0 60% 0);
     }
     100% {
       opacity: 1;
       transform: translateY(0);
+      filter: blur(0);
+      clip-path: inset(0 0 0 0);
     }
   }
 
   @keyframes previewDialogueCopyPhase {
     0% {
       opacity: 0;
-      transform: translateY(16px);
+      transform: translateY(10px);
+      filter: blur(6px);
+      clip-path: inset(0 0 70% 0);
     }
     100% {
       opacity: 1;
       transform: translateY(0);
+      filter: blur(0);
+      clip-path: inset(0 0 0 0);
     }
   }
 
   @keyframes previewDialogueBank {
     0% {
       opacity: 0;
-      clip-path: inset(0 0 0 4%);
-      transform: translateX(18px);
+      clip-path: inset(0 0 0 10%);
+      transform: translateX(22px);
     }
     100% {
       opacity: 1;
@@ -2876,26 +2949,31 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
   @keyframes previewDialogueParticipant {
     0% {
       opacity: 0;
-      transform: translateY(28px) scale(0.985);
+      transform: translateY(12px) scale(0.994);
+      filter: blur(8px);
     }
     72% {
       opacity: 1;
-      transform: translateY(0) scale(1.008);
+      transform: translateY(0) scale(1.003);
+      filter: blur(0);
     }
     100% {
       opacity: 1;
       transform: translateY(0) scale(1);
+      filter: blur(0);
     }
   }
 
   @keyframes previewDialogueRosterItem {
     0% {
       opacity: 0;
-      transform: translateY(14px);
+      transform: translateY(8px);
+      filter: blur(6px);
     }
     100% {
       opacity: 1;
       transform: translateY(0);
+      filter: blur(0);
     }
   }
 
