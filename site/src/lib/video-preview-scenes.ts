@@ -135,6 +135,50 @@ type DialogueSceneSeed = {
   durationMs?: number;
 };
 
+function normalizeDialogueVenueLabel(value?: string) {
+  const venue = value?.trim() ?? '';
+  if (!venue || venue.toUpperCase() === 'ПЛОЩАДКА УТОЧНЯЕТСЯ') {
+    return '';
+  }
+  return venue;
+}
+
+const DIALOGUE_SCENE_PARTICIPANT_STYLE_OVERRIDES: Record<string, Array<{ match: string; style: string }>> = {
+  'dialogue-opening-side': [
+    { match: 'Ярцев', style: '--dialogue-portrait-scale-side: 0.64; --dialogue-portrait-x-side: 12px; --dialogue-portrait-y-side: 8px;' },
+    { match: 'Левченков', style: '--dialogue-portrait-scale-side: 0.64; --dialogue-portrait-x-side: 10px; --dialogue-portrait-y-side: 8px;' },
+  ],
+  'dialogue-tourists-side': [
+    { match: 'Удовенко', style: '--dialogue-portrait-scale-side: 0.65; --dialogue-portrait-x-side: 10px; --dialogue-portrait-y-side: 6px;' },
+    { match: 'Селин', style: '--dialogue-portrait-scale-side: 0.65; --dialogue-portrait-x-side: -4px; --dialogue-portrait-y-side: 2px;' },
+  ],
+  'dialogue-habits-side': [
+    { match: 'Долотова', style: '--dialogue-portrait-scale-side: 0.65; --dialogue-portrait-x-side: 4px; --dialogue-portrait-y-side: -4px;' },
+    { match: 'Ярцев', style: '--dialogue-portrait-scale-side: 0.66; --dialogue-portrait-x-side: 6px; --dialogue-portrait-y-side: 4px;' },
+    { match: 'Попадин', style: '--dialogue-portrait-scale-side: 0.66; --dialogue-portrait-x-side: 2px; --dialogue-portrait-y-side: 10px;' },
+    { match: 'Литвинович', style: '--dialogue-portrait-scale-side: 0.65; --dialogue-portrait-x-side: -10px; --dialogue-portrait-y-side: 2px;' },
+  ],
+  'dialogue-soviet-side': [
+    { match: 'Марковец', style: '--dialogue-portrait-scale-side: 0.63; --dialogue-portrait-x-side: -10px; --dialogue-portrait-y-side: 6px;' },
+    { match: 'Литвинович', style: '--dialogue-portrait-scale-side: 0.63; --dialogue-portrait-x-side: -10px; --dialogue-portrait-y-side: 4px;' },
+    { match: 'Бойко', style: '--dialogue-portrait-scale-side: 0.64; --dialogue-portrait-x-side: 10px; --dialogue-portrait-y-side: 12px;' },
+    { match: 'Никитин', style: '--dialogue-portrait-scale-side: 0.63; --dialogue-portrait-x-side: 4px; --dialogue-portrait-y-side: 2px;' },
+  ],
+  'dialogue-city-garden-side': [
+    { match: 'Надымова', style: '--dialogue-portrait-scale-side: 0.67; --dialogue-portrait-x-side: -18px; --dialogue-portrait-y-side: 2px;' },
+    { match: 'Анисимов', style: '--dialogue-portrait-scale-side: 0.68; --dialogue-portrait-x-side: 2px; --dialogue-portrait-y-side: 8px;' },
+    { match: 'Сарниц', style: '--dialogue-portrait-scale-side: 0.67; --dialogue-portrait-x-side: 118px; --dialogue-portrait-y-side: 10px;' },
+    { match: 'Марковец', style: '--dialogue-portrait-scale-side: 0.67; --dialogue-portrait-x-side: -8px; --dialogue-portrait-y-side: 8px;' },
+    { match: 'Селин', style: '--dialogue-portrait-scale-side: 0.68; --dialogue-portrait-x-side: 8px; --dialogue-portrait-y-side: 8px;' },
+  ],
+};
+
+const DIALOGUE_SCENE_PARTICIPANT_IMAGE_OVERRIDES: Record<string, Array<{ match: string; image: string }>> = {
+  'dialogue-opening-side': [
+    { match: 'Ярцев', image: '/generated/speaker-strip/yartsev-andrey-3.webp' },
+  ],
+};
+
 type RegistrationManifestItem = {
   slug: string;
   capacity?: number;
@@ -245,9 +289,9 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     eventMatch: 'Как говорить о советском Калининграде без ностальгического тумана и без стыда',
     variant: 'bottom-strip',
     eyebrow: 'ОТКРЫТЫЙ ДИАЛОГ · 4 УЧАСТНИКА',
-    titleLines: ['КАК ГОВОРИТЬ', 'О СОВЕТСКОМ', 'КАЛИНИНГРАДЕ'],
-    subtitle: 'БЕЗ НОСТАЛЬГИЧЕСКОГО ТУМАНА И БЕЗ СТЫДА',
-    supportLine: 'НЕ ЛЕКЦИЯ, А РАЗГОВОР, ГДЕ ВАЖНЫ НЕ ОДИН ВЫВОД, А СТОЛКНОВЕНИЕ ВЗГЛЯДОВ.',
+    titleLines: ['Как говорить', 'о советском', 'Калининграде'],
+    subtitle: 'без ностальгического тумана\nи без стыда',
+    supportLine: '',
     durationMs: 5600,
   },
   {
@@ -256,9 +300,9 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     eventMatch: 'Как говорить о советском Калининграде без ностальгического тумана и без стыда',
     variant: 'side-strip',
     eyebrow: 'ОТКРЫТЫЙ ДИАЛОГ · 4 УЧАСТНИКА',
-    titleLines: ['КАК ГОВОРИТЬ', 'О СОВЕТСКОМ', 'КАЛИНИНГРАДЕ'],
-    subtitle: 'БЕЗ НОСТАЛЬГИЧЕСКОГО ТУМАНА И БЕЗ СТЫДА',
-    supportLine: 'ЧЕТЫРЕ УЧАСТНИКА, ЧЕТЫРЕ ОПТИКИ, ОДНА ТРУДНАЯ ТЕМА БЕЗ ГОТОВОГО ОТВЕТА.',
+    titleLines: ['Как говорить', 'о советском', 'Калининграде'],
+    subtitle: 'без ностальгического тумана\nи без стыда',
+    supportLine: '',
     durationMs: 5600,
   },
   {
@@ -267,9 +311,9 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     eventMatch: 'Как говорить о советском Калининграде без ностальгического тумана и без стыда',
     variant: 'split-strip',
     eyebrow: 'ОТКРЫТЫЙ ДИАЛОГ · 4 УЧАСТНИКА',
-    titleLines: ['КАК ГОВОРИТЬ', 'О СОВЕТСКОМ', 'КАЛИНИНГРАДЕ'],
-    subtitle: 'БЕЗ НОСТАЛЬГИЧЕСКОГО ТУМАНА И БЕЗ СТЫДА',
-    supportLine: 'ТЕМА СРАЗУ СЧИТЫВАЕТСЯ КАК ДИАЛОГ: СНАЧАЛА НАЗВАНИЕ, ПОТОМ УЧАСТНИКИ, ПОТОМ ПАРАМЕТРЫ.',
+    titleLines: ['Как говорить', 'о советском', 'Калининграде'],
+    subtitle: 'без ностальгического тумана\nи без стыда',
+    supportLine: '',
     durationMs: 5600,
   },
   {
@@ -278,9 +322,9 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     eventMatch: 'Открытие фестиваля «80 историй о главном»',
     variant: 'side-strip',
     eyebrow: 'ОТКРЫТИЕ ФЕСТИВАЛЯ · 2 УЧАСТНИКА',
-    titleLines: ['ОТКРЫТИЕ', 'ФЕСТИВАЛЯ'],
-    subtitle: '80 ИСТОРИЙ О ГЛАВНОМ',
-    supportLine: 'РАЗГОВОР О ТОМ, КАК ВХОДИТЬ В БОЛЬШУЮ ПРОГРАММУ ФЕСТИВАЛЯ И С ЧЕГО НАЧАТЬ СВОЙ МАРШРУТ.',
+    titleLines: ['Открытие', 'фестиваля'],
+    subtitle: '«80 историй о главном»',
+    supportLine: '',
     durationMs: 5600,
   },
   {
@@ -288,10 +332,10 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     label: 'Dialogue / Tourists / Side Strip',
     eventMatch: 'Калининградская область глазами туристов: тогда и сейчас',
     variant: 'side-strip',
-    eyebrow: 'ОТКРЫТЫЙ ДИАЛОГ · 3 УЧАСТНИКА',
-    titleLines: ['ОБЛАСТЬ', 'ГЛАЗАМИ', 'ТУРИСТОВ'],
-    subtitle: 'ТОГДА И СЕЙЧАС',
-    supportLine: 'ТРИ ГОЛОСА О ТОМ, КАК НА РЕГИОН СМОТРЯТ ПРИЕЗЖИЕ И ЧТО В ЭТОМ ВЗГЛЯДЕ МЕНЯЕТСЯ СО ВРЕМЕНЕМ.',
+    eyebrow: '3 УЧАСТНИКА',
+    titleLines: ['Калининградская', 'область глазами', 'туристов:'],
+    subtitle: 'тогда и сейчас',
+    supportLine: '',
     durationMs: 5600,
   },
   {
@@ -299,10 +343,10 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     label: 'Dialogue / Habits / Side Strip',
     eventMatch: 'Привычки калининградцев / Ты настоящий калининградец, если... / Калининградцы глазами гостей',
     variant: 'side-strip',
-    eyebrow: 'ОТКРЫТЫЙ ДИАЛОГ · 4 УЧАСТНИКА',
-    titleLines: ['КАЛИНИНГРАДЦЫ', 'И ГОСТИ'],
-    subtitle: 'КАК МЫ ВИДИМ ДРУГ ДРУГА',
-    supportLine: 'ЧЕТЫРЕ УЧАСТНИКА О ПРИВЫЧКАХ, УЗНАВАЕМЫХ ЖЕСТАХ И О ТОМ, КАК ГОРОД ЧИТАЕТСЯ СО СТОРОНЫ.',
+    eyebrow: '4 УЧАСТНИКА',
+    titleLines: ['Привычки', 'калининградцев /', 'Ты настоящий', 'калининградец, если... /'],
+    subtitle: 'Калининградцы глазами гостей',
+    supportLine: '',
     durationMs: 5600,
   },
   {
@@ -310,10 +354,10 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     label: 'Dialogue / Soviet / Side Strip',
     eventMatch: 'Как говорить о советском Калининграде без ностальгического тумана и без стыда',
     variant: 'side-strip',
-    eyebrow: 'ОТКРЫТЫЙ ДИАЛОГ · 4 УЧАСТНИКА',
-    titleLines: ['КАК ГОВОРИТЬ', 'О СОВЕТСКОМ', 'КАЛИНИНГРАДЕ'],
-    subtitle: 'БЕЗ НОСТАЛЬГИЧЕСКОГО ТУМАНА И БЕЗ СТЫДА',
-    supportLine: 'ЧЕТЫРЕ УЧАСТНИКА, ЧЕТЫРЕ ОПТИКИ, ОДНА ТРУДНАЯ ТЕМА БЕЗ ГОТОВОГО ОТВЕТА.',
+    eyebrow: '4 УЧАСТНИКА',
+    titleLines: ['Как говорить', 'о советском', 'Калининграде'],
+    subtitle: 'без ностальгического тумана\nи без стыда',
+    supportLine: 'Четыре участника о прошлом региона без ностальгии, стыда и удобных крайностей.',
     durationMs: 5600,
   },
   {
@@ -321,10 +365,10 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     label: 'Dialogue / City Garden / Side Strip',
     eventMatch: 'Калининград город сад или микрорайон для проживания у моря',
     variant: 'side-strip',
-    eyebrow: 'ОТКРЫТЫЙ ДИАЛОГ · 5 УЧАСТНИКОВ',
-    titleLines: ['ГОРОД-САД', 'ИЛИ РАЙОН', 'У МОРЯ'],
-    subtitle: 'КАКИМ ДОЛЖЕН БЫТЬ КАЛИНИНГРАД',
-    supportLine: 'ПЯТЬ УЧАСТНИКОВ О ГОРОДСКОЙ СРЕДЕ, ЖИЛЬЕ, ПЛАНИРОВКЕ И О ТОМ, КАК ЗДЕСЬ ХОЧЕТСЯ ЖИТЬ.',
+    eyebrow: '5 УЧАСТНИКОВ',
+    titleLines: ['Калининград', 'город сад', 'или микрорайон'],
+    subtitle: 'для проживания у моря',
+    supportLine: '',
     durationMs: 5600,
   },
 ];
@@ -379,6 +423,18 @@ function getDialogueMonogram(name: string) {
     .slice(0, 2)
     .map((chunk) => chunk[0]?.toUpperCase() ?? '')
     .join('');
+}
+
+function getDialogueSceneParticipantStyle(sceneSlug: string, participantName: string) {
+  return DIALOGUE_SCENE_PARTICIPANT_STYLE_OVERRIDES[sceneSlug]
+    ?.find((entry) => participantName.includes(entry.match))
+    ?.style;
+}
+
+function getDialogueSceneParticipantImage(sceneSlug: string, participantName: string, fallbackImage: string) {
+  return DIALOGUE_SCENE_PARTICIPANT_IMAGE_OVERRIDES[sceneSlug]
+    ?.find((entry) => participantName.includes(entry.match))
+    ?.image ?? fallbackImage;
 }
 
 function createBoostScene(events: FestivalEvent[], seed: BoostSceneSeed): VideoPreviewBoostScene {
@@ -438,12 +494,23 @@ function createDialogueScene(events: FestivalEvent[], seed: DialogueSceneSeed): 
       .map((participant) => ({
         name: participant.name,
         role: getSpeakerCaption(participant.affiliation),
-        image: participant.images[0] ? getDialoguePortraitImage(participant.name, participant.images[0]) : '',
-        imageStyle: getDialoguePortraitStyle(participant.name),
+        image: participant.images[0]
+          ? getDialogueSceneParticipantImage(
+              seed.slug,
+              participant.name,
+              getDialoguePortraitImage(participant.name, participant.images[0]),
+            )
+          : '',
+        imageStyle: [
+          getDialoguePortraitStyle(participant.name),
+          getDialogueSceneParticipantStyle(seed.slug, participant.name),
+        ]
+          .filter(Boolean)
+          .join(' ') || undefined,
         monogram: getDialogueMonogram(participant.name),
       })),
     dateLabel: event.dateLabel,
-    venue: event.venue || 'ПЛОЩАДКА УТОЧНЯЕТСЯ',
+    venue: normalizeDialogueVenueLabel(event.venue),
     accessLabel: 'БЕСПЛАТНО ПО РЕГИСТРАЦИИ',
     availabilityLabel: availabilityState?.label,
     availabilityTone: availabilityState?.tone,
