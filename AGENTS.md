@@ -60,6 +60,9 @@
 - Always verify both desktop and mobile views for visual tasks before saying the issue is fixed.
 - The verification pass must check the actual rendered result, not only the code or static CSS diff.
 - When the user reports a visual defect, re-open the affected screens in Playwright, capture fresh screenshots, and compare the result against the reported problem before closing the task.
+- For `video-preview` animation work, re-check the testing memo before closing:
+  - canonical doc: `/workspaces/kdg80/docs/video-preview-animation-testing.md`
+  - routes: `/video-preview/animation-testing/` and `/video-preview/testing/`
 
 ## Hero Reference Pack
 

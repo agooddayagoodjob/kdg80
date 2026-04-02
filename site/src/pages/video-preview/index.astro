@@ -12,6 +12,11 @@ const scenes = getVideoPreviewScenes();
     <div class="preview-index__panel">
       <p class="preview-index__eyebrow">VIDEO-FIRST PREVIEW</p>
       <h1 class="preview-index__title">Сцены для быстрой отработки композиции, масштаба и motion</h1>
+      <div class="preview-index__notes">
+        <strong>Testing notes</strong>
+        <a href="/video-preview/animation-testing/">/video-preview/animation-testing/</a>
+        <a href="/video-preview/testing/">/video-preview/testing/</a>
+      </div>
       <ul class="preview-index__list">
         {scenes.map((scene) => (
           <li>
@@ -59,10 +64,33 @@ const scenes = getVideoPreviewScenes();
 
   .preview-index__list {
     margin: 0;
+    margin-top: 1.25rem;
     padding: 0;
     list-style: none;
     display: grid;
     gap: 0.7rem;
+  }
+
+  .preview-index__notes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 0.9rem;
+    align-items: center;
+    padding: 0.95rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .preview-index__notes strong {
+    font: 700 0.96rem/1 var(--font-display);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff8f1;
+  }
+
+  .preview-index__notes a {
+    font: 500 0.96rem/1.15 var(--font-body);
+    color: rgba(255, 248, 241, 0.78);
   }
 
   .preview-index__list a {

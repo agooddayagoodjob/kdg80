@@ -1,0 +1,163 @@
+---
+import PreviewLayout from '../layouts/PreviewLayout.astro';
+import { videoPreviewTestingNotes } from '../lib/video-preview-testing-notes';
+---
+
+<PreviewLayout title={videoPreviewTestingNotes.title} description={videoPreviewTestingNotes.description}>
+  <main class="notes-page">
+    <section class="notes-page__panel">
+      <p class="notes-page__eyebrow">{videoPreviewTestingNotes.eyebrow}</p>
+      <h1 class="notes-page__title">{videoPreviewTestingNotes.title}</h1>
+      <p class="notes-page__lead">{videoPreviewTestingNotes.description}</p>
+
+      <div class="notes-page__links">
+        <a href="/video-preview/">Назад к video-preview</a>
+        <a href="/video-preview/testing/">Открыть alias route</a>
+      </div>
+
+      <p class="notes-page__doc">
+        Канонический документ: <code>{videoPreviewTestingNotes.canonicalDocPath}</code>
+      </p>
+
+      <div class="notes-page__grid">
+        {videoPreviewTestingNotes.sections.map((section) => (
+          <article class="notes-page__card">
+            <h2>{section.title}</h2>
+            <ul>
+              {section.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+
+      <section class="notes-page__code">
+        <h2>Seek + Pause Example</h2>
+        <pre><code>{videoPreviewTestingNotes.codeSample}</code></pre>
+      </section>
+    </section>
+  </main>
+</PreviewLayout>
+
+<style>
+  .notes-page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+  }
+
+  .notes-page__panel {
+    width: min(100%, 70rem);
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      radial-gradient(circle at top right, rgba(255, 115, 77, 0.16), transparent 36%),
+      rgba(22, 18, 18, 0.82);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(18px);
+  }
+
+  .notes-page__eyebrow {
+    margin: 0 0 0.9rem;
+    font: 600 0.82rem/1 var(--font-display);
+    letter-spacing: 0.2em;
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .notes-page__title {
+    margin: 0;
+    font: 700 clamp(2.4rem, 4.4vw, 4.6rem)/0.94 var(--font-display);
+    color: #fcf7ef;
+  }
+
+  .notes-page__lead {
+    margin: 1rem 0 0;
+    max-width: 54rem;
+    font: 500 1.08rem/1.5 var(--font-body);
+    color: rgba(255, 248, 241, 0.84);
+  }
+
+  .notes-page__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin: 1.3rem 0 0;
+  }
+
+  .notes-page__links a {
+    padding: 0.8rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    color: #fff8f1;
+  }
+
+  .notes-page__links a:hover {
+    border-color: rgba(240, 91, 63, 0.42);
+    background: rgba(240, 91, 63, 0.12);
+  }
+
+  .notes-page__doc {
+    margin: 1rem 0 0;
+    font: 500 0.98rem/1.5 var(--font-body);
+    color: rgba(255, 248, 241, 0.72);
+  }
+
+  .notes-page__doc code {
+    color: #fff8f1;
+  }
+
+  .notes-page__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .notes-page__card {
+    padding: 1.15rem 1.15rem 1.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .notes-page__card h2,
+  .notes-page__code h2 {
+    margin: 0 0 0.8rem;
+    font: 700 1.18rem/1.05 var(--font-display);
+    color: #fff8f1;
+  }
+
+  .notes-page__card ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.55rem;
+    color: rgba(255, 248, 241, 0.8);
+    font: 500 0.98rem/1.45 var(--font-body);
+  }
+
+  .notes-page__code {
+    margin-top: 1.5rem;
+    padding: 1.15rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(12, 10, 10, 0.42);
+  }
+
+  .notes-page__code pre {
+    margin: 0;
+    overflow-x: auto;
+    font: 500 0.95rem/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #fff1e9;
+  }
+
+  @media (max-width: 720px) {
+    .notes-page {
+      padding: 1rem;
+    }
+
+    .notes-page__panel {
+      padding: 1.2rem;
+    }
+  }
+</style>

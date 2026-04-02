@@ -157,10 +157,10 @@ function getDialogueSideStripLayout(participantCount: number, titleLines: string
   const titleLineCount = Math.max(titleLines.length, 1);
   const longestLineLength = titleLines.reduce((max, line) => Math.max(max, line.replace(/\s+/g, '').length), 0);
   const subtitleLength = subtitle.replace(/\s+/g, '').length;
-  const titleLinePenalty = titleLineCount >= 5 ? 1.78 : titleLineCount === 4 ? 1.18 : titleLineCount === 3 ? 0.42 : 0;
-  const titleLengthPenalty = longestLineLength >= 18 ? 0.92 : longestLineLength >= 15 ? 0.54 : longestLineLength >= 12 ? 0.18 : 0;
+  const titleLinePenalty = titleLineCount >= 6 ? 2.26 : titleLineCount === 5 ? 1.78 : titleLineCount === 4 ? 1.18 : titleLineCount === 3 ? 0.42 : 0;
+  const titleLengthPenalty = longestLineLength >= 20 ? 1.18 : longestLineLength >= 18 ? 0.92 : longestLineLength >= 15 ? 0.54 : longestLineLength >= 12 ? 0.18 : 0;
   const titleSize = Math.max(
-    3.7,
+    3.22,
     (count === 2 ? 7.2 : count === 3 ? 6.5 : count === 4 ? 6.08 : 5.58) - titleLinePenalty - titleLengthPenalty,
   );
   const titleMax = longestLineLength >= 18
@@ -176,7 +176,7 @@ function getDialogueSideStripLayout(participantCount: number, titleLines: string
             : count === 4
               ? 6.3
               : 5.9;
-  const titleGap = titleLineCount >= 5 ? 0.04 : titleLineCount === 4 ? 0.07 : titleLineCount === 3 ? 0.1 : 0.14;
+  const titleGap = titleLineCount >= 6 ? 0.01 : titleLineCount === 5 ? 0.04 : titleLineCount === 4 ? 0.07 : titleLineCount === 3 ? 0.1 : 0.14;
   const subtitleSizeBase = count === 2 ? 2.08 : count === 3 ? 1.98 : count === 4 ? 1.86 : 1.74;
   const subtitleSizePenalty = subtitleLength >= 48 ? 0.22 : subtitleLength >= 34 ? 0.12 : subtitleLength >= 22 ? 0.04 : 0;
   const subtitleSize = Math.max(1.24, subtitleSizeBase - subtitleSizePenalty);
@@ -187,8 +187,8 @@ function getDialogueSideStripLayout(participantCount: number, titleLines: string
   const scheduleSize = count === 2 ? 2.18 : count === 3 ? 2.14 : count === 4 ? 2.12 : 2.18;
   const supportSize = count === 2 ? 1.02 : count === 3 ? 0.98 : count === 4 ? 0.94 : 0.88;
   const ctaSize = count === 2 ? 1.52 : count === 3 ? 1.46 : count === 4 ? 1.38 : 1.28;
-  const copyTopBase = count === 5 ? 118 : count === 4 ? 124 : count === 3 ? 130 : 136;
-  const copyTop = copyTopBase - (titleLineCount >= 5 ? 12 : titleLineCount === 4 ? 8 : titleLineCount === 3 ? 4 : 0);
+  const copyTopBase = count === 5 ? 114 : count === 4 ? 120 : count === 3 ? 128 : 134;
+  const copyTop = copyTopBase - (titleLineCount >= 6 ? 14 : titleLineCount === 5 ? 10 : titleLineCount === 4 ? 7 : titleLineCount === 3 ? 4 : 0);
 
   return {
     sceneStyle: [
@@ -221,6 +221,9 @@ const sceneBrand = getSceneBrand(scene);
 const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === 'side-strip'
   ? getDialogueSideStripLayout(scene.participants.length, scene.titleLines, scene.subtitle)
   : undefined;
+const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side-strip'
+  ? getAnimStyle(2580, 980)
+  : getAnimStyle(220, 880);
 ---
 
 <PreviewLayout
@@ -378,14 +381,14 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
           >
             <div class:list={['dialogue-scene__backdrop', 'anim', 'anim--dialogue-backdrop']}></div>
             <div class:list={['dialogue-scene__grain', 'anim', 'anim--dialogue-grain']} style={getAnimStyle(140, 900)}></div>
-            <div class:list={['dialogue-scene__accent', 'anim', 'anim--dialogue-accent']} style={getAnimStyle(220, 880)}></div>
+            <div class:list={['dialogue-scene__accent', 'anim', 'anim--dialogue-accent']} style={dialogueAccentStyle}></div>
 
             <div class="dialogue-scene__copy">
               <div class="dialogue-scene__identity">
-                <p class:list={['dialogue-scene__eyebrow', 'anim', 'anim--dialogue-kicker']} style={getAnimStyle(820, 620)}>
+                <p class:list={['dialogue-scene__eyebrow', 'anim', 'anim--dialogue-kicker']} style={getAnimStyle(1400, 620)}>
                   {scene.eyebrow}
                 </p>
-                <p class:list={['dialogue-scene__format', 'anim', 'anim--dialogue-kicker']} style={getAnimStyle(940, 660)}>
+                <p class:list={['dialogue-scene__format', 'anim', 'anim--dialogue-kicker']} style={getAnimStyle(1540, 660)}>
                   ОТКРЫТЫЙ ДИАЛОГ
                 </p>
               </div>
@@ -401,7 +404,7 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
                       {words.map((word, wordIndex) => (
                         <span
                           class:list={['dialogue-scene__title-word', 'anim', 'anim--myth-word']}
-                          style={getAnimStyle(1060 + (previousWords + wordIndex) * 150, 700)}
+                          style={getAnimStyle(1760 + (previousWords + wordIndex) * 150, 700)}
                         >
                           {word}
                         </span>
@@ -412,24 +415,24 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
               </h2>
               {scene.variant === 'side-strip' ? (
                 <>
-                  <div class:list={['dialogue-scene__schedule-block', 'anim', 'anim--dialogue-schedule-phase']} style={getAnimStyle(2200, 920)}>
+                  <div class:list={['dialogue-scene__schedule-block', 'anim', 'anim--dialogue-schedule-phase']} style={getAnimStyle(3340, 920)}>
                     <p class="dialogue-scene__schedule">{scene.dateLabel}</p>
                     {scene.venue && <p class="dialogue-scene__venue">{scene.venue}</p>}
                   </div>
                   {scene.subtitle && (
-                    <p class:list={['dialogue-scene__subtitle', 'anim', 'anim--dialogue-subtitle-phase']} style={getAnimStyle(2480, 920)}>
+                    <p class:list={['dialogue-scene__subtitle', 'anim', 'anim--dialogue-subtitle-phase']} style={getAnimStyle(3580, 920)}>
                       {scene.subtitle}
                     </p>
                   )}
-                  <p class:list={['dialogue-scene__cta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(3000, 760)}>
+                  <p class:list={['dialogue-scene__cta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(3940, 760)}>
                     ПОСЛУШАЙ И ЗАДАЙ СВОЙ ВОПРОС
                   </p>
                   {scene.supportLine && (
-                    <p class:list={['dialogue-scene__support', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(3180, 820)}>
+                    <p class:list={['dialogue-scene__support', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(4120, 820)}>
                       {scene.supportLine}
                     </p>
                   )}
-                  <div class:list={['dialogue-scene__meta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(3340, 820)}>
+                  <div class:list={['dialogue-scene__meta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(4300, 820)}>
                     {scene.availabilityLabel && (
                       <p class:list={[
                         'dialogue-scene__availability',
@@ -441,12 +444,12 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
                     {scene.accessLabel && <p class="dialogue-scene__access-pill">{scene.accessLabel}</p>}
                   </div>
                   <div class="dialogue-scene__roster-shell">
-                    <p class:list={['dialogue-scene__roster-label', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(3640, 720)}>
+                    <p class:list={['dialogue-scene__roster-label', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(4640, 720)}>
                       УЧАСТНИКИ
                     </p>
                     <div class="dialogue-scene__roster">
                       {scene.participants.map((participant, index) => (
-                        <article class:list={['dialogue-scene__roster-item', 'anim', 'anim--dialogue-roster-item']} style={getAnimStyle(3780 + index * 65, 720)}>
+                        <article class:list={['dialogue-scene__roster-item', 'anim', 'anim--dialogue-roster-item']} style={getAnimStyle(4800 + index * 70, 720)}>
                           <strong>{participant.name}</strong>
                           <span>{participant.role}</span>
                         </article>
@@ -457,19 +460,19 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
               ) : (
                 <>
                   {scene.subtitle && (
-                    <p class:list={['dialogue-scene__subtitle', 'anim', 'anim--dialogue-subtitle-phase']} style={getAnimStyle(2320, 920)}>
+                    <p class:list={['dialogue-scene__subtitle', 'anim', 'anim--dialogue-subtitle-phase']} style={getAnimStyle(3320, 920)}>
                       {scene.subtitle}
                     </p>
                   )}
                   {scene.supportLine && (
-                    <p class:list={['dialogue-scene__support', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(2520, 820)}>
+                    <p class:list={['dialogue-scene__support', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(3520, 820)}>
                       {scene.supportLine}
                     </p>
                   )}
-                  <p class:list={['dialogue-scene__cta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(2840, 760)}>
+                  <p class:list={['dialogue-scene__cta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(3860, 760)}>
                     ПОСЛУШАЙ И ЗАДАЙ СВОЙ ВОПРОС
                   </p>
-                  <div class:list={['dialogue-scene__meta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(3040, 820)}>
+                  <div class:list={['dialogue-scene__meta', 'anim', 'anim--dialogue-copy-phase']} style={getAnimStyle(4060, 820)}>
                     {scene.availabilityLabel && (
                       <p class:list={[
                         'dialogue-scene__availability',
@@ -480,7 +483,7 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
                     )}
                     {scene.accessLabel && <p class="dialogue-scene__access-pill">{scene.accessLabel}</p>}
                   </div>
-                  <div class:list={['dialogue-scene__schedule-block', 'anim', 'anim--dialogue-schedule-phase']} style={getAnimStyle(2080, 920)}>
+                  <div class:list={['dialogue-scene__schedule-block', 'anim', 'anim--dialogue-schedule-phase']} style={getAnimStyle(3000, 920)}>
                     <p class="dialogue-scene__schedule">{scene.dateLabel}</p>
                     <p class="dialogue-scene__venue">{scene.venue}</p>
                   </div>
@@ -493,7 +496,7 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
               aria-label="Участники открытого диалога"
               style={[
                 scene.variant === 'side-strip' ? dialogueSideStripLayout?.participantsStyle : undefined,
-                getAnimStyle(140, 1580),
+                getAnimStyle(280, 1860),
               ].filter(Boolean).join('; ')}
             >
               {scene.participants.map((participant, index) => {
@@ -502,7 +505,7 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
                 return (
                   <article
                     class:list={['dialogue-person', !participant.image && 'dialogue-person--placeholder', 'anim', 'anim--dialogue-participant']}
-                    style={getAnimStyle(260 + revealIndex * 170, 1320)}
+                    style={getAnimStyle(420 + revealIndex * 220, 1480)}
                   >
                     <div class:list={['dialogue-person__media', !participant.image && 'dialogue-person__media--placeholder']}>
                       {participant.image ? (
@@ -1692,13 +1695,7 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
 
   .dialogue-scene--side-strip {
     background:
-      linear-gradient(
-        90deg,
-        #f05b3f 0%,
-        #d84b31 calc(var(--dialogue-side-bank-left, 850px) - 3rem),
-        #12100f calc(var(--dialogue-side-bank-left, 850px) - 3rem),
-        #12100f 100%
-      );
+      linear-gradient(135deg, #f05b3f 0%, #dc4e33 44%, #b5361e 100%);
   }
 
   .dialogue-scene--side-strip .dialogue-scene__backdrop {
@@ -1788,23 +1785,44 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
     display: grid;
     grid-template-columns: repeat(var(--dialogue-side-columns, 4), minmax(0, var(--dialogue-side-column-width, 268px)));
     gap: 0;
+    isolation: isolate;
+  }
+
+  .dialogue-scene--side-strip .dialogue-scene__participants::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.08), transparent 34%),
+      linear-gradient(180deg, rgba(35, 30, 27, 0.82) 0%, rgba(18, 16, 15, 0.96) 100%);
+    opacity: 0;
+    animation: previewDialogueSideBankPlate 920ms cubic-bezier(0.19, 0.86, 0.24, 1) both;
+    animation-delay: 2580ms;
+    animation-play-state: paused;
   }
 
   .dialogue-scene--side-strip .dialogue-person {
     display: block;
     min-height: 100%;
-    border-left: 1px solid rgba(255, 255, 255, 0.12);
-    background: #12100f;
+    z-index: 1;
+    border-left: none;
+    background: transparent;
   }
 
   .dialogue-scene--side-strip .dialogue-person__media {
     min-height: 100%;
+    background: transparent;
   }
 
   .dialogue-scene--side-strip .dialogue-person__media::after {
     background:
       radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.08), transparent 34%),
       linear-gradient(180deg, rgba(18, 16, 15, 0.08) 0%, rgba(18, 16, 15, 0.3) 62%, rgba(18, 16, 15, 0.68) 100%);
+    opacity: 0;
+    animation: previewDialogueSideBankShade 920ms cubic-bezier(0.19, 0.86, 0.24, 1) both;
+    animation-delay: 2580ms;
+    animation-play-state: paused;
   }
 
   .dialogue-scene--side-strip .dialogue-person__monogram {
@@ -1815,9 +1833,7 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
     min-height: 100%;
     align-content: center;
     padding: 3.2rem 1.4rem 3rem;
-    background:
-      radial-gradient(circle at top left, rgba(240, 91, 63, 0.18), transparent 11rem),
-      linear-gradient(180deg, rgba(34, 28, 25, 0.94) 0%, rgba(21, 17, 16, 0.98) 100%);
+    background: transparent;
   }
 
   .dialogue-scene--side-strip .dialogue-person__placeholder-card strong {
@@ -2839,6 +2855,24 @@ const dialogueSideStripLayout = scene.kind === 'dialogue' && scene.variant === '
       opacity: 1;
       clip-path: inset(0 0 0 0);
       transform: scaleX(1);
+    }
+  }
+
+  @keyframes previewDialogueSideBankPlate {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes previewDialogueSideBankShade {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
     }
   }
 
