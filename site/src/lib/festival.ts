@@ -1516,15 +1516,20 @@ function parseSections() {
   return sortEvents(attachRelatedEvents(events));
 }
 
-export function getFestivalEvents() {
+export function getFestivalEvents(options: { includeHidden?: boolean } = {}) {
   if (!cache) {
     cache = parseSections();
   }
+
+  if (options.includeHidden) {
+    return cache;
+  }
+
   return cache.filter((event) => !event.hiddenFromPublic);
 }
 
-export function getFestivalEventBySlug(slug: string) {
-  return getFestivalEvents().find((event) => event.slug === slug);
+export function getFestivalEventBySlug(slug: string, options: { includeHidden?: boolean } = {}) {
+  return getFestivalEvents(options).find((event) => event.slug === slug);
 }
 
 export function getMonthGroups(events: FestivalEvent[]) {

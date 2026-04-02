@@ -8,7 +8,7 @@ import {
 } from './media';
 import registrationManifest from '../data/registration-state-manifest.json';
 
-export type VideoPreviewSceneKind = 'cold-open' | 'boost' | 'dialogue' | 'cascade' | 'site' | 'qr' | 'sequence';
+export type VideoPreviewSceneKind = 'cold-open' | 'act-title' | 'boost' | 'dialogue' | 'cascade' | 'site' | 'qr' | 'sequence';
 
 type VideoPreviewBaseScene = {
   slug: string;
@@ -22,6 +22,13 @@ export type VideoPreviewColdOpenScene = VideoPreviewBaseScene & {
   tagline: string[];
   supportLine: string;
   period: string;
+};
+
+export type VideoPreviewActTitleScene = VideoPreviewBaseScene & {
+  kind: 'act-title';
+  kicker?: string;
+  title: string;
+  subtitle?: string;
 };
 
 export type VideoPreviewBoostScene = VideoPreviewBaseScene & {
@@ -69,6 +76,7 @@ export type VideoPreviewDialogueScene = VideoPreviewBaseScene & {
 
 export type VideoPreviewCascadeScene = VideoPreviewBaseScene & {
   kind: 'cascade';
+  eyebrow?: string;
   routeLabel: string;
   cards: Array<{
     title: string;
@@ -101,6 +109,7 @@ export type VideoPreviewSequenceScene = VideoPreviewBaseScene & {
 
 export type VideoPreviewScene =
   | VideoPreviewColdOpenScene
+  | VideoPreviewActTitleScene
   | VideoPreviewBoostScene
   | VideoPreviewDialogueScene
   | VideoPreviewCascadeScene
@@ -133,6 +142,27 @@ type DialogueSceneSeed = {
   subtitle: string;
   supportLine: string;
   durationMs?: number;
+};
+
+type ActTitleSceneSeed = {
+  slug: string;
+  label: string;
+  title: string;
+  kicker?: string;
+  subtitle?: string;
+  durationMs?: number;
+};
+
+type CascadeSceneSeed = {
+  slug: string;
+  label: string;
+  eyebrow?: string;
+  routeLabel: string;
+  durationMs?: number;
+  cards: Array<{
+    eventMatch: string;
+    title: string;
+  }>;
 };
 
 function normalizeDialogueVenueLabel(value?: string) {
@@ -266,6 +296,20 @@ const BOOST_SCENE_SEEDS: BoostSceneSeed[] = [
     durationMs: 9000,
   },
   {
+    slug: 'zoo-right',
+    label: 'Boost / Зачем городу зоопарк',
+    eventMatch: 'Право на существование: зоопарки в современном мире',
+    eyebrow: 'ЛЕКЦИЯ · БЕСПЛАТНО ПО РЕГИСТРАЦИИ',
+    shortTitle: 'ЗАЧЕМ ГОРОДУ ЗООПАРК',
+    hook: 'ПРАВО НА СУЩЕСТВОВАНИЕ И БУДУЩЕЕ ЗООПАРКА',
+    detailLabel: 'ЛЕКЦИЯ ОТВЕЧАЕТ',
+    detailLines: [
+      'ПОЧЕМУ СОВРЕМЕННОМУ ГОРОДУ НУЖЕН ЗООПАРК?',
+      'КАКОЕ БУДУЩЕЕ ВОЗМОЖНО ДЛЯ КАЛИНИНГРАДСКОГО ЗООПАРКА?',
+    ],
+    durationMs: 8600,
+  },
+  {
     slug: 'cinema',
     label: 'Boost / Калининград в кино',
     eventMatch: 'Калининград и область как кинодекорация',
@@ -339,6 +383,17 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     durationMs: 7600,
   },
   {
+    slug: 'dialogue-sea-side',
+    label: 'Dialogue / Sea / Side Strip',
+    eventMatch: 'Разговоры о море',
+    variant: 'side-strip',
+    eyebrow: '3 УЧАСТНИКА',
+    titleLines: ['Разговоры', 'о море'],
+    subtitle: '',
+    supportLine: 'Море здесь не фон, а образ жизни, профессия и характер города.',
+    durationMs: 7600,
+  },
+  {
     slug: 'dialogue-habits-side',
     label: 'Dialogue / Habits / Side Strip',
     eventMatch: 'Привычки калининградцев / Ты настоящий калининградец, если... / Калининградцы глазами гостей',
@@ -370,6 +425,144 @@ const DIALOGUE_SCENE_SEEDS: DialogueSceneSeed[] = [
     subtitle: '',
     supportLine: '',
     durationMs: 7600,
+  },
+];
+
+const ACT_TITLE_SCENE_SEEDS: ActTitleSceneSeed[] = [
+  {
+    slug: 'act-settlement',
+    label: 'Act Title / Как область стала домом',
+    kicker: 'АКТ 1',
+    title: 'КАК ОБЛАСТЬ\nСТАЛА ДОМОМ',
+    subtitle: '7 АКТУАЛЬНЫХ ЛЕКЦИЙ',
+    durationMs: 1700,
+  },
+  {
+    slug: 'act-sea',
+    label: 'Act Title / Море и территория',
+    kicker: 'АКТ 2',
+    title: 'МОРЕ\nИ ТЕРРИТОРИЯ',
+    subtitle: '5 АКТУАЛЬНЫХ ЛЕКЦИЙ',
+    durationMs: 1700,
+  },
+  {
+    slug: 'act-city',
+    label: 'Act Title / Город, архитектура, среда',
+    kicker: 'АКТ 3',
+    title: 'ГОРОД,\nАРХИТЕКТУРА,\nСРЕДА',
+    subtitle: '7 АКТУАЛЬНЫХ ЛЕКЦИЙ',
+    durationMs: 1700,
+  },
+  {
+    slug: 'act-everyday',
+    label: 'Act Title / Быт, память, культурные образы',
+    kicker: 'АКТ 4',
+    title: 'БЫТ,\nПАМЯТЬ,\nКУЛЬТУРНЫЕ ОБРАЗЫ',
+    subtitle: '5 АКТУАЛЬНЫХ ЛЕКЦИЙ',
+    durationMs: 1700,
+  },
+  {
+    slug: 'act-people',
+    label: 'Act Title / Люди, профессии, институции',
+    kicker: 'АКТ 5',
+    title: 'ЛЮДИ,\nПРОФЕССИИ,\nИНСТИТУЦИИ',
+    subtitle: '6 АКТУАЛЬНЫХ ЛЕКЦИЙ',
+    durationMs: 1700,
+  },
+  {
+    slug: 'act-dialogues',
+    label: 'Act Title / Открытые диалоги',
+    kicker: 'АКТ 6',
+    title: 'ОТКРЫТЫЕ\nДИАЛОГИ',
+    subtitle: '5 АКТУАЛЬНЫХ ПАБЛИК-ТОКОВ',
+    durationMs: 1700,
+  },
+];
+
+const CASCADE_SCENE_SEEDS: CascadeSceneSeed[] = [
+  {
+    slug: 'cascade',
+    label: 'Cascade / Названия событий',
+    eyebrow: 'ROUGH CUT',
+    routeLabel: 'ЧТО ЕЩЁ МОЖНО УСПЕТЬ',
+    durationMs: 5600,
+    cards: [
+      { eventMatch: 'История становления и развития малых городов', title: 'МАЛЫЕ ГОРОДА' },
+      { eventMatch: 'О чём мечтали в советском Калининграде', title: 'О ЧЁМ МЕЧТАЛИ' },
+      { eventMatch: 'История Светлогорска в семейном альбоме', title: 'СВЕТЛОГОРСК В СЕМЕЙНОМ АЛЬБОМЕ' },
+      { eventMatch: 'Право на существование: зоопарки', title: 'ЗАЧЕМ ГОРОДУ ЗООПАРК' },
+      { eventMatch: 'Калининград 2125', title: 'КАЛИНИНГРАД 2125' },
+      { eventMatch: 'Калининград и область как кинодекорация', title: 'КАЛИНИНГРАД В КИНО' },
+    ],
+  },
+  {
+    slug: 'settlement-cascade',
+    label: 'Cascade / Как область стала домом',
+    eyebrow: 'АКТ 1 · 6 СОБЫТИЙ',
+    routeLabel: 'КАК ОБЛАСТЬ СТАЛА ДОМОМ',
+    durationMs: 6200,
+    cards: [
+      { eventMatch: 'История становления и развития малых городов', title: 'МАЛЫЕ ГОРОДА' },
+      { eventMatch: 'Демография первого десятилетия', title: 'ДЕМОГРАФИЯ ПЕРВОГО ДЕСЯТИЛЕТИЯ' },
+      { eventMatch: 'История Светлогорска в семейном альбоме', title: 'СВЕТЛОГОРСК В СЕМЕЙНОМ АЛЬБОМЕ' },
+      { eventMatch: 'Восприятие новой родины переселенцами', title: 'НОВАЯ РОДИНА ПЕРЕСЕЛЕНЦЕВ' },
+      { eventMatch: 'Советский Гусев — время созиданий', title: 'СОВЕТСКИЙ ГУСЕВ' },
+      { eventMatch: 'Приморский (Зеленоградский) район', title: 'ПРИМОРСКИЙ РАЙОН' },
+    ],
+  },
+  {
+    slug: 'sea-cascade',
+    label: 'Cascade / Море и территория',
+    eyebrow: 'АКТ 2 · 4 СОБЫТИЯ',
+    routeLabel: 'МОРЕ И ТЕРРИТОРИЯ',
+    durationMs: 6200,
+    cards: [
+      { eventMatch: 'История парусного спорта', title: 'ИСТОРИЯ ПАРУСНОГО СПОРТА' },
+      { eventMatch: 'Первые на косе', title: 'ПЕРВЫЕ НА КОСЕ' },
+      { eventMatch: 'Мирная жизнь самой западной точки России', title: 'МИРНАЯ ЖИЗНЬ БАЛТИЙСКОЙ КОСЫ' },
+      { eventMatch: 'История образования и развития национального парка', title: 'НАЦПАРК «КУРШСКАЯ КОСА»' },
+    ],
+  },
+  {
+    slug: 'city-cascade',
+    label: 'Cascade / Город, архитектура, среда',
+    eyebrow: 'АКТ 3 · 5 СОБЫТИЙ',
+    routeLabel: 'ГОРОД, АРХИТЕКТУРА, СРЕДА',
+    durationMs: 6200,
+    cards: [
+      { eventMatch: 'Влияние планировочных решений на качество жизни', title: 'КАК ГОРОД ВЛИЯЕТ НА ЖИЗНЬ' },
+      { eventMatch: 'Архитектура советского Калининграда', title: 'АРХИТЕКТУРА СОВЕТСКОГО КАЛИНИНГРАДА' },
+      { eventMatch: 'Голубые ладони города К.', title: 'ГОЛУБЫЕ ЛАДОНИ ГОРОДА' },
+      { eventMatch: 'Памятники искусства и истории в ландшафте Калининградского зоопарка', title: 'ПАМЯТНИКИ В ЛАНДШАФТЕ ЗООПАРКА' },
+      { eventMatch: 'Зелёная память: история Ботанического сада', title: 'ЗЕЛЁНАЯ ПАМЯТЬ' },
+    ],
+  },
+  {
+    slug: 'everyday-cascade',
+    label: 'Cascade / Быт, память, культурные образы',
+    eyebrow: 'АКТ 4 · 4 СОБЫТИЯ',
+    routeLabel: 'БЫТ, ПАМЯТЬ, КУЛЬТУРНЫЕ ОБРАЗЫ',
+    durationMs: 6200,
+    cards: [
+      { eventMatch: 'Природа чемодана', title: 'ПРИРОДА ЧЕМОДАНА' },
+      { eventMatch: 'Калининградская область — вдохновение для писателей', title: 'ВДОХНОВЕНИЕ ДЛЯ ПИСАТЕЛЕЙ' },
+      { eventMatch: 'Денежное обращение в послевоенный период', title: 'ДЕНЕЖНОЕ ОБРАЩЕНИЕ 1945-1947' },
+      { eventMatch: 'Привычки калининградцев, юмор, суеверия', title: 'ПРИВЫЧКИ И ЛЕГЕНДЫ' },
+    ],
+  },
+  {
+    slug: 'people-cascade',
+    label: 'Cascade / Люди, профессии, институции',
+    eyebrow: 'АКТ 5 · 5 СОБЫТИЙ',
+    routeLabel: 'ЛЮДИ, ПРОФЕССИИ, ИНСТИТУЦИИ',
+    durationMs: 6200,
+    cards: [
+      { eventMatch: 'Курсанты с крылышками', title: 'КУРСАНТЫ С КРЫЛЫШКАМИ' },
+      { eventMatch: 'Калининградское здравоохранение', title: 'ЗДРАВООХРАНЕНИЕ ОБЛАСТИ' },
+      { eventMatch: 'Зоопарку — быть!', title: 'ЗООПАРКУ - БЫТЬ!' },
+      { eventMatch: 'Великие учителя', title: 'ВЕЛИКИЕ УЧИТЕЛЯ' },
+      { eventMatch: 'Калининградский морской торговый порт', title: 'МОРСКОЙ ТОРГОВЫЙ ПОРТ' },
+    ],
   },
 ];
 
@@ -517,23 +710,66 @@ function createDialogueScene(events: FestivalEvent[], seed: DialogueSceneSeed): 
   };
 }
 
-export function getVideoPreviewScenes(): VideoPreviewScene[] {
-  const events = getFestivalEvents();
+function createActTitleScene(seed: ActTitleSceneSeed): VideoPreviewActTitleScene {
+  return {
+    slug: seed.slug,
+    label: seed.label,
+    kind: 'act-title',
+    durationMs: seed.durationMs ?? 1700,
+    kicker: seed.kicker,
+    title: seed.title,
+    subtitle: seed.subtitle,
+  };
+}
 
-  const cascadeCards = [
-    'История становления и развития малых городов',
-    'О чём мечтали в советском Калининграде',
-    'История Светлогорска в семейном альбоме',
-    'Право на существование: зоопарки',
-    'Калининград 2125',
-    'Калининград и область как кинодекорация',
-  ].map((match) => {
-    const event = findEvent(events, match);
-    return {
-      title: event.title,
-      date: event.dateLabel,
-    };
-  });
+function createCascadeScene(events: FestivalEvent[], seed: CascadeSceneSeed): VideoPreviewCascadeScene {
+  return {
+    slug: seed.slug,
+    label: seed.label,
+    kind: 'cascade',
+    durationMs: seed.durationMs ?? 5600,
+    eyebrow: seed.eyebrow,
+    routeLabel: seed.routeLabel,
+    cards: seed.cards.map((card) => {
+      const event = findEvent(events, card.eventMatch);
+      return {
+        title: card.title,
+        date: event.dateLabel,
+      };
+    }),
+  };
+}
+
+export const VIDEO_PREVIEW_ROUGH_CUT_SCENE_SLUGS = [
+  'cold-open',
+  'act-settlement',
+  'dreams',
+  'settlement-cascade',
+  'act-sea',
+  'ocean',
+  'sea-cascade',
+  'act-city',
+  'bridge',
+  'future-city',
+  'city-cascade',
+  'act-everyday',
+  'cinema',
+  'everyday-cascade',
+  'act-people',
+  'zoo-right',
+  'people-cascade',
+  'act-dialogues',
+  'dialogue-tourists-side',
+  'dialogue-sea-side',
+  'dialogue-habits-side',
+  'dialogue-soviet-side',
+  'dialogue-city-garden-side',
+  'telegram',
+  'max',
+] as const;
+
+export function getVideoPreviewScenes(): VideoPreviewScene[] {
+  const events = getFestivalEvents({ includeHidden: true });
 
   return [
     {
@@ -545,16 +781,10 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       supportLine: '43 СПИКЕРА · 50+ СОБЫТИЙ · БЕСПЛАТНО',
       period: '28 МАРТА - 19 ИЮЛЯ 2026',
     },
+    ...ACT_TITLE_SCENE_SEEDS.map((seed) => createActTitleScene(seed)),
     ...BOOST_SCENE_SEEDS.map((seed) => createBoostScene(events, seed)),
     ...DIALOGUE_SCENE_SEEDS.map((seed) => createDialogueScene(events, seed)),
-    {
-      slug: 'cascade',
-      label: 'Cascade / Названия событий',
-      kind: 'cascade',
-      durationMs: 5600,
-      routeLabel: 'ЧТО ЕЩЁ МОЖНО УСПЕТЬ',
-      cards: cascadeCards,
-    },
+    ...CASCADE_SCENE_SEEDS.map((seed) => createCascadeScene(events, seed)),
     {
       slug: 'festival-flow',
       label: 'Sequence / Общий ролик',
@@ -576,7 +806,7 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       slug: 'telegram',
       label: 'QR / Telegram',
       kind: 'qr',
-      durationMs: 6400,
+      durationMs: 10000,
       platform: 'Telegram',
       title: 'ПОЛЮБИТЬ КАЛИНИНГРАД АНОНСЫ',
       subtitle: '@kenigevents',
@@ -588,7 +818,7 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
       slug: 'max',
       label: 'QR / Max',
       kind: 'qr',
-      durationMs: 6400,
+      durationMs: 10000,
       platform: 'Max',
       title: 'ПОЛЮБИТЬ КАЛИНИНГРАД АНОНСЫ',
       subtitle: 'max.ru',
@@ -601,4 +831,8 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
 
 export function getVideoPreviewScene(slug: string) {
   return getVideoPreviewScenes().find((scene) => scene.slug === slug);
+}
+
+export function getVideoPreviewRoughCutSceneSlugs() {
+  return [...VIDEO_PREVIEW_ROUGH_CUT_SCENE_SLUGS];
 }

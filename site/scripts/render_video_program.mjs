@@ -1,0 +1,360 @@
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { spawn, execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { chromium } from 'playwright';
+
+const execFileAsync = promisify(execFile);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const siteRoot = path.resolve(__dirname, '..');
+const workspaceRoot = path.resolve(siteRoot, '..');
+const distRoot = path.join(siteRoot, 'dist');
+const outputRoot = path.join(workspaceRoot, 'test-results', 'video-preview-20260327', '_rough-cut-20260402');
+const clipRoot = path.join(outputRoot, 'clips');
+const args = process.argv.slice(2);
+const port = Number(process.env.VIDEO_PREVIEW_PORT ?? '4326');
+const baseUrl = `http://127.0.0.1:${port}`;
+const qualityArg = args.find((value) => value.startsWith('--quality='));
+const profileArg = args.find((value) => value.startsWith('--profile='));
+const fpsArg = args.find((value) => value.startsWith('--fps='));
+const supersampleArg = args.find((value) => value.startsWith('--supersample='));
+const quality = qualityArg?.split('=')[1] ?? 'low';
+const profile = profileArg?.split('=')[1] ?? 'playback-safe';
+const fps = Number(fpsArg?.split('=')[1] ?? '15');
+const supersample = Number(supersampleArg?.split('=')[1] ?? '1');
+const outputPath = path.join(outputRoot, `festival-rough-cut-${profile}-${quality}-${fps}fps.mp4`);
+
+const sceneSlugs = [
+  'cold-open',
+  'act-settlement',
+  'dreams',
+  'settlement-cascade',
+  'act-sea',
+  'ocean',
+  'sea-cascade',
+  'act-city',
+  'bridge',
+  'future-city',
+  'city-cascade',
+  'act-everyday',
+  'cinema',
+  'everyday-cascade',
+  'act-people',
+  'zoo-right',
+  'people-cascade',
+  'act-dialogues',
+  'dialogue-tourists-side',
+  'dialogue-sea-side',
+  'dialogue-habits-side',
+  'dialogue-soviet-side',
+  'dialogue-city-garden-side',
+  'telegram',
+  'max',
+];
+
+if (!['low', 'high'].includes(quality)) {
+  throw new Error(`Unsupported quality value: ${quality}`);
+}
+
+if (!['playback-safe', 'master'].includes(profile)) {
+  throw new Error(`Unsupported profile value: ${profile}`);
+}
+
+if (!Number.isFinite(fps) || fps < 12 || fps > 60) {
+  throw new Error(`Unsupported fps value: ${fps}`);
+}
+
+if (!Number.isFinite(supersample) || supersample < 1 || supersample > 3) {
+  throw new Error(`Unsupported supersample value: ${supersample}`);
+}
+
+async function ensureDir(targetPath) {
+  await fs.mkdir(targetPath, { recursive: true });
+}
+
+async function waitForServer(url, timeoutMs = 30_000) {
+  const startedAt = Date.now();
+
+  while (Date.now() - startedAt < timeoutMs) {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        return;
+      }
+    } catch {
+      // Server is still booting.
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 400));
+  }
+
+  throw new Error(`Timed out waiting for preview server: ${url}`);
+}
+
+async function isServerReachable(url) {
+  try {
+    const response = await fetch(url);
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+function startPreviewServer() {
+  const child = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1'], {
+    cwd: distRoot,
+    stdio: 'pipe',
+  });
+
+  child.stdout.on('data', (chunk) => process.stdout.write(chunk));
+  child.stderr.on('data', (chunk) => process.stderr.write(chunk));
+  return child;
+}
+
+function getEncodeSettings() {
+  if (profile === 'master') {
+    return {
+      h264Profile: 'high',
+      level: '4.1',
+      preset: quality === 'high' ? 'slow' : 'medium',
+      crf: quality === 'high' ? '15' : '18',
+      maxrate: quality === 'high' ? '14M' : '10M',
+      bufsize: quality === 'high' ? '28M' : '20M',
+    };
+  }
+
+  return {
+    h264Profile: 'main',
+    level: '4.0',
+    preset: quality === 'high' ? 'slow' : 'medium',
+    crf: quality === 'high' ? '16' : '19',
+    maxrate: quality === 'high' ? '8M' : '6M',
+    bufsize: quality === 'high' ? '16M' : '12M',
+  };
+}
+
+async function ensureBuiltPreview() {
+  const build = spawn('npm', ['run', 'build'], {
+    cwd: siteRoot,
+    stdio: 'inherit',
+    env: {
+      ...process.env,
+      PUBLIC_SITE_ORIGIN: baseUrl,
+    },
+  });
+
+  await new Promise((resolve, reject) => {
+    build.on('exit', (code) => {
+      if (code === 0) {
+        resolve(undefined);
+        return;
+      }
+      reject(new Error(`Build failed with exit code ${code}`));
+    });
+    build.on('error', reject);
+  });
+
+  await fs.access(path.join(distRoot, 'video-preview', 'index.html'));
+}
+
+async function ensurePreviewServer() {
+  const previewIndexUrl = `${baseUrl}/video-preview/`;
+
+  if (await isServerReachable(previewIndexUrl)) {
+    return null;
+  }
+
+  const child = startPreviewServer();
+  await waitForServer(previewIndexUrl);
+  return child;
+}
+
+async function flushAnimationFrame(page) {
+  await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(resolve);
+        });
+      }),
+  );
+}
+
+async function loadScene(page, slug) {
+  await page.goto(`${baseUrl}/video-preview/${slug}/`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('[data-capture-root]');
+  await page.waitForFunction(() => typeof window.__videoPreview?.seek === 'function');
+  const durationMs = await page.evaluate(() => window.__videoPreview?.durationMs ?? 5600);
+  return durationMs;
+}
+
+async function renderSceneClip(page, slug, index, totalScenes, totalFrames, progressState) {
+  const sceneDurationMs = await loadScene(page, slug);
+  const totalSceneFrames = Math.max(2, Math.ceil((sceneDurationMs / 1000) * fps));
+  const captureRoot = page.locator('[data-capture-root]');
+  const frameDir = await fs.mkdtemp(path.join(os.tmpdir(), `video-preview-program-${slug}-`));
+  const clipPath = path.join(clipRoot, `${String(index + 1).padStart(2, '0')}-${slug}.mp4`);
+  const encodeSettings = getEncodeSettings();
+
+  try {
+    console.log(`Rendering scene ${index + 1}/${totalScenes}: ${slug} (${totalSceneFrames} frames)`);
+
+    for (let frameIndex = 0; frameIndex < totalSceneFrames; frameIndex += 1) {
+      const ms = Math.min(sceneDurationMs - 1, Math.round((frameIndex * 1000) / fps));
+      const framePath = path.join(frameDir, `frame-${String(frameIndex).padStart(5, '0')}.png`);
+
+      await page.evaluate((timeMs) => window.__videoPreview?.seek?.(timeMs), ms);
+      await flushAnimationFrame(page);
+      await captureRoot.screenshot({ path: framePath, animations: 'allow' });
+
+      progressState.renderedFrames += 1;
+      const percent = Math.floor((progressState.renderedFrames / totalFrames) * 100);
+      if (percent > progressState.lastPercentLogged) {
+        progressState.lastPercentLogged = percent;
+        console.log(`PROGRESS ${percent}%`);
+      }
+    }
+
+    await execFileAsync('ffmpeg', [
+      '-y',
+      '-framerate',
+      String(fps),
+      '-i',
+      path.join(frameDir, 'frame-%05d.png'),
+      '-f',
+      'lavfi',
+      '-i',
+      'anullsrc=channel_layout=stereo:sample_rate=48000',
+      '-shortest',
+      '-vf',
+      'scale=1920:1080:flags=lanczos,format=yuv420p',
+      '-c:v',
+      'libx264',
+      '-profile:v',
+      encodeSettings.h264Profile,
+      '-level',
+      encodeSettings.level,
+      '-preset',
+      encodeSettings.preset,
+      '-crf',
+      encodeSettings.crf,
+      '-maxrate',
+      encodeSettings.maxrate,
+      '-bufsize',
+      encodeSettings.bufsize,
+      '-g',
+      String(Math.max(30, fps * 2)),
+      '-movflags',
+      '+faststart',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '128k',
+      clipPath,
+    ]);
+
+    console.log(`Saved clip: ${clipPath}`);
+  } finally {
+    await fs.rm(frameDir, { recursive: true, force: true });
+  }
+
+  return clipPath;
+}
+
+async function buildConcatVideo(clipPaths) {
+  const concatListPath = path.join(outputRoot, 'rough-cut-concat.txt');
+  const concatBody = clipPaths
+    .map((clipPath) => `file '${clipPath.replace(/'/g, "'\\''")}'`)
+    .join('\n');
+  await fs.writeFile(concatListPath, `${concatBody}\n`, 'utf-8');
+
+  await execFileAsync('ffmpeg', [
+    '-y',
+    '-f',
+    'concat',
+    '-safe',
+    '0',
+    '-i',
+    concatListPath,
+    '-c',
+    'copy',
+    outputPath,
+  ]);
+}
+
+async function probeVideo(targetPath) {
+  const { stdout } = await execFileAsync('ffprobe', [
+    '-v',
+    'error',
+    '-show_streams',
+    '-show_format',
+    '-of',
+    'json',
+    targetPath,
+  ]);
+
+  return JSON.parse(stdout);
+}
+
+await ensureDir(outputRoot);
+await ensureDir(clipRoot);
+await fs.rm(clipRoot, { recursive: true, force: true });
+await ensureDir(clipRoot);
+
+await ensureBuiltPreview();
+const previewServer = await ensurePreviewServer();
+
+try {
+  await waitForServer(`${baseUrl}/video-preview/`);
+
+  const browser = await chromium.launch();
+
+  try {
+    const page = await browser.newPage({
+      viewport: { width: 2460, height: 1400 },
+      deviceScaleFactor: supersample,
+    });
+
+    const sceneDurations = [];
+    for (const slug of sceneSlugs) {
+      const durationMs = await loadScene(page, slug);
+      sceneDurations.push({ slug, durationMs, frames: Math.max(2, Math.ceil((durationMs / 1000) * fps)) });
+    }
+
+    const totalFrames = sceneDurations.reduce((sum, scene) => sum + scene.frames, 0);
+    const totalDurationMs = sceneDurations.reduce((sum, scene) => sum + scene.durationMs, 0);
+
+    console.log(`ROUGH CUT SCENES: ${sceneSlugs.length}`);
+    console.log(`ROUGH CUT DURATION: ${(totalDurationMs / 1000).toFixed(1)}s`);
+    console.log(`ROUGH CUT FRAMES: ${totalFrames}`);
+    console.log('PROGRESS 0%');
+
+    const progressState = {
+      renderedFrames: 0,
+      lastPercentLogged: 0,
+    };
+
+    const clipPaths = [];
+    for (const [index, slug] of sceneSlugs.entries()) {
+      const clipPath = await renderSceneClip(page, slug, index, sceneSlugs.length, totalFrames, progressState);
+      clipPaths.push(clipPath);
+    }
+
+    await page.close();
+    await buildConcatVideo(clipPaths);
+
+    const probe = await probeVideo(outputPath);
+    const reportPath = path.join(outputRoot, 'festival-rough-cut-ffprobe.json');
+    await fs.writeFile(reportPath, JSON.stringify(probe, null, 2), 'utf-8');
+
+    console.log(`PROGRESS 100%`);
+    console.log(`Saved rough cut to ${outputPath}`);
+    console.log(`Saved ffprobe report to ${reportPath}`);
+  } finally {
+    await browser.close();
+  }
+} finally {
+  previewServer?.kill('SIGTERM');
+}

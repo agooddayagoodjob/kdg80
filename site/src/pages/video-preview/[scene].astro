@@ -28,6 +28,10 @@ const sequenceMaxScene = getVideoPreviewScene('max');
 const boostMythLabelParts = scene.kind === 'boost' ? getMythLabelParts(scene.mythLabel) : { lead: '', accent: '' };
 
 function getSceneTitle(value: VideoPreviewScene) {
+  if (value.kind === 'act-title') {
+    return value.title.replace(/\n/g, ' ');
+  }
+
   if (value.kind === 'boost') {
     return value.shortTitle;
   }
@@ -52,7 +56,9 @@ function getSceneTitle(value: VideoPreviewScene) {
     return value.title;
   }
 
-  return `${value.tagline.join(' ')} ${value.period}`;
+  return value.kind === 'cold-open'
+    ? `${value.tagline.join(' ')} ${value.period}`
+    : value.label;
 }
 
 function getMythWords(text?: string) {
@@ -260,7 +266,7 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
         data-capture-root
         style={`--scene-duration:${scene.durationMs}ms;`}
       >
-        {scene.kind !== 'site' && (
+        {scene.kind !== 'site' && scene.kind !== 'act-title' && (
           <div class:list={['video-scene__brand', sceneBrand.className, scene.kind !== 'dialogue' && 'anim', scene.kind !== 'dialogue' && 'anim--fade']}>
             <img src={sceneBrand.path} alt={sceneBrand.alt} />
           </div>
@@ -286,6 +292,25 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
             </div>
             <div class="cold-open__accent anim anim--grow-x" style="--anim-delay:260ms;"></div>
             <p class="cold-open__period anim anim--fade-up" style="--anim-delay:520ms;">{scene.period}</p>
+          </div>
+        )}
+
+        {scene.kind === 'act-title' && (
+          <div class="act-title-scene">
+            <div class="act-title-scene__backdrop anim anim--fade"></div>
+            <div class="act-title-scene__copy">
+              {scene.kicker && <p class="act-title-scene__kicker anim anim--fade-up">{scene.kicker}</p>}
+              <h2 class="act-title-scene__title anim anim--title" style="--anim-delay:90ms;">
+                {scene.title.split('\n').map((line) => (
+                  <span class="act-title-scene__title-line">{line}</span>
+                ))}
+              </h2>
+              {scene.subtitle && (
+                <p class="act-title-scene__subtitle anim anim--fade-up" style="--anim-delay:190ms;">
+                  {scene.subtitle}
+                </p>
+              )}
+            </div>
           </div>
         )}
 
@@ -541,7 +566,7 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
 
         {scene.kind === 'cascade' && (
           <div class="cascade-scene">
-            <p class="cascade-scene__eyebrow anim anim--fade-up">ВЫБРАТЬ СВОЙ МАРШРУТ</p>
+            <p class="cascade-scene__eyebrow anim anim--fade-up">{scene.eyebrow ?? 'ВЫБРАТЬ СВОЙ МАРШРУТ'}</p>
             <h2 class="cascade-scene__title anim anim--title" style="--anim-delay:110ms;">{scene.routeLabel}</h2>
             <div class="cascade-scene__grid">
               {scene.cards.map((card, index) => (
@@ -908,6 +933,7 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   }
 
   .cold-open,
+  .act-title-scene,
   .boost-scene,
   .dialogue-scene,
   .cascade-scene,
@@ -988,6 +1014,61 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
     margin: 0;
     font: 500 2rem/1 var(--font-body);
     color: #2b2522;
+  }
+
+  .act-title-scene {
+    background:
+      radial-gradient(circle at top center, rgba(255, 255, 255, 0.08), transparent 22rem),
+      linear-gradient(180deg, #d84b31 0%, #b53222 100%);
+    color: #fff8f1;
+  }
+
+  .act-title-scene__backdrop {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(17, 13, 12, 0.16) 0%, rgba(17, 13, 12, 0.04) 36%, rgba(17, 13, 12, 0.16) 100%);
+  }
+
+  .act-title-scene__copy {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1rem;
+    padding: 6rem 8rem;
+    text-align: center;
+  }
+
+  .act-title-scene__kicker {
+    margin: 0;
+    font: 700 1rem/1 var(--font-display);
+    letter-spacing: 0.24em;
+    color: rgba(255, 248, 241, 0.74);
+    text-transform: uppercase;
+  }
+
+  .act-title-scene__title {
+    margin: 0;
+    display: grid;
+    gap: 0.1em;
+    font: 700 7.1rem/0.88 var(--font-display);
+    letter-spacing: -0.06em;
+    color: #fff8f1;
+    text-wrap: balance;
+  }
+
+  .act-title-scene__title-line {
+    display: block;
+  }
+
+  .act-title-scene__subtitle {
+    margin: 0.15rem 0 0;
+    font: 600 1.22rem/1 var(--font-display);
+    letter-spacing: 0.18em;
+    color: rgba(255, 248, 241, 0.82);
+    text-transform: uppercase;
   }
 
   .boost-scene {

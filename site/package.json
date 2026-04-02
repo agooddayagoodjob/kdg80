@@ -12,6 +12,7 @@
     "video:preview:dev": "node scripts/prepare_public_assets.mjs && astro dev --host 127.0.0.1 --port 4321",
     "video:preview:capture": "node scripts/capture_video_preview.mjs",
     "video:preview:render": "node scripts/render_video_scene.mjs",
+    "video:preview:program": "node scripts/render_video_program.mjs",
     "video:preview:sample": "node scripts/render_video_scene.mjs --quality=high --profile=playback-safe --fps=30 --supersample=2",
     "slide:preview:capture": "node scripts/capture_slide_deck.mjs",
     "build": "node scripts/prepare_public_assets.mjs && astro build && node scripts/verify_public_assets.mjs",
