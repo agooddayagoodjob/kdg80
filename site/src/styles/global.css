@@ -2613,6 +2613,10 @@ summary {
   border: 1px solid rgba(18, 17, 14, 0.08);
 }
 
+.notice[hidden] {
+  display: none;
+}
+
 .calendar-menu {
   width: fit-content;
 }

@@ -39,7 +39,22 @@ type EventRow = {
   registration_opens_at: string | null;
 };
 
+type CatalogSyncOverride = {
+  defaultPublicState?: RegistrationPublicState;
+  openOnCatalogSyncWhenStateIsSoon?: boolean;
+};
+
 const EVENT_OVERBOOKING_PERCENT_OVERRIDES: Record<string, number> = {};
+const EVENT_CATALOG_SYNC_OVERRIDES: Record<string, CatalogSyncOverride> = {
+  'kaliningradskaya-oblast-glazami-turistov-togda-i-seychas': {
+    defaultPublicState: 'open',
+    openOnCatalogSyncWhenStateIsSoon: true,
+  },
+  'kaliningrad-gorod-sad-ili-mikrorayon-dlya-prozhivaniya-u-morya': {
+    defaultPublicState: 'open',
+    openOnCatalogSyncWhenStateIsSoon: true,
+  },
+};
 
 const HALLS: HallSeed[] = [
   {
@@ -155,6 +170,7 @@ function toCatalogSeed(event: FestivalEvent): CatalogEventSeed | null {
   const durationMinutes = getDefaultDurationMinutes(event);
   const startsAt = new Date(event.isoStart).toISOString();
   const endsAt = addMinutes(startsAt, durationMinutes);
+  const syncOverride = EVENT_CATALOG_SYNC_OVERRIDES[event.slug];
 
   if (!hall) {
     return {
@@ -169,7 +185,7 @@ function toCatalogSeed(event: FestivalEvent): CatalogEventSeed | null {
       overbookingPercent: 0,
       registrationLimit: 0,
       sourceStatus: 'needs_mapping',
-      defaultPublicState: 'closed',
+      defaultPublicState: syncOverride?.defaultPublicState ?? 'closed',
     };
   }
 
@@ -188,7 +204,7 @@ function toCatalogSeed(event: FestivalEvent): CatalogEventSeed | null {
     overbookingPercent,
     registrationLimit,
     sourceStatus: 'ready',
-    defaultPublicState: 'soon',
+    defaultPublicState: syncOverride?.defaultPublicState ?? 'soon',
   };
 }
 
@@ -274,6 +290,16 @@ export function syncCatalog(db: Database.Database) {
       source_updated_at = excluded.source_updated_at,
       updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
   `);
+  const openEventOnSync = db.prepare(`
+    UPDATE events
+    SET registration_public_state = 'open',
+        updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+    WHERE slug = @slug
+      AND registration_public_state = 'soon'
+      AND venue_name = @venueName
+      AND hall_name = @hallName
+      AND address = @address
+  `);
 
   const sync = db.transaction(() => {
     for (const seed of getCatalogSeeds()) {
@@ -281,6 +307,16 @@ export function syncCatalog(db: Database.Database) {
         ...seed,
         hallId: findHallId(seed),
       });
+
+      const syncOverride = EVENT_CATALOG_SYNC_OVERRIDES[seed.slug];
+      if (syncOverride?.openOnCatalogSyncWhenStateIsSoon && seed.defaultPublicState === 'open') {
+        openEventOnSync.run({
+          slug: seed.slug,
+          venueName: seed.venueName,
+          hallName: seed.hallName,
+          address: seed.address,
+        });
+      }
     }
   });
 
