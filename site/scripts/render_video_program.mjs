@@ -20,6 +20,7 @@ const qualityArg = args.find((value) => value.startsWith('--quality='));
 const profileArg = args.find((value) => value.startsWith('--profile='));
 const fpsArg = args.find((value) => value.startsWith('--fps='));
 const supersampleArg = args.find((value) => value.startsWith('--supersample='));
+const resume = args.includes('--resume');
 const quality = qualityArg?.split('=')[1] ?? 'low';
 const profile = profileArg?.split('=')[1] ?? 'playback-safe';
 const fps = Number(fpsArg?.split('=')[1] ?? '15');
@@ -195,7 +196,7 @@ async function renderSceneClip(page, slug, index, totalScenes, totalFrames, prog
   const totalSceneFrames = Math.max(2, Math.ceil((sceneDurationMs / 1000) * fps));
   const captureRoot = page.locator('[data-capture-root]');
   const frameDir = await fs.mkdtemp(path.join(os.tmpdir(), `video-preview-program-${slug}-`));
-  const clipPath = path.join(clipRoot, `${String(index + 1).padStart(2, '0')}-${slug}.mp4`);
+  const clipPath = getClipPath(slug, index);
   const encodeSettings = getEncodeSettings();
 
   try {
@@ -263,6 +264,10 @@ async function renderSceneClip(page, slug, index, totalScenes, totalFrames, prog
   return clipPath;
 }
 
+function getClipPath(slug, index) {
+  return path.join(clipRoot, `${String(index + 1).padStart(2, '0')}-${slug}.mp4`);
+}
+
 async function buildConcatVideo(clipPaths) {
   const concatListPath = path.join(outputRoot, 'rough-cut-concat.txt');
   const concatBody = clipPaths
@@ -300,8 +305,10 @@ async function probeVideo(targetPath) {
 
 await ensureDir(outputRoot);
 await ensureDir(clipRoot);
-await fs.rm(clipRoot, { recursive: true, force: true });
-await ensureDir(clipRoot);
+if (!resume) {
+  await fs.rm(clipRoot, { recursive: true, force: true });
+  await ensureDir(clipRoot);
+}
 
 await ensureBuiltPreview();
 const previewServer = await ensurePreviewServer();
@@ -338,6 +345,26 @@ try {
 
     const clipPaths = [];
     for (const [index, slug] of sceneSlugs.entries()) {
+      const existingClipPath = getClipPath(slug, index);
+      if (resume) {
+        try {
+          const stats = await fs.stat(existingClipPath);
+          if (stats.isFile() && stats.size > 0) {
+            progressState.renderedFrames += sceneDurations[index]?.frames ?? 0;
+            const percent = Math.floor((progressState.renderedFrames / totalFrames) * 100);
+            if (percent > progressState.lastPercentLogged) {
+              progressState.lastPercentLogged = percent;
+              console.log(`PROGRESS ${percent}%`);
+            }
+            console.log(`Reusing clip ${index + 1}/${sceneSlugs.length}: ${slug}`);
+            clipPaths.push(existingClipPath);
+            continue;
+          }
+        } catch {
+          // Clip does not exist yet; render it below.
+        }
+      }
+
       const clipPath = await renderSceneClip(page, slug, index, sceneSlugs.length, totalFrames, progressState);
       clipPaths.push(clipPath);
     }
