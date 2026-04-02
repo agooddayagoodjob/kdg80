@@ -1807,7 +1807,10 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
     min-height: 100%;
     z-index: 1;
     border-left: none;
-    background: transparent;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.08), transparent 34%),
+      linear-gradient(180deg, rgba(35, 30, 27, 0.82) 0%, rgba(18, 16, 15, 0.96) 100%);
   }
 
   .dialogue-scene--side-strip .dialogue-person__media {
@@ -1819,10 +1822,8 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
     background:
       radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.08), transparent 34%),
       linear-gradient(180deg, rgba(18, 16, 15, 0.08) 0%, rgba(18, 16, 15, 0.3) 62%, rgba(18, 16, 15, 0.68) 100%);
-    opacity: 0;
-    animation: previewDialogueSideBankShade 920ms cubic-bezier(0.19, 0.86, 0.24, 1) both;
-    animation-delay: 2580ms;
-    animation-play-state: paused;
+    opacity: 1;
+    animation: none;
   }
 
   .dialogue-scene--side-strip .dialogue-person__monogram {
@@ -2859,15 +2860,6 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   }
 
   @keyframes previewDialogueSideBankPlate {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-
-  @keyframes previewDialogueSideBankShade {
     0% {
       opacity: 0;
     }

@@ -20,6 +20,7 @@ export const videoPreviewTestingNotes = {
         'Contact sheet, потому что representative still у длинных сцен может попасть в mid-animation, а не в hold-state.',
         'Mobile shell, чтобы не пропустить переполнение и выпадение текста из layout.',
         'Ранние seek-фазы анимации, если есть требования к стартовому состоянию сцены.',
+        'Для side-strip проверять, что серая колонка приходит вместе со спикером, а не отдельной поздней фазой.',
         'Новый mp4 sample, если менялся motion.',
       ],
     },
