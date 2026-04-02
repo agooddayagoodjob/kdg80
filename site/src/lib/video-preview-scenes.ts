@@ -159,17 +159,17 @@ const DIALOGUE_SCENE_PARTICIPANT_STYLE_OVERRIDES: Record<string, Array<{ match: 
     { match: 'Литвинович', style: '--dialogue-portrait-scale-side: 0.65; --dialogue-portrait-x-side: -10px; --dialogue-portrait-y-side: 2px;' },
   ],
   'dialogue-soviet-side': [
-    { match: 'Марковец', style: '--dialogue-portrait-scale-side: 0.63; --dialogue-portrait-x-side: -10px; --dialogue-portrait-y-side: 6px;' },
-    { match: 'Литвинович', style: '--dialogue-portrait-scale-side: 0.63; --dialogue-portrait-x-side: -10px; --dialogue-portrait-y-side: 4px;' },
-    { match: 'Бойко', style: '--dialogue-portrait-scale-side: 0.64; --dialogue-portrait-x-side: 10px; --dialogue-portrait-y-side: 12px;' },
-    { match: 'Никитин', style: '--dialogue-portrait-scale-side: 0.63; --dialogue-portrait-x-side: 4px; --dialogue-portrait-y-side: 2px;' },
+    { match: 'Марковец', style: '--dialogue-portrait-scale-side: 0.64; --dialogue-portrait-x-side: -4px; --dialogue-portrait-y-side: 14px;' },
+    { match: 'Литвинович', style: '--dialogue-portrait-scale-side: 0.63; --dialogue-portrait-x-side: -8px; --dialogue-portrait-y-side: 6px;' },
+    { match: 'Бойко', style: '--dialogue-portrait-scale-side: 0.64; --dialogue-portrait-x-side: 8px; --dialogue-portrait-y-side: 14px;' },
+    { match: 'Никитин', style: '--dialogue-portrait-scale-side: 0.62; --dialogue-portrait-x-side: 10px; --dialogue-portrait-y-side: 0px;' },
   ],
   'dialogue-city-garden-side': [
-    { match: 'Надымова', style: '--dialogue-portrait-scale-side: 0.67; --dialogue-portrait-x-side: -18px; --dialogue-portrait-y-side: 2px;' },
-    { match: 'Анисимов', style: '--dialogue-portrait-scale-side: 0.68; --dialogue-portrait-x-side: 2px; --dialogue-portrait-y-side: 8px;' },
-    { match: 'Сарниц', style: '--dialogue-portrait-scale-side: 0.67; --dialogue-portrait-x-side: 118px; --dialogue-portrait-y-side: 10px;' },
-    { match: 'Марковец', style: '--dialogue-portrait-scale-side: 0.67; --dialogue-portrait-x-side: -8px; --dialogue-portrait-y-side: 8px;' },
-    { match: 'Селин', style: '--dialogue-portrait-scale-side: 0.68; --dialogue-portrait-x-side: 8px; --dialogue-portrait-y-side: 8px;' },
+    { match: 'Надымова', style: '--dialogue-portrait-scale-side: 0.67; --dialogue-portrait-x-side: -18px; --dialogue-portrait-y-side: 12px;' },
+    { match: 'Анисимов', style: '--dialogue-portrait-scale-side: 0.67; --dialogue-portrait-x-side: 2px; --dialogue-portrait-y-side: 16px;' },
+    { match: 'Сарниц', style: '--dialogue-portrait-scale-side: 0.65; --dialogue-portrait-x-side: 118px; --dialogue-portrait-y-side: 2px;' },
+    { match: 'Марковец', style: '--dialogue-portrait-scale-side: 0.67; --dialogue-portrait-x-side: -8px; --dialogue-portrait-y-side: 16px;' },
+    { match: 'Селин', style: '--dialogue-portrait-scale-side: 0.67; --dialogue-portrait-x-side: 8px; --dialogue-portrait-y-side: 16px;' },
   ],
 };
 
