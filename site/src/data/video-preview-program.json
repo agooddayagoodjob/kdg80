@@ -75,17 +75,20 @@
     {
       "sceneSlug": "lecture-small-towns",
       "eventSlug": "istoriya-stanovleniya-i-razvitiya-malyh-gorodov-kaliningradskoy-oblasti-na-primere-p-zheleznodorozhnyy",
-      "shortTitle": "МАЛЫЕ ГОРОДА"
+      "shortTitle": "МАЛЫЕ ГОРОДА",
+      "mythText": "В МАЛЫХ ГОРОДАХ НЕТ БУДУЩЕГО ДЛЯ МОЛОДЫХ"
     },
     {
       "sceneSlug": "lecture-demography",
       "eventSlug": "demografiya-pervogo-desyatiletiya-kaliningradskoy-oblasti",
-      "shortTitle": "ДЕМОГРАФИЯ ПЕРВОГО ДЕСЯТИЛЕТИЯ"
+      "shortTitle": "ДЕМОГРАФИЯ ПЕРВОГО ДЕСЯТИЛЕТИЯ",
+      "mythText": "МАССОВОЕ ЗАСЕЛЕНИЕ ОБЛАСТИ НАЧАЛОСЬ ЛИШЬ ЛЕТОМ 1946 ГОДА"
     },
     {
       "sceneSlug": "lecture-svetlogorsk",
       "eventSlug": "istoriya-svetlogorska-v-semeynom-albome",
-      "shortTitle": "СВЕТЛОГОРСК В СЕМЕЙНОМ АЛЬБОМЕ"
+      "shortTitle": "СВЕТЛОГОРСК В СЕМЕЙНОМ АЛЬБОМЕ",
+      "mythText": "СВЕТЛОГОРСК СТАЛ ЗАМЕТНЫМ КУРОРТОМ ЛИШЬ В ПОЗДНЕСОВЕТСКОЕ ВРЕМЯ"
     },
     {
       "sceneSlug": "lecture-new-homeland",
@@ -95,12 +98,14 @@
     {
       "sceneSlug": "lecture-gusev",
       "eventSlug": "sovetskiy-gusev-vremya-sozidaniy",
-      "shortTitle": "СОВЕТСКИЙ ГУСЕВ"
+      "shortTitle": "СОВЕТСКИЙ ГУСЕВ",
+      "mythText": "СОВЕТСКИЙ ГУСЕВ - СКУЧНАЯ И ГЛУХАЯ ПРОВИНЦИЯ"
     },
     {
       "sceneSlug": "lecture-primorsky",
       "eventSlug": "primorskiy-zelenogradskiy-rayon-kaliningradskoy-oblasti-v-sovetskoe-vremya-na-etape-stanovleniya",
-      "shortTitle": "ПРИМОРСКИЙ РАЙОН"
+      "shortTitle": "ПРИМОРСКИЙ РАЙОН",
+      "mythText": "ПЕРЕСЕЛЕНЦЫ ДУМАЛИ, ЧТО КАЛИНИНГРАДСКУЮ ОБЛАСТЬ ВСЁ РАВНО ОТДАДУТ ОБРАТНО ГЕРМАНИИ"
     },
     {
       "sceneSlug": "lecture-sailing",
@@ -110,22 +115,26 @@
     {
       "sceneSlug": "lecture-baltic-spit",
       "eventSlug": "mirnaya-zhizn-samoy-zapadnoy-tochki-rossii-baltiyskoy-kosy",
-      "shortTitle": "МИРНАЯ ЖИЗНЬ БАЛТИЙСКОЙ КОСЫ"
+      "shortTitle": "МИРНАЯ ЖИЗНЬ БАЛТИЙСКОЙ КОСЫ",
+      "mythText": "ПОСЛЕ 1945 ГОДА ЗДЕСЬ В ОСНОВНОМ РАЗРУШАЛИ УЖЕ СОЗДАННОЕ ДО ВОЙНЫ"
     },
     {
       "sceneSlug": "lecture-kurshskaya-kosa",
       "eventSlug": "istoriya-obrazovaniya-i-razvitiya-natsionalnogo-parka-kurshskaya-kosa",
-      "shortTitle": "НАЦПАРК «КУРШСКАЯ КОСА»"
+      "shortTitle": "НАЦПАРК «КУРШСКАЯ КОСА»",
+      "mythText": "НАЦИОНАЛЬНЫЙ ПАРК И ЗАПОВЕДНИК - ЭТО ОДНО И ТО ЖЕ"
     },
     {
       "sceneSlug": "lecture-city-life",
       "eventSlug": "vliyanie-planirovochnyh-resheniy-na-kachestvo-zhizni-na-primere-starogo-i-novogo-kaliningrada",
-      "shortTitle": "КАК ГОРОД ВЛИЯЕТ НА ЖИЗНЬ"
+      "shortTitle": "КАК ГОРОД ВЛИЯЕТ НА ЖИЗНЬ",
+      "mythText": "ЧТОБЫ СПРАВИТЬСЯ С ПРОБКАМИ, НУЖНО ПРОСТО РАСШИРЯТЬ ДОРОГИ"
     },
     {
       "sceneSlug": "lecture-architecture",
       "eventSlug": "arhitektura-sovetskogo-kaliningrada-1946-1960-gody",
-      "shortTitle": "АРХИТЕКТУРА СОВЕТСКОГО КАЛИНИНГРАДА"
+      "shortTitle": "АРХИТЕКТУРА СОВЕТСКОГО КАЛИНИНГРАДА",
+      "mythText": "МЕЖДУ СОВЕТСКОЙ И НЕМЕЦКОЙ АРХИТЕКТУРОЙ БЫЛ НЕПРЕОДОЛИМЫЙ КОНФЛИКТ"
     },
     {
       "sceneSlug": "lecture-waterworks",
@@ -135,12 +144,14 @@
     {
       "sceneSlug": "lecture-zoo-monuments",
       "eventSlug": "pamyatniki-iskusstva-i-istorii-v-landshafte-kaliningradskogo-zooparka",
-      "shortTitle": "ПАМЯТНИКИ В ЛАНДШАФТЕ ЗООПАРКА"
+      "shortTitle": "ПАМЯТНИКИ В ЛАНДШАФТЕ ЗООПАРКА",
+      "mythText": "СКУЛЬПТУРЫ У ГЛАВНОГО ВХОДА В ЗООПАРК ОСТАЛИСЬ С ДОВОЕННОГО ВРЕМЕНИ"
     },
     {
       "sceneSlug": "lecture-green-memory",
       "eventSlug": "zelenaya-pamyat-istoriya-botanicheskogo-sada-kaliningrada",
-      "shortTitle": "ЗЕЛЁНАЯ ПАМЯТЬ"
+      "shortTitle": "ЗЕЛЁНАЯ ПАМЯТЬ",
+      "mythText": "ПОСЛЕ ВОЙНЫ БОТАНИЧЕСКИЙ САД ПРИШЛОСЬ СОЗДАВАТЬ ЗАНОВО НА ПУСТОМ МЕСТЕ"
     },
     {
       "sceneSlug": "lecture-chemodan",
@@ -155,17 +166,20 @@
     {
       "sceneSlug": "lecture-money",
       "eventSlug": "denezhnoe-obraschenie-v-poslevoennyy-period-1945-1947",
-      "shortTitle": "ДЕНЕЖНОЕ ОБРАЩЕНИЕ"
+      "shortTitle": "ДЕНЕЖНОЕ ОБРАЩЕНИЕ",
+      "mythText": "В СССР ГРАЖДАНИН МОГ ПРОСТО КУПИТЬ ТАНК Т-34"
     },
     {
       "sceneSlug": "lecture-habits-lecture",
       "eventSlug": "privychki-kaliningradtsev-yumor-sueveriya-ne-tolko-podrostkovye-strashilki-legendy-kaliningradskih-dvorov",
-      "shortTitle": "ПРИВЫЧКИ И ЛЕГЕНДЫ"
+      "shortTitle": "ПРИВЫЧКИ И ЛЕГЕНДЫ",
+      "mythText": "КАЛИНИНГРАДСКАЯ ПОВСЕДНЕВНОСТЬ - ЭТО ТОЛЬКО ЛЁГКОСТЬ, МИЛОТА И КРАСИВЫЙ ВАЙБ"
     },
     {
       "sceneSlug": "lecture-cadets",
       "eventSlug": "kursanty-s-krylyshkami-kaliningradskoe-vatu-i-vliyanie-na-kaliningrad",
-      "shortTitle": "КУРСАНТЫ С КРЫЛЫШКАМИ"
+      "shortTitle": "КУРСАНТЫ С КРЫЛЫШКАМИ",
+      "mythText": "У КВАТУ БЫЛИ СОБСТВЕННЫЙ АЭРОДРОМ И САМОЛЁТЫ"
     },
     {
       "sceneSlug": "lecture-healthcare",
@@ -175,7 +189,8 @@
     {
       "sceneSlug": "lecture-zoo-1945",
       "eventSlug": "zooparku-byt-zoopark-trofey-1945-goda-i-odin-iz-pervyh-ochagov-mirnoy-zhizni-v-kaliningrade",
-      "shortTitle": "ЗООПАРКУ — БЫТЬ!"
+      "shortTitle": "ЗООПАРКУ — БЫТЬ!",
+      "mythText": "ЗА ТЕРРИТОРИЮ ЗООПАРКА ВО ВРЕМЯ ШТУРМА ШЛИ ТЯЖЁЛЫЕ БОИ"
     },
     {
       "sceneSlug": "lecture-teachers",

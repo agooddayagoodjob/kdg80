@@ -12,8 +12,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteRoot = path.resolve(__dirname, '..');
 const workspaceRoot = path.resolve(siteRoot, '..');
 const distRoot = path.join(siteRoot, 'dist');
-const outputRoot = path.join(workspaceRoot, 'test-results', 'video-preview-20260327', '_program-cut-20260403');
-const clipRoot = path.join(outputRoot, 'clips');
 const args = process.argv.slice(2);
 const port = Number(process.env.VIDEO_PREVIEW_PORT ?? '4326');
 const baseUrl = `http://127.0.0.1:${port}`;
@@ -21,12 +19,27 @@ const qualityArg = args.find((value) => value.startsWith('--quality='));
 const profileArg = args.find((value) => value.startsWith('--profile='));
 const fpsArg = args.find((value) => value.startsWith('--fps='));
 const supersampleArg = args.find((value) => value.startsWith('--supersample='));
+const tagArg = args.find((value) => value.startsWith('--tag='));
 const resume = args.includes('--resume');
 const quality = qualityArg?.split('=')[1] ?? 'low';
 const profile = profileArg?.split('=')[1] ?? 'playback-safe';
 const fps = Number(fpsArg?.split('=')[1] ?? '15');
 const supersample = Number(supersampleArg?.split('=')[1] ?? '1');
-const outputPath = path.join(outputRoot, `festival-program-cut-${profile}-${quality}-${fps}fps.mp4`);
+const outputTag = (tagArg?.split('=')[1] ?? '')
+  .trim()
+  .toLowerCase()
+  .replace(/[^a-z0-9-]+/g, '-')
+  .replace(/-{2,}/g, '-')
+  .replace(/^-+|-+$/g, '');
+const outputRoot = path.join(
+  workspaceRoot,
+  'test-results',
+  'video-preview-20260327',
+  outputTag ? `_program-cut-20260403-${outputTag}` : '_program-cut-20260403',
+);
+const clipRoot = path.join(outputRoot, 'clips');
+const outputBaseName = `festival-program-cut-${profile}-${quality}-${fps}fps`;
+const outputPath = path.join(outputRoot, `${outputBaseName}.mp4`);
 
 const sceneSlugs = [
   'cold-open',
@@ -249,11 +262,12 @@ function getClipPath(slug, index) {
 }
 
 async function buildConcatVideo(clipPaths) {
-  const concatListPath = path.join(outputRoot, 'program-cut-concat.txt');
+  const concatListPath = path.join(outputRoot, `${outputBaseName}-concat.txt`);
   const concatBody = clipPaths
     .map((clipPath) => `file '${clipPath.replace(/'/g, "'\\''")}'`)
     .join('\n');
   await fs.writeFile(concatListPath, `${concatBody}\n`, 'utf-8');
+  const encodeSettings = getEncodeSettings();
 
   await execFileAsync('ffmpeg', [
     '-y',
@@ -263,8 +277,46 @@ async function buildConcatVideo(clipPaths) {
     '0',
     '-i',
     concatListPath,
-    '-c',
-    'copy',
+    '-map',
+    '0:v:0',
+    '-map',
+    '0:a:0',
+    '-vf',
+    `fps=${fps},format=yuv420p`,
+    '-r',
+    String(fps),
+    '-fps_mode',
+    'cfr',
+    '-af',
+    'aresample=async=1:first_pts=0',
+    '-c:v',
+    'libx264',
+    '-profile:v',
+    encodeSettings.h264Profile,
+    '-level',
+    encodeSettings.level,
+    '-preset',
+    encodeSettings.preset,
+    '-crf',
+    encodeSettings.crf,
+    '-maxrate',
+    encodeSettings.maxrate,
+    '-bufsize',
+    encodeSettings.bufsize,
+    '-g',
+    String(Math.max(30, fps * 2)),
+    '-video_track_timescale',
+    String(Math.max(1000, fps * 1000)),
+    '-movflags',
+    '+faststart',
+    '-c:a',
+    'aac',
+    '-b:a',
+    '128k',
+    '-ar',
+    '48000',
+    '-ac',
+    '2',
     outputPath,
   ]);
 }
@@ -353,7 +405,7 @@ try {
     await buildConcatVideo(clipPaths);
 
     const probe = await probeVideo(outputPath);
-    const reportPath = path.join(outputRoot, 'festival-program-cut-ffprobe.json');
+    const reportPath = path.join(outputRoot, `${outputBaseName}.ffprobe.json`);
     await fs.writeFile(reportPath, JSON.stringify(probe, null, 2), 'utf-8');
 
     console.log(`PROGRESS 100%`);

@@ -171,6 +171,7 @@ type LectureBeatSceneSeed = {
   sceneSlug: string;
   eventSlug: string;
   shortTitle: string;
+  mythText?: string;
   durationMs?: number;
   portraitStyle?: string;
 };
@@ -750,6 +751,8 @@ function createLectureBeatScene(events: FestivalEvent[], seed: LectureBeatSceneS
     durationMs: seed.durationMs ?? 5600,
     eyebrow: 'ЛЕКЦИЯ',
     shortTitle: seed.shortTitle,
+    mythLabel: seed.mythText ? 'ПРАВДА ЛИ, ЧТО' : undefined,
+    mythText: seed.mythText,
     detailLabel: 'СОБЫТИЕ',
     detailLines: wrapBoostDetailLines(event.title.toLocaleUpperCase('ru-RU')),
     speakerName: event.speakerLabel,
