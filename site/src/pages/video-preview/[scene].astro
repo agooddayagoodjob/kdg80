@@ -347,25 +347,27 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
             )}
             <div class="boost-scene__panel anim anim--panel"></div>
             <div class="boost-scene__copy">
-              <p class="boost-scene__eyebrow anim anim--boost-lead-phase">НА ЭТОТ ВОПРОС ОТВЕТИТ ЛЕКТОР</p>
+              <p class="boost-scene__eyebrow anim anim--boost-lead-phase">{scene.eyebrow}</p>
               <div class="boost-scene__rule anim anim--boost-rule-phase"></div>
-              <h2 class="boost-scene__title anim anim--boost-title-phase">{scene.shortTitle}</h2>
-              <p class="boost-scene__hook anim anim--boost-hook-phase">{scene.hook}</p>
-              <div class="boost-scene__detail anim anim--detail-card">
-                <p class="boost-scene__detail-label">{scene.detailLabel}</p>
-                <div class="boost-scene__detail-lines">
-                  {scene.detailLines.map((line, index) => (
-                    <p class="boost-scene__detail-line anim anim--detail-line" style={`--anim-delay:${3660 + index * 160}ms; --anim-duration:420ms;`}>
-                      {line}
+              <h2 class="boost-scene__title anim anim--boost-title-phase" style={scene.titleStyle}>{scene.shortTitle}</h2>
+              {scene.hook && <p class="boost-scene__hook anim anim--boost-hook-phase">{scene.hook}</p>}
+              {scene.detailLines.length > 0 && (
+                <div class="boost-scene__detail anim anim--detail-card">
+                  <p class="boost-scene__detail-label">{scene.detailLabel}</p>
+                  <div class="boost-scene__detail-lines">
+                    {scene.detailLines.map((line, index) => (
+                      <p class="boost-scene__detail-line anim anim--detail-line" style={`--anim-delay:${3660 + index * 160}ms; --anim-duration:420ms;`}>
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                  {scene.detailAttribution && (
+                    <p class="boost-scene__detail-attribution anim anim--detail-line" style="--anim-delay:4020ms; --anim-duration:420ms;">
+                      {scene.detailAttribution}
                     </p>
-                  ))}
+                  )}
                 </div>
-                {scene.detailAttribution && (
-                  <p class="boost-scene__detail-attribution anim anim--detail-line" style="--anim-delay:4020ms; --anim-duration:420ms;">
-                    {scene.detailAttribution}
-                  </p>
-                )}
-              </div>
+              )}
               {(scene.availabilityLabel || scene.accessLabel) && (
                 <div class="boost-scene__status-row anim anim--boost-meta-phase">
                   {scene.availabilityLabel && (
@@ -381,7 +383,7 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
               )}
               <div class="boost-scene__meta anim anim--boost-meta-phase">
                 <p class="boost-scene__schedule">{scene.dateLabel}</p>
-                <p class="boost-scene__venue">{scene.venue}</p>
+                {scene.venue && <p class="boost-scene__venue">{scene.venue}</p>}
               </div>
             </div>
             {scene.portraitImage && (
@@ -1191,8 +1193,8 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   }
 
   .boost-scene__title {
-    max-width: 7ch;
-    font-size: 6.6rem;
+    max-width: var(--boost-title-max, 7ch);
+    font-size: var(--boost-title-size, 6.6rem);
     text-wrap: balance;
   }
 
@@ -2745,8 +2747,8 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   }
 
   @keyframes previewTitle {
-    0%, 14% { opacity: 0; transform: translateY(34px) scale(0.985); }
-    30%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+    0%, 14% { opacity: 0; transform: translateY(34px); }
+    30%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewWipe {
@@ -2755,8 +2757,8 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   }
 
   @keyframes previewLockup {
-    0%, 12% { opacity: 0; transform: translateY(24px) scale(0.97); }
-    28%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+    0%, 12% { opacity: 0; transform: translateY(24px); }
+    28%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewGrowX {
@@ -2845,13 +2847,11 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   @keyframes previewMythWord {
     0% {
       opacity: 0;
-      transform: translateY(28px) scale(0.985);
-      filter: blur(5px);
+      transform: translateY(28px);
     }
     100% {
       opacity: 1;
-      transform: translateY(0) scale(1);
-      filter: blur(0);
+      transform: translateY(0);
     }
   }
 
@@ -2866,8 +2866,8 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   }
 
   @keyframes previewBoostTitlePhase {
-    0%, 32% { opacity: 0; transform: translateY(32px) scale(1.015); }
-    50%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+    0%, 32% { opacity: 0; transform: translateY(32px); }
+    50%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewBoostHookPhase {
@@ -2891,8 +2891,8 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   }
 
   @keyframes previewBoostSpeakerPhase {
-    0%, 30% { opacity: 0; transform: translateY(20px) scale(0.985); }
-    48%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+    0%, 30% { opacity: 0; transform: translateY(20px); }
+    48%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewCard {
@@ -2906,13 +2906,13 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   }
 
   @keyframes previewDomainAccent {
-    0%, 12% { opacity: 0; transform: scale(0.88); }
-    24%, 100% { opacity: 1; transform: scale(1); }
+    0%, 12% { opacity: 0; transform: translateY(20px); }
+    24%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewQr {
-    0%, 12% { opacity: 0; transform: translateY(30px) scale(0.92); }
-    24%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+    0%, 12% { opacity: 0; transform: translateY(30px); }
+    24%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewDialogueBackdrop {
@@ -2953,13 +2953,11 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
     0% {
       opacity: 0;
       transform: translateY(12px);
-      filter: blur(6px);
       letter-spacing: 0.18em;
     }
     100% {
       opacity: 1;
       transform: translateY(0);
-      filter: blur(0);
       letter-spacing: 0.14em;
     }
   }
@@ -2985,13 +2983,11 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   @keyframes previewDialogueTitleWord {
     0% {
       opacity: 0;
-      transform: translateY(18px) scale(0.992);
-      filter: blur(8px);
+      transform: translateY(18px);
     }
     100% {
       opacity: 1;
-      transform: translateY(0) scale(1);
-      filter: blur(0);
+      transform: translateY(0);
     }
   }
 
@@ -2999,19 +2995,16 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
     0% {
       opacity: 0;
       transform: translateY(16px);
-      filter: blur(6px);
       clip-path: inset(0 0 48% 0);
     }
     72% {
       opacity: 1;
       transform: translateY(0);
-      filter: blur(0);
       clip-path: inset(0 0 0 0);
     }
     100% {
       opacity: 1;
       transform: translateY(0);
-      filter: blur(0);
       clip-path: inset(0 0 0 0);
     }
   }
@@ -3020,13 +3013,11 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
     0% {
       opacity: 0;
       transform: translateY(12px);
-      filter: blur(8px);
       clip-path: inset(0 0 60% 0);
     }
     100% {
       opacity: 1;
       transform: translateY(0);
-      filter: blur(0);
       clip-path: inset(0 0 0 0);
     }
   }
@@ -3035,13 +3026,11 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
     0% {
       opacity: 0;
       transform: translateY(10px);
-      filter: blur(6px);
       clip-path: inset(0 0 70% 0);
     }
     100% {
       opacity: 1;
       transform: translateY(0);
-      filter: blur(0);
       clip-path: inset(0 0 0 0);
     }
   }
@@ -3062,18 +3051,15 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   @keyframes previewDialogueParticipant {
     0% {
       opacity: 0;
-      transform: translateY(12px) scale(0.994);
-      filter: blur(8px);
+      transform: translateY(12px);
     }
     72% {
       opacity: 1;
-      transform: translateY(0) scale(1.003);
-      filter: blur(0);
+      transform: translateY(0);
     }
     100% {
       opacity: 1;
-      transform: translateY(0) scale(1);
-      filter: blur(0);
+      transform: translateY(0);
     }
   }
 
@@ -3081,40 +3067,34 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
     0% {
       opacity: 0;
       transform: translateY(8px);
-      filter: blur(6px);
     }
     100% {
       opacity: 1;
       transform: translateY(0);
-      filter: blur(0);
     }
   }
 
   @keyframes previewSequenceBeat {
     0% {
       opacity: 0;
-      transform:
-        translate(var(--seq-enter-x, 24px), var(--seq-enter-y, 0))
-        scale(var(--seq-enter-scale, 0.992));
+      transform: translate(var(--seq-enter-x, 24px), var(--seq-enter-y, 0));
     }
     20%, 82% {
       opacity: 1;
-      transform: translate(0, 0) scale(1);
+      transform: translate(0, 0);
     }
     100% {
       opacity: 0;
-      transform:
-        translate(var(--seq-exit-x, -18px), var(--seq-exit-y, 0))
-        scale(var(--seq-exit-scale, 1.006));
+      transform: translate(var(--seq-exit-x, -18px), var(--seq-exit-y, 0));
     }
   }
 
   @keyframes previewScenePush {
     0% {
-      transform: scale(1) translateX(0) translateY(0);
+      transform: translateX(0) translateY(0);
     }
     100% {
-      transform: scale(1.016) translateX(-6px) translateY(-2px);
+      transform: translateX(-6px) translateY(-2px);
     }
   }
 

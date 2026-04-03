@@ -5,13 +5,14 @@ import { fileURLToPath } from 'node:url';
 import { spawn, execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { chromium } from 'playwright';
+import videoProgramConfig from '../src/data/video-preview-program.json' with { type: 'json' };
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteRoot = path.resolve(__dirname, '..');
 const workspaceRoot = path.resolve(siteRoot, '..');
 const distRoot = path.join(siteRoot, 'dist');
-const outputRoot = path.join(workspaceRoot, 'test-results', 'video-preview-20260327', '_rough-cut-20260402');
+const outputRoot = path.join(workspaceRoot, 'test-results', 'video-preview-20260327', '_program-cut-20260403');
 const clipRoot = path.join(outputRoot, 'clips');
 const args = process.argv.slice(2);
 const port = Number(process.env.VIDEO_PREVIEW_PORT ?? '4326');
@@ -25,32 +26,11 @@ const quality = qualityArg?.split('=')[1] ?? 'low';
 const profile = profileArg?.split('=')[1] ?? 'playback-safe';
 const fps = Number(fpsArg?.split('=')[1] ?? '15');
 const supersample = Number(supersampleArg?.split('=')[1] ?? '1');
-const outputPath = path.join(outputRoot, `festival-rough-cut-${profile}-${quality}-${fps}fps.mp4`);
+const outputPath = path.join(outputRoot, `festival-program-cut-${profile}-${quality}-${fps}fps.mp4`);
 
 const sceneSlugs = [
   'cold-open',
-  'act-settlement',
-  'dreams',
-  'settlement-cascade',
-  'act-sea',
-  'ocean',
-  'sea-cascade',
-  'act-city',
-  'bridge',
-  'future-city',
-  'city-cascade',
-  'act-everyday',
-  'cinema',
-  'everyday-cascade',
-  'act-people',
-  'zoo-right',
-  'people-cascade',
-  'act-dialogues',
-  'dialogue-tourists-side',
-  'dialogue-sea-side',
-  'dialogue-habits-side',
-  'dialogue-soviet-side',
-  'dialogue-city-garden-side',
+  ...videoProgramConfig.acts.flatMap((act) => [act.sceneSlug, ...act.sceneSlugs]),
   'telegram',
   'max',
 ];
@@ -269,7 +249,7 @@ function getClipPath(slug, index) {
 }
 
 async function buildConcatVideo(clipPaths) {
-  const concatListPath = path.join(outputRoot, 'rough-cut-concat.txt');
+  const concatListPath = path.join(outputRoot, 'program-cut-concat.txt');
   const concatBody = clipPaths
     .map((clipPath) => `file '${clipPath.replace(/'/g, "'\\''")}'`)
     .join('\n');
@@ -333,9 +313,9 @@ try {
     const totalFrames = sceneDurations.reduce((sum, scene) => sum + scene.frames, 0);
     const totalDurationMs = sceneDurations.reduce((sum, scene) => sum + scene.durationMs, 0);
 
-    console.log(`ROUGH CUT SCENES: ${sceneSlugs.length}`);
-    console.log(`ROUGH CUT DURATION: ${(totalDurationMs / 1000).toFixed(1)}s`);
-    console.log(`ROUGH CUT FRAMES: ${totalFrames}`);
+    console.log(`PROGRAM CUT SCENES: ${sceneSlugs.length}`);
+    console.log(`PROGRAM CUT DURATION: ${(totalDurationMs / 1000).toFixed(1)}s`);
+    console.log(`PROGRAM CUT FRAMES: ${totalFrames}`);
     console.log('PROGRESS 0%');
 
     const progressState = {
@@ -373,11 +353,11 @@ try {
     await buildConcatVideo(clipPaths);
 
     const probe = await probeVideo(outputPath);
-    const reportPath = path.join(outputRoot, 'festival-rough-cut-ffprobe.json');
+    const reportPath = path.join(outputRoot, 'festival-program-cut-ffprobe.json');
     await fs.writeFile(reportPath, JSON.stringify(probe, null, 2), 'utf-8');
 
     console.log(`PROGRESS 100%`);
-    console.log(`Saved rough cut to ${outputPath}`);
+    console.log(`Saved program cut to ${outputPath}`);
     console.log(`Saved ffprobe report to ${reportPath}`);
   } finally {
     await browser.close();

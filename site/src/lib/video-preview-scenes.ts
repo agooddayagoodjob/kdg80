@@ -7,6 +7,7 @@ import {
   getSpeakerCaption,
 } from './media';
 import registrationManifest from '../data/registration-state-manifest.json';
+import videoProgramConfig from '../data/video-preview-program.json';
 
 export type VideoPreviewSceneKind = 'cold-open' | 'act-title' | 'boost' | 'dialogue' | 'cascade' | 'site' | 'qr' | 'sequence';
 
@@ -35,12 +36,13 @@ export type VideoPreviewBoostScene = VideoPreviewBaseScene & {
   kind: 'boost';
   eyebrow: string;
   shortTitle: string;
-  hook: string;
+  hook?: string;
   mythLabel?: string;
   mythText?: string;
   detailLabel: string;
   detailLines: string[];
   detailAttribution?: string;
+  titleStyle?: string;
   speakerName: string;
   speakerRole: string;
   portraitImage: string;
@@ -123,7 +125,7 @@ type BoostSceneSeed = {
   eventMatch: string;
   eyebrow: string;
   shortTitle: string;
-  hook: string;
+  hook?: string;
   mythText?: string;
   detailLabel: string;
   detailLines: string[];
@@ -164,6 +166,26 @@ type CascadeSceneSeed = {
     title: string;
   }>;
 };
+
+type LectureBeatSceneSeed = {
+  sceneSlug: string;
+  eventSlug: string;
+  shortTitle: string;
+  durationMs?: number;
+  portraitStyle?: string;
+};
+
+type VideoPreviewProgramConfig = {
+  acts: Array<{
+    id: string;
+    sceneSlug: string;
+    sceneSlugs: string[];
+  }>;
+  lectureBeatScenes: LectureBeatSceneSeed[];
+};
+
+const videoProgram = videoProgramConfig as VideoPreviewProgramConfig;
+const actSceneCountBySlug = new Map(videoProgram.acts.map((act) => [act.sceneSlug, act.sceneSlugs.length] as const));
 
 function normalizeDialogueVenueLabel(value?: string) {
   const venue = value?.trim() ?? '';
@@ -434,7 +456,7 @@ const ACT_TITLE_SCENE_SEEDS: ActTitleSceneSeed[] = [
     label: 'Act Title / Как область стала домом',
     kicker: 'АКТ 1',
     title: 'КАК ОБЛАСТЬ\nСТАЛА ДОМОМ',
-    subtitle: '7 АКТУАЛЬНЫХ ЛЕКЦИЙ',
+    subtitle: `${actSceneCountBySlug.get('act-settlement') ?? 0} АКТУАЛЬНЫХ ЛЕКЦИЙ`,
     durationMs: 1700,
   },
   {
@@ -442,7 +464,7 @@ const ACT_TITLE_SCENE_SEEDS: ActTitleSceneSeed[] = [
     label: 'Act Title / Море и территория',
     kicker: 'АКТ 2',
     title: 'МОРЕ\nИ ТЕРРИТОРИЯ',
-    subtitle: '5 АКТУАЛЬНЫХ ЛЕКЦИЙ',
+    subtitle: `${actSceneCountBySlug.get('act-sea') ?? 0} АКТУАЛЬНЫХ ЛЕКЦИЙ`,
     durationMs: 1700,
   },
   {
@@ -450,7 +472,7 @@ const ACT_TITLE_SCENE_SEEDS: ActTitleSceneSeed[] = [
     label: 'Act Title / Город, архитектура, среда',
     kicker: 'АКТ 3',
     title: 'ГОРОД,\nАРХИТЕКТУРА,\nСРЕДА',
-    subtitle: '7 АКТУАЛЬНЫХ ЛЕКЦИЙ',
+    subtitle: `${actSceneCountBySlug.get('act-city') ?? 0} АКТУАЛЬНЫХ ЛЕКЦИЙ`,
     durationMs: 1700,
   },
   {
@@ -458,7 +480,7 @@ const ACT_TITLE_SCENE_SEEDS: ActTitleSceneSeed[] = [
     label: 'Act Title / Быт, память, культурные образы',
     kicker: 'АКТ 4',
     title: 'БЫТ,\nПАМЯТЬ,\nКУЛЬТУРНЫЕ ОБРАЗЫ',
-    subtitle: '5 АКТУАЛЬНЫХ ЛЕКЦИЙ',
+    subtitle: `${actSceneCountBySlug.get('act-everyday') ?? 0} АКТУАЛЬНЫХ ЛЕКЦИЙ`,
     durationMs: 1700,
   },
   {
@@ -466,7 +488,7 @@ const ACT_TITLE_SCENE_SEEDS: ActTitleSceneSeed[] = [
     label: 'Act Title / Люди, профессии, институции',
     kicker: 'АКТ 5',
     title: 'ЛЮДИ,\nПРОФЕССИИ,\nИНСТИТУЦИИ',
-    subtitle: '6 АКТУАЛЬНЫХ ЛЕКЦИЙ',
+    subtitle: `${actSceneCountBySlug.get('act-people') ?? 0} АКТУАЛЬНЫХ ЛЕКЦИЙ`,
     durationMs: 1700,
   },
   {
@@ -474,7 +496,7 @@ const ACT_TITLE_SCENE_SEEDS: ActTitleSceneSeed[] = [
     label: 'Act Title / Открытые диалоги',
     kicker: 'АКТ 6',
     title: 'ОТКРЫТЫЕ\nДИАЛОГИ',
-    subtitle: '5 АКТУАЛЬНЫХ ПАБЛИК-ТОКОВ',
+    subtitle: `${actSceneCountBySlug.get('act-dialogues') ?? 0} АКТУАЛЬНЫХ ПАБЛИК-ТОКОВ`,
     durationMs: 1700,
   },
 ];
@@ -574,6 +596,14 @@ function findEvent(events: FestivalEvent[], match: string) {
   return event;
 }
 
+function findEventBySlug(events: FestivalEvent[], slug: string) {
+  const event = events.find((item) => item.slug === slug);
+  if (!event) {
+    throw new Error(`Video preview event not found for slug: ${slug}`);
+  }
+  return event;
+}
+
 function isLecture(formatLabel: string) {
   return formatLabel.toLowerCase().includes('лекц');
 }
@@ -607,6 +637,41 @@ function resolveAvailabilityState(event: FestivalEvent) {
     label: 'ЕСТЬ МЕСТА',
     tone: 'available' as const,
   };
+}
+
+function getBoostTitleStyle(shortTitle: string) {
+  const plainLength = shortTitle.replace(/\s+/g, '').length;
+  const titleSize = plainLength >= 30 ? 4.45 : plainLength >= 24 ? 4.88 : plainLength >= 18 ? 5.42 : plainLength >= 13 ? 5.94 : 6.6;
+  const titleMax = plainLength >= 30 ? '12.5ch' : plainLength >= 24 ? '11.1ch' : plainLength >= 18 ? '9.8ch' : plainLength >= 13 ? '8.4ch' : '7ch';
+
+  return `--boost-title-size:${titleSize}rem; --boost-title-max:${titleMax};`;
+}
+
+function wrapBoostDetailLines(text: string, maxLineLength = 34, maxLines = 3) {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let currentLine = '';
+
+  for (const word of words) {
+    const candidate = currentLine ? `${currentLine} ${word}` : word;
+    if (candidate.length <= maxLineLength || !currentLine) {
+      currentLine = candidate;
+      continue;
+    }
+
+    lines.push(currentLine);
+    currentLine = word;
+  }
+
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+
+  if (lines.length <= maxLines) {
+    return lines;
+  }
+
+  return [...lines.slice(0, maxLines - 1), lines.slice(maxLines - 1).join(' ')];
 }
 
 function getDialogueMonogram(name: string) {
@@ -651,8 +716,45 @@ function createBoostScene(events: FestivalEvent[], seed: BoostSceneSeed): VideoP
     detailLabel: seed.detailLabel,
     detailLines: seed.detailLines,
     detailAttribution: seed.detailAttribution,
+    titleStyle: undefined,
     speakerName: event.speakerLabel,
     speakerRole: event.affiliation,
+    portraitImage,
+    portraitStyle: [
+      getEventPortraitStyle(event.speakerLabel, isLecture(event.formatLabel)),
+      seed.portraitStyle,
+    ]
+      .filter(Boolean)
+      .join(' '),
+    posterImage: event.image,
+    dateLabel: event.dateLabel,
+    venue: event.venue,
+    accessLabel: 'БЕСПЛАТНО ПО РЕГИСТРАЦИИ',
+    availabilityLabel: availabilityState?.label,
+    availabilityTone: availabilityState?.tone,
+  };
+}
+
+function createLectureBeatScene(events: FestivalEvent[], seed: LectureBeatSceneSeed): VideoPreviewBoostScene {
+  const event = findEventBySlug(events, seed.eventSlug);
+  const fallbackPortrait = event.speakerImages[0] ?? '';
+  const portraitImage = fallbackPortrait
+    ? getEventPortraitImage(event.speakerLabel, fallbackPortrait, isLecture(event.formatLabel))
+    : '';
+  const availabilityState = resolveAvailabilityState(event);
+
+  return {
+    slug: seed.sceneSlug,
+    label: `Lecture Beat / ${seed.shortTitle}`,
+    kind: 'boost',
+    durationMs: seed.durationMs ?? 5600,
+    eyebrow: 'ЛЕКЦИЯ',
+    shortTitle: seed.shortTitle,
+    detailLabel: 'СОБЫТИЕ',
+    detailLines: wrapBoostDetailLines(event.title.toLocaleUpperCase('ru-RU')),
+    speakerName: event.speakerLabel,
+    speakerRole: event.affiliation,
+    titleStyle: getBoostTitleStyle(seed.shortTitle),
     portraitImage,
     portraitStyle: [
       getEventPortraitStyle(event.speakerLabel, isLecture(event.formatLabel)),
@@ -742,28 +844,7 @@ function createCascadeScene(events: FestivalEvent[], seed: CascadeSceneSeed): Vi
 
 export const VIDEO_PREVIEW_ROUGH_CUT_SCENE_SLUGS = [
   'cold-open',
-  'act-settlement',
-  'dreams',
-  'settlement-cascade',
-  'act-sea',
-  'ocean',
-  'sea-cascade',
-  'act-city',
-  'bridge',
-  'future-city',
-  'city-cascade',
-  'act-everyday',
-  'cinema',
-  'everyday-cascade',
-  'act-people',
-  'zoo-right',
-  'people-cascade',
-  'act-dialogues',
-  'dialogue-tourists-side',
-  'dialogue-sea-side',
-  'dialogue-habits-side',
-  'dialogue-soviet-side',
-  'dialogue-city-garden-side',
+  ...videoProgram.acts.flatMap((act) => [act.sceneSlug, ...act.sceneSlugs]),
   'telegram',
   'max',
 ] as const;
@@ -783,6 +864,7 @@ export function getVideoPreviewScenes(): VideoPreviewScene[] {
     },
     ...ACT_TITLE_SCENE_SEEDS.map((seed) => createActTitleScene(seed)),
     ...BOOST_SCENE_SEEDS.map((seed) => createBoostScene(events, seed)),
+    ...videoProgram.lectureBeatScenes.map((seed) => createLectureBeatScene(events, seed)),
     ...DIALOGUE_SCENE_SEEDS.map((seed) => createDialogueScene(events, seed)),
     ...CASCADE_SCENE_SEEDS.map((seed) => createCascadeScene(events, seed)),
     {

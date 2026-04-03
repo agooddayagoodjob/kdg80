@@ -1,0 +1,191 @@
+{
+  "acts": [
+    {
+      "id": "settlement",
+      "sceneSlug": "act-settlement",
+      "sceneSlugs": [
+        "dreams",
+        "lecture-small-towns",
+        "lecture-demography",
+        "lecture-svetlogorsk",
+        "lecture-new-homeland",
+        "lecture-gusev",
+        "lecture-primorsky"
+      ]
+    },
+    {
+      "id": "sea",
+      "sceneSlug": "act-sea",
+      "sceneSlugs": [
+        "ocean",
+        "lecture-sailing",
+        "lecture-baltic-spit",
+        "lecture-kurshskaya-kosa"
+      ]
+    },
+    {
+      "id": "city",
+      "sceneSlug": "act-city",
+      "sceneSlugs": [
+        "bridge",
+        "future-city",
+        "lecture-city-life",
+        "lecture-architecture",
+        "lecture-waterworks",
+        "lecture-zoo-monuments",
+        "lecture-green-memory"
+      ]
+    },
+    {
+      "id": "everyday",
+      "sceneSlug": "act-everyday",
+      "sceneSlugs": [
+        "cinema",
+        "lecture-chemodan",
+        "lecture-writers",
+        "lecture-money",
+        "lecture-habits-lecture"
+      ]
+    },
+    {
+      "id": "people",
+      "sceneSlug": "act-people",
+      "sceneSlugs": [
+        "zoo-right",
+        "lecture-cadets",
+        "lecture-healthcare",
+        "lecture-zoo-1945",
+        "lecture-teachers",
+        "lecture-port"
+      ]
+    },
+    {
+      "id": "dialogues",
+      "sceneSlug": "act-dialogues",
+      "sceneSlugs": [
+        "dialogue-tourists-side",
+        "dialogue-sea-side",
+        "dialogue-habits-side",
+        "public-talk-cutout",
+        "dialogue-city-garden-side"
+      ]
+    }
+  ],
+  "lectureBeatScenes": [
+    {
+      "sceneSlug": "lecture-small-towns",
+      "eventSlug": "istoriya-stanovleniya-i-razvitiya-malyh-gorodov-kaliningradskoy-oblasti-na-primere-p-zheleznodorozhnyy",
+      "shortTitle": "МАЛЫЕ ГОРОДА"
+    },
+    {
+      "sceneSlug": "lecture-demography",
+      "eventSlug": "demografiya-pervogo-desyatiletiya-kaliningradskoy-oblasti",
+      "shortTitle": "ДЕМОГРАФИЯ ПЕРВОГО ДЕСЯТИЛЕТИЯ"
+    },
+    {
+      "sceneSlug": "lecture-svetlogorsk",
+      "eventSlug": "istoriya-svetlogorska-v-semeynom-albome",
+      "shortTitle": "СВЕТЛОГОРСК В СЕМЕЙНОМ АЛЬБОМЕ"
+    },
+    {
+      "sceneSlug": "lecture-new-homeland",
+      "eventSlug": "vospriyatie-novoy-rodiny-pereselentsami-kak-vosprinimali-vostochnaya-prussiya",
+      "shortTitle": "НОВАЯ РОДИНА ПЕРЕСЕЛЕНЦЕВ"
+    },
+    {
+      "sceneSlug": "lecture-gusev",
+      "eventSlug": "sovetskiy-gusev-vremya-sozidaniy",
+      "shortTitle": "СОВЕТСКИЙ ГУСЕВ"
+    },
+    {
+      "sceneSlug": "lecture-primorsky",
+      "eventSlug": "primorskiy-zelenogradskiy-rayon-kaliningradskoy-oblasti-v-sovetskoe-vremya-na-etape-stanovleniya",
+      "shortTitle": "ПРИМОРСКИЙ РАЙОН"
+    },
+    {
+      "sceneSlug": "lecture-sailing",
+      "eventSlug": "istoriya-parusnogo-sporta-v-kaliningradskoy-oblasti",
+      "shortTitle": "ИСТОРИЯ ПАРУСНОГО СПОРТА"
+    },
+    {
+      "sceneSlug": "lecture-baltic-spit",
+      "eventSlug": "mirnaya-zhizn-samoy-zapadnoy-tochki-rossii-baltiyskoy-kosy",
+      "shortTitle": "МИРНАЯ ЖИЗНЬ БАЛТИЙСКОЙ КОСЫ"
+    },
+    {
+      "sceneSlug": "lecture-kurshskaya-kosa",
+      "eventSlug": "istoriya-obrazovaniya-i-razvitiya-natsionalnogo-parka-kurshskaya-kosa",
+      "shortTitle": "НАЦПАРК «КУРШСКАЯ КОСА»"
+    },
+    {
+      "sceneSlug": "lecture-city-life",
+      "eventSlug": "vliyanie-planirovochnyh-resheniy-na-kachestvo-zhizni-na-primere-starogo-i-novogo-kaliningrada",
+      "shortTitle": "КАК ГОРОД ВЛИЯЕТ НА ЖИЗНЬ"
+    },
+    {
+      "sceneSlug": "lecture-architecture",
+      "eventSlug": "arhitektura-sovetskogo-kaliningrada-1946-1960-gody",
+      "shortTitle": "АРХИТЕКТУРА СОВЕТСКОГО КАЛИНИНГРАДА"
+    },
+    {
+      "sceneSlug": "lecture-waterworks",
+      "eventSlug": "golubye-ladoni-goroda-k-vosstanovlenie-vodoprovodnoy-sistemy-v-poslevoennom-kaliningrade",
+      "shortTitle": "ГОЛУБЫЕ ЛАДОНИ ГОРОДА"
+    },
+    {
+      "sceneSlug": "lecture-zoo-monuments",
+      "eventSlug": "pamyatniki-iskusstva-i-istorii-v-landshafte-kaliningradskogo-zooparka",
+      "shortTitle": "ПАМЯТНИКИ В ЛАНДШАФТЕ ЗООПАРКА"
+    },
+    {
+      "sceneSlug": "lecture-green-memory",
+      "eventSlug": "zelenaya-pamyat-istoriya-botanicheskogo-sada-kaliningrada",
+      "shortTitle": "ЗЕЛЁНАЯ ПАМЯТЬ"
+    },
+    {
+      "sceneSlug": "lecture-chemodan",
+      "eventSlug": "priroda-chemodana",
+      "shortTitle": "ПРИРОДА ЧЕМОДАНА"
+    },
+    {
+      "sceneSlug": "lecture-writers",
+      "eventSlug": "kaliningradskaya-oblast-vdohnovenie-dlya-pisateley",
+      "shortTitle": "ВДОХНОВЕНИЕ ДЛЯ ПИСАТЕЛЕЙ"
+    },
+    {
+      "sceneSlug": "lecture-money",
+      "eventSlug": "denezhnoe-obraschenie-v-poslevoennyy-period-1945-1947",
+      "shortTitle": "ДЕНЕЖНОЕ ОБРАЩЕНИЕ"
+    },
+    {
+      "sceneSlug": "lecture-habits-lecture",
+      "eventSlug": "privychki-kaliningradtsev-yumor-sueveriya-ne-tolko-podrostkovye-strashilki-legendy-kaliningradskih-dvorov",
+      "shortTitle": "ПРИВЫЧКИ И ЛЕГЕНДЫ"
+    },
+    {
+      "sceneSlug": "lecture-cadets",
+      "eventSlug": "kursanty-s-krylyshkami-kaliningradskoe-vatu-i-vliyanie-na-kaliningrad",
+      "shortTitle": "КУРСАНТЫ С КРЫЛЫШКАМИ"
+    },
+    {
+      "sceneSlug": "lecture-healthcare",
+      "eventSlug": "kaliningradskoe-zdravoohranenie-v-period-stanovleniya-oblasti-osobennosti-vyzovy-pobedy-i-problemy",
+      "shortTitle": "ЗДРАВООХРАНЕНИЕ ОБЛАСТИ"
+    },
+    {
+      "sceneSlug": "lecture-zoo-1945",
+      "eventSlug": "zooparku-byt-zoopark-trofey-1945-goda-i-odin-iz-pervyh-ochagov-mirnoy-zhizni-v-kaliningrade",
+      "shortTitle": "ЗООПАРКУ — БЫТЬ!"
+    },
+    {
+      "sceneSlug": "lecture-teachers",
+      "eventSlug": "velikie-uchitelya-preemstvennost-hudozhestvennyh-pokoleniy",
+      "shortTitle": "ВЕЛИКИЕ УЧИТЕЛЯ"
+    },
+    {
+      "sceneSlug": "lecture-port",
+      "eventSlug": "kaliningradskiy-morskoy-torgovyy-port-yarkie-stranitsy-sovetskoy-istorii-i-sovremennost",
+      "shortTitle": "МОРСКОЙ ТОРГОВЫЙ ПОРТ"
+    }
+  ]
+}
