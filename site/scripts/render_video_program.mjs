@@ -21,6 +21,7 @@ const fpsArg = args.find((value) => value.startsWith('--fps='));
 const supersampleArg = args.find((value) => value.startsWith('--supersample='));
 const tagArg = args.find((value) => value.startsWith('--tag='));
 const resume = args.includes('--resume');
+const skipBuild = args.includes('--skip-build');
 const quality = qualityArg?.split('=')[1] ?? 'low';
 const profile = profileArg?.split('=')[1] ?? 'playback-safe';
 const fps = Number(fpsArg?.split('=')[1] ?? '15');
@@ -184,77 +185,143 @@ async function loadScene(page, slug) {
   return durationMs;
 }
 
-async function renderSceneClip(page, slug, index, totalScenes, totalFrames, progressState) {
-  const sceneDurationMs = await loadScene(page, slug);
-  const totalSceneFrames = Math.max(2, Math.ceil((sceneDurationMs / 1000) * fps));
+function getCaptureViewport() {
+  return {
+    width: 2460,
+    height: 1400,
+  };
+}
+
+async function createCapturePage(browser) {
+  return browser.newPage({
+    viewport: getCaptureViewport(),
+    deviceScaleFactor: supersample,
+  });
+}
+
+async function getCaptureClip(page) {
   const captureRoot = page.locator('[data-capture-root]');
-  const frameDir = await fs.mkdtemp(path.join(os.tmpdir(), `video-preview-program-${slug}-`));
-  const clipPath = getClipPath(slug, index);
-  const encodeSettings = getEncodeSettings();
+  const box = await captureRoot.boundingBox();
 
-  try {
-    console.log(`Rendering scene ${index + 1}/${totalScenes}: ${slug} (${totalSceneFrames} frames)`);
-
-    for (let frameIndex = 0; frameIndex < totalSceneFrames; frameIndex += 1) {
-      const ms = Math.min(sceneDurationMs - 1, Math.round((frameIndex * 1000) / fps));
-      const framePath = path.join(frameDir, `frame-${String(frameIndex).padStart(5, '0')}.png`);
-
-      await page.evaluate((timeMs) => window.__videoPreview?.seek?.(timeMs), ms);
-      await flushAnimationFrame(page);
-      await captureRoot.screenshot({ path: framePath, animations: 'allow' });
-
-      progressState.renderedFrames += 1;
-      const percent = Math.floor((progressState.renderedFrames / totalFrames) * 100);
-      if (percent > progressState.lastPercentLogged) {
-        progressState.lastPercentLogged = percent;
-        console.log(`PROGRESS ${percent}%`);
-      }
-    }
-
-    await execFileAsync('ffmpeg', [
-      '-y',
-      '-framerate',
-      String(fps),
-      '-i',
-      path.join(frameDir, 'frame-%05d.png'),
-      '-f',
-      'lavfi',
-      '-i',
-      'anullsrc=channel_layout=stereo:sample_rate=48000',
-      '-shortest',
-      '-vf',
-      'scale=1920:1080:flags=lanczos,format=yuv420p',
-      '-c:v',
-      'libx264',
-      '-profile:v',
-      encodeSettings.h264Profile,
-      '-level',
-      encodeSettings.level,
-      '-preset',
-      encodeSettings.preset,
-      '-crf',
-      encodeSettings.crf,
-      '-maxrate',
-      encodeSettings.maxrate,
-      '-bufsize',
-      encodeSettings.bufsize,
-      '-g',
-      String(Math.max(30, fps * 2)),
-      '-movflags',
-      '+faststart',
-      '-c:a',
-      'aac',
-      '-b:a',
-      '128k',
-      clipPath,
-    ]);
-
-    console.log(`Saved clip: ${clipPath}`);
-  } finally {
-    await fs.rm(frameDir, { recursive: true, force: true });
+  if (!box) {
+    throw new Error('Capture root bounding box is unavailable');
   }
 
-  return clipPath;
+  return {
+    x: Math.max(0, Math.floor(box.x)),
+    y: Math.max(0, Math.floor(box.y)),
+    width: Math.max(1, Math.ceil(box.width)),
+    height: Math.max(1, Math.ceil(box.height)),
+  };
+}
+
+function isRecoverableCaptureError(error) {
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    message.includes('Target page, context or browser has been closed') ||
+    message.includes('Target crashed') ||
+    message.includes('Page crashed') ||
+    message.includes('Browser has been closed')
+  );
+}
+
+async function renderSceneClip(slug, sceneDurationMs, index, totalScenes, totalFrames, progressState) {
+  const totalSceneFrames = Math.max(2, Math.ceil((sceneDurationMs / 1000) * fps));
+  const clipPath = getClipPath(slug, index);
+  const tempClipPath = `${clipPath}.partial.mp4`;
+  const encodeSettings = getEncodeSettings();
+  const maxAttempts = 3;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const frameDir = await fs.mkdtemp(path.join(os.tmpdir(), `video-preview-program-${slug}-`));
+    let browser;
+    let page;
+    let renderedFramesThisAttempt = 0;
+
+    try {
+      browser = await chromium.launch();
+      page = await createCapturePage(browser);
+      await loadScene(page, slug);
+      const captureClip = await getCaptureClip(page);
+      const retrySuffix = attempt > 1 ? ` [retry ${attempt}/${maxAttempts}]` : '';
+      console.log(
+        `Rendering scene ${index + 1}/${totalScenes}: ${slug} (${totalSceneFrames} frames)${retrySuffix}`,
+      );
+
+      for (let frameIndex = 0; frameIndex < totalSceneFrames; frameIndex += 1) {
+        const ms = Math.min(sceneDurationMs - 1, Math.round((frameIndex * 1000) / fps));
+        const framePath = path.join(frameDir, `frame-${String(frameIndex).padStart(5, '0')}.png`);
+
+        await page.evaluate((timeMs) => window.__videoPreview?.seek?.(timeMs), ms);
+        await flushAnimationFrame(page);
+        await page.screenshot({ path: framePath, animations: 'allow', clip: captureClip });
+
+        renderedFramesThisAttempt += 1;
+        progressState.renderedFrames += 1;
+        const percent = Math.floor((progressState.renderedFrames / totalFrames) * 100);
+        if (percent > progressState.lastPercentLogged) {
+          progressState.lastPercentLogged = percent;
+          console.log(`PROGRESS ${percent}%`);
+        }
+      }
+
+      await execFileAsync('ffmpeg', [
+        '-y',
+        '-framerate',
+        String(fps),
+        '-i',
+        path.join(frameDir, 'frame-%05d.png'),
+        '-f',
+        'lavfi',
+        '-i',
+        'anullsrc=channel_layout=stereo:sample_rate=48000',
+        '-shortest',
+        '-vf',
+        'scale=1920:1080:flags=lanczos,format=yuv420p',
+        '-c:v',
+        'libx264',
+        '-profile:v',
+        encodeSettings.h264Profile,
+        '-level',
+        encodeSettings.level,
+        '-preset',
+        encodeSettings.preset,
+        '-crf',
+        encodeSettings.crf,
+        '-maxrate',
+        encodeSettings.maxrate,
+        '-bufsize',
+        encodeSettings.bufsize,
+        '-g',
+        String(Math.max(30, fps * 2)),
+        '-movflags',
+        '+faststart',
+        '-c:a',
+        'aac',
+        '-b:a',
+        '128k',
+        tempClipPath,
+      ]);
+
+      await fs.rename(tempClipPath, clipPath);
+      console.log(`Saved clip: ${clipPath}`);
+      return clipPath;
+    } catch (error) {
+      progressState.renderedFrames = Math.max(0, progressState.renderedFrames - renderedFramesThisAttempt);
+
+      if (attempt < maxAttempts && isRecoverableCaptureError(error)) {
+        console.warn(`Retrying scene ${slug} after browser/page closure (${attempt}/${maxAttempts})`);
+        continue;
+      }
+
+      throw error;
+    } finally {
+      await page?.close().catch(() => {});
+      await browser?.close().catch(() => {});
+      await fs.rm(frameDir, { recursive: true, force: true });
+      await fs.rm(tempClipPath, { force: true });
+    }
+  }
 }
 
 function getClipPath(slug, index) {
@@ -342,19 +409,19 @@ if (!resume) {
   await ensureDir(clipRoot);
 }
 
-await ensureBuiltPreview();
+if (!skipBuild) {
+  await ensureBuiltPreview();
+} else {
+  await fs.access(path.join(distRoot, 'video-preview', 'index.html'));
+}
 const previewServer = await ensurePreviewServer();
 
 try {
   await waitForServer(`${baseUrl}/video-preview/`);
-
   const browser = await chromium.launch();
 
   try {
-    const page = await browser.newPage({
-      viewport: { width: 2460, height: 1400 },
-      deviceScaleFactor: supersample,
-    });
+    const page = await createCapturePage(browser);
 
     const sceneDurations = [];
     for (const slug of sceneSlugs) {
@@ -397,7 +464,14 @@ try {
         }
       }
 
-      const clipPath = await renderSceneClip(page, slug, index, sceneSlugs.length, totalFrames, progressState);
+      const clipPath = await renderSceneClip(
+        slug,
+        sceneDurations[index]?.durationMs ?? 5600,
+        index,
+        sceneSlugs.length,
+        totalFrames,
+        progressState,
+      );
       clipPaths.push(clipPath);
     }
 
