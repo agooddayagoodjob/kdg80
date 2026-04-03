@@ -1018,6 +1018,23 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
     color: #2b2522;
   }
 
+  .cold-open {
+    animation-name: previewScenePushSoft;
+  }
+
+  .cold-open__support.anim--fade-up,
+  .cold-open__period.anim--fade-up {
+    animation-name: previewFadeUpSoft;
+  }
+
+  .cold-open__tagline-line.anim--title {
+    animation-name: previewTitleSoft;
+  }
+
+  .cold-open__lockup-shell.anim--lockup {
+    animation-name: previewLockupSoft;
+  }
+
   .act-title-scene {
     background:
       radial-gradient(circle at top center, rgba(255, 255, 255, 0.08), transparent 22rem),
@@ -2746,8 +2763,18 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
     28%, 100% { opacity: 1; transform: translateY(0); }
   }
 
+  @keyframes previewFadeUpSoft {
+    0%, 14% { opacity: 0; transform: translateY(16px); }
+    28%, 100% { opacity: 1; transform: translateY(0); }
+  }
+
   @keyframes previewTitle {
     0%, 14% { opacity: 0; transform: translateY(34px); }
+    30%, 100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes previewTitleSoft {
+    0%, 14% { opacity: 0; transform: translateY(20px); }
     30%, 100% { opacity: 1; transform: translateY(0); }
   }
 
@@ -2758,6 +2785,11 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
 
   @keyframes previewLockup {
     0%, 12% { opacity: 0; transform: translateY(24px); }
+    28%, 100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes previewLockupSoft {
+    0%, 12% { opacity: 0; transform: translateY(14px); }
     28%, 100% { opacity: 1; transform: translateY(0); }
   }
 
@@ -3095,6 +3127,15 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
     }
     100% {
       transform: translateX(-6px) translateY(-2px);
+    }
+  }
+
+  @keyframes previewScenePushSoft {
+    0% {
+      transform: translateX(0) translateY(0);
+    }
+    100% {
+      transform: translateX(-2px) translateY(-1px);
     }
   }
 
