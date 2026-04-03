@@ -177,6 +177,13 @@ async function flushAnimationFrame(page) {
   );
 }
 
+async function pauseAndSeek(page, timeMs) {
+  await page.evaluate((targetMs) => {
+    window.__videoPreview?.pause?.();
+    window.__videoPreview?.seek?.(targetMs);
+  }, timeMs);
+}
+
 async function loadScene(page, slug) {
   await page.goto(`${baseUrl}/video-preview/${slug}/`, { waitUntil: 'networkidle' });
   await page.waitForSelector('[data-capture-root]');
@@ -252,7 +259,7 @@ async function renderSceneClip(slug, sceneDurationMs, index, totalScenes, totalF
         const ms = Math.min(sceneDurationMs - 1, Math.round((frameIndex * 1000) / fps));
         const framePath = path.join(frameDir, `frame-${String(frameIndex).padStart(5, '0')}.png`);
 
-        await page.evaluate((timeMs) => window.__videoPreview?.seek?.(timeMs), ms);
+        await pauseAndSeek(page, ms);
         await flushAnimationFrame(page);
         await page.screenshot({ path: framePath, animations: 'allow', clip: captureClip });
 

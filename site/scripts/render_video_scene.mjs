@@ -175,6 +175,13 @@ async function flushAnimationFrame(page) {
   );
 }
 
+async function pauseAndSeek(page, timeMs) {
+  await page.evaluate((targetMs) => {
+    window.__videoPreview?.pause?.();
+    window.__videoPreview?.seek?.(targetMs);
+  }, timeMs);
+}
+
 async function renderSceneVideo(browser, slug) {
   const sceneDir = path.join(outputRoot, slug);
   await ensureDir(sceneDir);
@@ -207,7 +214,7 @@ async function renderSceneVideo(browser, slug) {
       const ms = Math.min(renderEndMs - 1, renderStartMs + Math.round((index * 1000) / fps));
       const framePath = path.join(frameDir, `frame-${String(index).padStart(5, '0')}.png`);
 
-      await page.evaluate((timeMs) => window.__videoPreview?.seek?.(timeMs), ms);
+      await pauseAndSeek(page, ms);
       await flushAnimationFrame(page);
       await captureRoot.screenshot({ path: framePath, animations: 'allow' });
 
