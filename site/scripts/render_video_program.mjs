@@ -206,22 +206,6 @@ async function createCapturePage(browser) {
   });
 }
 
-async function getCaptureClip(page) {
-  const captureRoot = page.locator('[data-capture-root]');
-  const box = await captureRoot.boundingBox();
-
-  if (!box) {
-    throw new Error('Capture root bounding box is unavailable');
-  }
-
-  return {
-    x: Math.max(0, Math.floor(box.x)),
-    y: Math.max(0, Math.floor(box.y)),
-    width: Math.max(1, Math.ceil(box.width)),
-    height: Math.max(1, Math.ceil(box.height)),
-  };
-}
-
 function isRecoverableCaptureError(error) {
   const message = error instanceof Error ? error.message : String(error);
   return (
@@ -249,7 +233,7 @@ async function renderSceneClip(slug, sceneDurationMs, index, totalScenes, totalF
       browser = await chromium.launch();
       page = await createCapturePage(browser);
       await loadScene(page, slug);
-      const captureClip = await getCaptureClip(page);
+      const captureRoot = page.locator('[data-capture-root]');
       const retrySuffix = attempt > 1 ? ` [retry ${attempt}/${maxAttempts}]` : '';
       console.log(
         `Rendering scene ${index + 1}/${totalScenes}: ${slug} (${totalSceneFrames} frames)${retrySuffix}`,
@@ -261,7 +245,7 @@ async function renderSceneClip(slug, sceneDurationMs, index, totalScenes, totalF
 
         await pauseAndSeek(page, ms);
         await flushAnimationFrame(page);
-        await page.screenshot({ path: framePath, animations: 'allow', clip: captureClip });
+        await captureRoot.screenshot({ path: framePath, animations: 'allow' });
 
         renderedFramesThisAttempt += 1;
         progressState.renderedFrames += 1;
