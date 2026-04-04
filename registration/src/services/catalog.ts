@@ -44,7 +44,10 @@ type CatalogSyncOverride = {
   openOnCatalogSyncWhenStateIsSoon?: boolean;
 };
 
-const EVENT_OVERBOOKING_PERCENT_OVERRIDES: Record<string, number> = {};
+const EVENT_OVERBOOKING_PERCENT_OVERRIDES: Record<string, number> = {
+  'pamyatniki-iskusstva-i-istorii-v-landshafte-kaliningradskogo-zooparka': 20,
+  'velikie-uchitelya-preemstvennost-hudozhestvennyh-pokoleniy': 20,
+};
 const EVENT_CATALOG_SYNC_OVERRIDES: Record<string, CatalogSyncOverride> = {
   'kaliningradskaya-oblast-glazami-turistov-togda-i-seychas': {
     defaultPublicState: 'open',

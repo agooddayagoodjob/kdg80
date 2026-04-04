@@ -1,4 +1,4 @@
-export const DEFAULT_OVERBOOKING_PERCENT = 20;
+export const DEFAULT_OVERBOOKING_PERCENT = 26;
 
 export function normalizeOverbookingPercent(value: number) {
   if (!Number.isFinite(value)) {
