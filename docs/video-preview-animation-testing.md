@@ -97,3 +97,14 @@ await captureRoot.screenshot({ path: outPath, animations: 'allow' });
 5. Снять mobile shell.
 6. Сгенерировать новый `mp4` sample для затронутой сцены.
 7. Только после этого считать motion-pass проверенным.
+
+## Full Program QA
+
+- Для полного ролика нельзя ограничиваться `ffprobe`, парой таймкодов или просмотром только первых сцен.
+- Перед сдачей full-program export обязателен отдельный scene-by-scene visual board:
+  - по одному representative `png`-кадру на каждый `scene clip`;
+  - общий contact-board по всем сценам;
+  - ручная отметка `clean / broken` глазами по каждой сцене.
+- Если в full-video используются переиспользованные `scene mp4`, они всё равно должны заново попасть в этот visual board перед склейкой финального файла.
+- Если хотя бы одна сцена на board выглядит сжатой, разъехавшейся или визуально пустой, full-program export нельзя считать проверенным.
+- Только после полного clip-board pass имеет смысл собирать и отдавать итоговый `mp4`.
