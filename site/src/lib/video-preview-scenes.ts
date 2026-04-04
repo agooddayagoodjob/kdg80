@@ -748,7 +748,7 @@ function createLectureBeatScene(events: FestivalEvent[], seed: LectureBeatSceneS
     slug: seed.sceneSlug,
     label: `Lecture Beat / ${seed.shortTitle}`,
     kind: 'boost',
-    durationMs: seed.durationMs ?? 5600,
+    durationMs: seed.durationMs ?? 7600,
     eyebrow: 'ЛЕКЦИЯ',
     shortTitle: seed.shortTitle,
     mythLabel: seed.mythText ? 'ПРАВДА ЛИ, ЧТО' : undefined,

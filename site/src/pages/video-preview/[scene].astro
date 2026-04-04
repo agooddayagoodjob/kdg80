@@ -26,6 +26,17 @@ const sequenceCascadeScene = getVideoPreviewScene('cascade');
 const sequenceSiteScene = getVideoPreviewScene('site');
 const sequenceMaxScene = getVideoPreviewScene('max');
 const boostMythLabelParts = scene.kind === 'boost' ? getMythLabelParts(scene.mythLabel) : { lead: '', accent: '' };
+const boostDetailLineBaseDelay = scene.kind === 'boost'
+  ? Math.min(3200, Math.round(scene.durationMs * 0.36))
+  : 0;
+const boostDetailLineStep = 110;
+const boostDetailLineDuration = 420;
+const boostDetailAttributionDelay = scene.kind === 'boost'
+  ? Math.min(
+      Math.round(scene.durationMs * 0.5),
+      boostDetailLineBaseDelay + scene.detailLines.length * boostDetailLineStep + 90,
+    )
+  : 0;
 
 function getSceneTitle(value: VideoPreviewScene) {
   if (value.kind === 'act-title') {
@@ -356,13 +367,19 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
                   <p class="boost-scene__detail-label">{scene.detailLabel}</p>
                   <div class="boost-scene__detail-lines">
                     {scene.detailLines.map((line, index) => (
-                      <p class="boost-scene__detail-line anim anim--detail-line" style={`--anim-delay:${3660 + index * 160}ms; --anim-duration:420ms;`}>
+                      <p
+                        class="boost-scene__detail-line anim anim--detail-line"
+                        style={`--anim-delay:${boostDetailLineBaseDelay + index * boostDetailLineStep}ms; --anim-duration:${boostDetailLineDuration}ms;`}
+                      >
                         {line}
                       </p>
                     ))}
                   </div>
                   {scene.detailAttribution && (
-                    <p class="boost-scene__detail-attribution anim anim--detail-line" style="--anim-delay:4020ms; --anim-duration:420ms;">
+                    <p
+                      class="boost-scene__detail-attribution anim anim--detail-line"
+                      style={`--anim-delay:${boostDetailAttributionDelay}ms; --anim-duration:${boostDetailLineDuration}ms;`}
+                    >
                       {scene.detailAttribution}
                     </p>
                   )}
@@ -2600,6 +2617,7 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
 
   .anim--backdrop {
     animation-name: previewBackdrop;
+    animation-timing-function: cubic-bezier(0.2, 0.76, 0.22, 1);
   }
 
   .anim--panel {
@@ -2608,6 +2626,7 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
 
   .anim--portrait {
     animation-name: previewPortrait;
+    animation-timing-function: cubic-bezier(0.18, 0.74, 0.22, 1);
   }
 
   .anim--myth-plate {
@@ -2685,6 +2704,7 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   .anim--dialogue-backdrop {
     animation-name: previewDialogueBackdrop;
     animation-duration: var(--anim-duration, var(--scene-duration));
+    animation-timing-function: cubic-bezier(0.2, 0.76, 0.22, 1);
   }
 
   .anim--dialogue-grain {
@@ -2799,10 +2819,18 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   }
 
   @keyframes previewBackdrop {
-    0%, 10% { opacity: 0; transform: scale(1.02) translateX(0); }
-    22% { opacity: 1; transform: scale(1.01) translateX(0); }
-    68% { opacity: 1; transform: scale(1.005) translateX(-4px); }
-    100% { opacity: 1; transform: scale(1.008) translateX(-8px); }
+    0% {
+      opacity: 0;
+      transform: scale(1.028) translate3d(0px, 6px, 0);
+    }
+    12% {
+      opacity: 1;
+      transform: scale(1.036) translate3d(0px, 4px, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1.084) translate3d(-3px, -2px, 0);
+    }
   }
 
   @keyframes previewPanel {
@@ -2819,44 +2847,38 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   }
 
   @keyframes previewPortrait {
-    0%, 24% {
+    0% {
       opacity: 0;
       transform:
-        translate(calc(var(--event-portrait-shift-x, 0rem) + 20px), calc(var(--event-portrait-shift-y, 0rem) + 12px))
-        scale(calc(var(--event-portrait-size, 1) * 0.92));
+        translate(calc(var(--event-portrait-shift-x, 0rem) + 8px), calc(var(--event-portrait-shift-y, 0rem) + 14px))
+        scale(calc(var(--event-portrait-size, 1) * 0.95));
     }
-    40% {
+    24% {
       opacity: 0.72;
       transform:
-        translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
-        scale(calc(var(--event-portrait-size, 1) * 1.005));
-    }
-    54% {
-      opacity: 1;
-      transform:
-        translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
-        scale(var(--event-portrait-size, 1));
+        translate(calc(var(--event-portrait-shift-x, 0rem) + 4px), calc(var(--event-portrait-shift-y, 0rem) + 8px))
+        scale(calc(var(--event-portrait-size, 1) * 0.985));
     }
     100% {
       opacity: 1;
       transform:
-        translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
-        scale(var(--event-portrait-size, 1));
+        translate(calc(var(--event-portrait-shift-x, 0rem) + 1px), calc(var(--event-portrait-shift-y, 0rem) - 1px))
+        scale(calc(var(--event-portrait-size, 1) * 1.018));
     }
   }
 
   @keyframes previewMythPlate {
-    0%, 34% {
+    0%, 22% {
       opacity: 1;
       clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
       transform: translateX(0);
     }
-    48% {
+    34% {
       opacity: 1;
       clip-path: polygon(0 0, 100% 0, 82% 100%, 0 100%);
       transform: translateX(0);
     }
-    60%, 100% {
+    44%, 100% {
       opacity: 0;
       clip-path: polygon(100% 0, 100% 0, 78% 100%, 78% 100%);
       transform: translateX(0);
@@ -2888,28 +2910,28 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   }
 
   @keyframes previewBoostLeadPhase {
-    0%, 30% { opacity: 0; transform: translateY(26px); }
-    46%, 100% { opacity: 1; transform: translateY(0); }
+    0%, 18% { opacity: 0; transform: translateY(22px); }
+    32%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewBoostRulePhase {
-    0%, 34% { opacity: 0; transform: scaleX(0); }
-    50%, 100% { opacity: 1; transform: scaleX(1); }
+    0%, 20% { opacity: 0; transform: scaleX(0); }
+    34%, 100% { opacity: 1; transform: scaleX(1); }
   }
 
   @keyframes previewBoostTitlePhase {
-    0%, 32% { opacity: 0; transform: translateY(32px); }
-    50%, 100% { opacity: 1; transform: translateY(0); }
+    0%, 18% { opacity: 0; transform: translateY(24px); }
+    34%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewBoostHookPhase {
-    0%, 42% { opacity: 0; transform: translateY(24px); }
-    58%, 100% { opacity: 1; transform: translateY(0); }
+    0%, 24% { opacity: 0; transform: translateY(18px); }
+    40%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewDetailCard {
-    0%, 64% { opacity: 0; transform: translateY(40px); }
-    80%, 100% { opacity: 1; transform: translateY(0); }
+    0%, 38% { opacity: 0; transform: translateY(28px); }
+    54%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewDetailLine {
@@ -2918,13 +2940,13 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   }
 
   @keyframes previewBoostMetaPhase {
-    0%, 72% { opacity: 0; transform: translateY(20px); }
-    86%, 100% { opacity: 1; transform: translateY(0); }
+    0%, 46% { opacity: 0; transform: translateY(16px); }
+    62%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewBoostSpeakerPhase {
-    0%, 30% { opacity: 0; transform: translateY(20px); }
-    48%, 100% { opacity: 1; transform: translateY(0); }
+    0%, 18% { opacity: 0; transform: translateY(18px); }
+    34%, 100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes previewCard {
@@ -2948,10 +2970,18 @@ const dialogueAccentStyle = scene.kind === 'dialogue' && scene.variant === 'side
   }
 
   @keyframes previewDialogueBackdrop {
-    0%, 6% { opacity: 0; transform: scale(1.016) translateX(0); }
-    18% { opacity: 1; transform: scale(1.008) translateX(0); }
-    78% { opacity: 1; transform: scale(1.002) translateX(-3px); }
-    100% { opacity: 1; transform: scale(1.004) translateX(-6px); }
+    0% {
+      opacity: 0;
+      transform: scale(1.022) translate3d(0px, 6px, 0);
+    }
+    12% {
+      opacity: 1;
+      transform: scale(1.028) translate3d(0px, 4px, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1.064) translate3d(-2px, -2px, 0);
+    }
   }
 
   @keyframes previewDialogueGrain {
