@@ -1,0 +1,1059 @@
+---
+import PreviewLayout from '../../layouts/PreviewLayout.astro';
+import type { VideoStoryScene } from '../../lib/video-story-scenes';
+import { getVideoStoryScene, getVideoStoryScenes } from '../../lib/video-story-scenes';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return getVideoStoryScenes().map((scene) => ({
+    params: { scene: scene.slug },
+  }));
+}
+
+const slug = Astro.params.scene ?? '';
+const scene = getVideoStoryScene(slug);
+
+if (!scene) {
+  throw new Error(`Unknown video story scene: ${slug}`);
+}
+
+const allScenes = getVideoStoryScenes();
+
+function getSceneTitle(value: VideoStoryScene) {
+  if (value.kind === 'intro') {
+    return value.titleLines.join(' ');
+  }
+
+  if (value.kind === 'event') {
+    return value.titleLines.join(' ');
+  }
+
+  if (value.kind === 'site') {
+    return value.domain;
+  }
+
+  return `${value.platform} ${value.handle}`;
+}
+
+const sceneTitle = getSceneTitle(scene);
+---
+
+<PreviewLayout title={`Video Story / ${scene.label}`}>
+  <main class="story-preview-page">
+    <aside class="story-preview-page__hud">
+      <a class="story-preview-page__back" href="/video-story/">/video-story/</a>
+      <p class="story-preview-page__caption">СЦЕНА</p>
+      <h1 class="story-preview-page__title">{scene.label}</h1>
+      <nav class="story-preview-page__nav" aria-label="Список vertical story сцен">
+        {allScenes.map((entry) => (
+          <a
+            class:list={['story-preview-page__nav-link', entry.slug === scene.slug && 'is-active']}
+            href={`/video-story/${entry.slug}/`}
+          >
+            {entry.label}
+          </a>
+        ))}
+      </nav>
+      <div class="story-preview-page__controls">
+        <button type="button" data-preview-restart>Перезапустить</button>
+        <button type="button" data-preview-pause>Пауза</button>
+        <button type="button" data-preview-play>Пуск</button>
+      </div>
+      <p class="story-preview-page__hint">Для capture берётся только кадр `1080x1920` внутри story-stage.</p>
+    </aside>
+
+    <section class="story-preview-page__stage">
+      <div
+        class={`story-scene story-scene--${scene.kind}`}
+        data-story-scene
+        data-capture-root
+        lang="ru"
+        style={`--scene-duration:${scene.durationMs}ms;`}
+      >
+        {scene.kind === 'intro' && (
+          <div class="story-intro">
+            <div class="story-intro__paper anim anim--fade"></div>
+            <div class="story-intro__accent anim anim--wipe-up"></div>
+            <div class="story-intro__grid-lines anim anim--fade"></div>
+            <img
+              class="story-intro__brand anim anim--fade-up"
+              src="/shared-assets/logo-znanie-festival.svg"
+              alt="Знание, 80 историй о главном"
+            />
+            <p class="story-intro__kicker anim anim--fade-up" style="--anim-delay:160ms;">{scene.kicker}</p>
+            <div class="story-intro__copy">
+              {scene.titleLines.map((line, index) => (
+                <p class="story-intro__title-line anim anim--title" style={`--anim-delay:${320 + index * 130}ms;`}>
+                  {line}
+                </p>
+              ))}
+            </div>
+            <p class="story-intro__support anim anim--fade-up" style="--anim-delay:760ms;">{scene.supportLine}</p>
+            <p class="story-intro__period anim anim--slide-up" style="--anim-delay:980ms;">{scene.period}</p>
+            <p class="story-intro__count anim anim--slide-up" style="--anim-delay:1140ms;">{scene.countLabel}</p>
+            <p class="story-intro__outline anim anim--fade" style="--anim-delay:300ms;">06—12</p>
+          </div>
+        )}
+
+        {scene.kind === 'event' && (
+          <div class="story-event">
+            <div class="story-event__camera">
+              {scene.image && (
+                <img
+                  class="story-event__photo anim anim--photo-reveal"
+                  style={scene.photoStyle}
+                  src={scene.image}
+                  alt=""
+                />
+              )}
+              <div class="story-event__photo-veil anim anim--fade" style={scene.photoVeilStyle}></div>
+              <div class="story-event__paper-panel anim anim--panel-up"></div>
+              <div class="story-event__accent-rail anim anim--panel-up" style="--anim-delay:120ms;"></div>
+              <img
+                class="story-event__brand anim anim--fade-up"
+                src="/shared-assets/logo-znanie-festival-master-inverse.svg"
+                alt="Знание, 80 историй о главном"
+                style="--anim-delay:210ms;"
+              />
+
+              <div class="story-event__topline">
+                <p class="story-event__format anim anim--slide-down" style="--anim-delay:280ms;">{scene.formatLabel}</p>
+                <p class="story-event__progress anim anim--slide-down" style="--anim-delay:360ms;">
+                  {scene.index} / {scene.total}
+                </p>
+              </div>
+
+              <div class="story-event__date-time anim anim--slide-down" style="--anim-delay:460ms;">
+                <div class="story-event__date-card">
+                  <span class="story-event__weekday">{scene.weekdayLabel}</span>
+                  <strong>{scene.dayNumber}</strong>
+                  <span class="story-event__month">{scene.monthLabel}</span>
+                </div>
+                <div class="story-event__time-card">
+                  <span class="story-event__time-label">НАЧАЛО</span>
+                  <strong>{scene.timeLabel}</strong>
+                  <p class="story-event__time-venue">{scene.venueLine}</p>
+                </div>
+              </div>
+
+              <div class="story-event__copy">
+                <h2 class="story-event__title" style={scene.titleStyle}>
+                  {scene.titleLines.map((line, index) => (
+                    <span class="story-event__title-line anim anim--title" style={`--anim-delay:${980 + index * 150}ms;`}>
+                      {line}
+                    </span>
+                  ))}
+                </h2>
+                <div class="story-event__support">
+                  {scene.supportLines.map((line, index) => (
+                    <p class="story-event__support-line anim anim--fade-up" style={`--anim-delay:${1760 + index * 150}ms;`}>
+                      {line}
+                    </p>
+                  ))}
+                </div>
+              </div>
+
+              <div class="story-event__meta">
+                <p class="story-event__speaker anim anim--fade-up" style="--anim-delay:2280ms;">{scene.speakerLine}</p>
+                <p class="story-event__role anim anim--fade-up" style="--anim-delay:2420ms;">{scene.speakerRoleLine}</p>
+              </div>
+
+              {scene.portraitImage && (
+                <img
+                  class="story-event__portrait anim anim--portrait-reveal"
+                  style={`${scene.portraitStyle ?? ''} --anim-delay:1500ms;`}
+                  src={scene.portraitImage}
+                  alt={scene.speakerLine}
+                />
+              )}
+            </div>
+          </div>
+        )}
+
+        {scene.kind === 'site' && (
+          <div class="story-site">
+            <div class="story-site__paper anim anim--fade"></div>
+            <div class="story-site__accent anim anim--panel-up"></div>
+            <img
+              class="story-site__brand anim anim--fade-up"
+              src="/shared-assets/logo-znanie-festival.svg"
+              alt="Знание, 80 историй о главном"
+            />
+            <div class="story-site__copy">
+              <p class="story-site__eyebrow anim anim--fade-up" style="--anim-delay:180ms;">{scene.eyebrow}</p>
+              <h2 class="story-site__domain anim anim--title" style="--anim-delay:340ms;">{scene.domain}</h2>
+              <p class="story-site__title anim anim--fade-up" style="--anim-delay:860ms;">{scene.title}</p>
+              <p class="story-site__subtitle anim anim--fade-up" style="--anim-delay:1120ms;">{scene.subtitle}</p>
+              <p class="story-site__footer anim anim--fade-up" style="--anim-delay:1380ms;">{scene.footer}</p>
+            </div>
+          </div>
+        )}
+
+        {scene.kind === 'qr' && (
+          <div class="story-qr">
+            <div class="story-qr__paper anim anim--fade"></div>
+            <div class="story-qr__accent anim anim--panel-up"></div>
+            <img
+              class="story-qr__brand anim anim--fade-up"
+              src="/shared-assets/logo-znanie-festival.svg"
+              alt="Знание, 80 историй о главном"
+            />
+            <div class="story-qr__copy">
+              <p class="story-qr__eyebrow anim anim--fade-up">{scene.eyebrow}</p>
+              <h2 class="story-qr__title anim anim--title" style="--anim-delay:110ms;">{scene.platform}</h2>
+              <p class="story-qr__cta anim anim--fade-up" style="--anim-delay:220ms;">{scene.title}</p>
+              <p class="story-qr__handle anim anim--fade-up" style="--anim-delay:300ms;">{scene.handle}</p>
+              <p class="story-qr__subtitle anim anim--fade-up" style="--anim-delay:380ms;">{scene.subtitle}</p>
+              <p class="story-qr__footer anim anim--fade-up" style="--anim-delay:460ms;">{scene.footer}</p>
+            </div>
+            <div class="story-qr__code-shell anim anim--qr" style="--anim-delay:200ms;">
+              <img class="story-qr__code" src={scene.qrPath} alt={`${scene.platform} QR`} />
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  </main>
+
+  <script is:inline define:vars={{ sceneTitle, sceneDurationMs: scene.durationMs }}>
+    const root = document.querySelector('[data-story-scene]');
+    const restartButton = document.querySelector('[data-preview-restart]');
+    const pauseButton = document.querySelector('[data-preview-pause]');
+    const playButton = document.querySelector('[data-preview-play]');
+
+    function getAnimations() {
+      return root ? root.getAnimations({ subtree: true }) : [];
+    }
+
+    function playAnimations() {
+      for (const animation of getAnimations()) {
+        animation.play();
+      }
+    }
+
+    function pauseAnimations() {
+      for (const animation of getAnimations()) {
+        animation.pause();
+      }
+    }
+
+    function seekAnimations(ms = 0) {
+      const animations = getAnimations();
+      for (const animation of animations) {
+        animation.pause();
+        animation.currentTime = ms;
+      }
+    }
+
+    function restartAnimations() {
+      seekAnimations(0);
+      requestAnimationFrame(() => {
+        playAnimations();
+      });
+    }
+
+    window.__storyPreview = {
+      title: sceneTitle,
+      durationMs: sceneDurationMs,
+      play: playAnimations,
+      pause: pauseAnimations,
+      restart: restartAnimations,
+      seek: seekAnimations,
+    };
+
+    restartButton?.addEventListener('click', restartAnimations);
+    pauseButton?.addEventListener('click', pauseAnimations);
+    playButton?.addEventListener('click', playAnimations);
+
+    window.addEventListener('load', () => {
+      requestAnimationFrame(() => {
+        seekAnimations(0);
+      });
+    });
+  </script>
+</PreviewLayout>
+
+<style>
+  .story-preview-page {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(18rem, 21rem) 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .story-preview-page__hud {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(20, 16, 16, 0.76);
+    backdrop-filter: blur(16px);
+  }
+
+  .story-preview-page__back,
+  .story-preview-page__caption,
+  .story-preview-page__hint {
+    color: rgba(255, 255, 255, 0.56);
+  }
+
+  .story-preview-page__caption {
+    margin: 0;
+    font: 600 0.78rem/1 var(--font-display);
+    letter-spacing: 0.18em;
+  }
+
+  .story-preview-page__title {
+    margin: 0;
+    font: 700 clamp(1.9rem, 3vw, 2.7rem)/0.94 var(--font-display);
+    color: #fff8f1;
+  }
+
+  .story-preview-page__nav {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .story-preview-page__nav-link {
+    padding: 0.72rem 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .story-preview-page__nav-link.is-active {
+    border-color: rgba(216, 75, 49, 0.42);
+    color: white;
+    background: rgba(216, 75, 49, 0.16);
+  }
+
+  .story-preview-page__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .story-preview-page__controls button {
+    border: 0;
+    padding: 0.75rem 0.95rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    font: 500 0.92rem/1 var(--font-body);
+    cursor: pointer;
+  }
+
+  .story-preview-page__hint {
+    margin: 0.2rem 0 0;
+    font: 400 0.9rem/1.3 var(--font-body);
+  }
+
+  .story-preview-page__stage {
+    display: grid;
+    place-items: center;
+    overflow: auto;
+  }
+
+  .story-scene {
+    --story-safe-top: 268px;
+    --story-safe-bottom: 340px;
+    --story-safe-left: 72px;
+    --story-safe-right: 72px;
+    position: relative;
+    width: 1080px;
+    height: 1920px;
+    overflow: hidden;
+    isolation: isolate;
+    background: #120f10;
+  }
+
+  .story-intro,
+  .story-qr,
+  .story-site {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    animation: storySceneDrift var(--scene-duration) cubic-bezier(0.18, 0.82, 0.22, 1) both;
+  }
+
+  .story-intro__paper,
+  .story-qr__paper,
+  .story-site__paper {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 18% 16%, rgba(255, 255, 255, 0.14), transparent 20rem),
+      linear-gradient(180deg, #f7f1e8 0%, #ece1d3 100%);
+  }
+
+  .story-intro__accent {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 44%;
+    background:
+      radial-gradient(circle at 68% 20%, rgba(255, 255, 255, 0.14), transparent 18rem),
+      linear-gradient(180deg, #d84b31 0%, #b53923 100%);
+    clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .story-intro__grid-lines {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(rgba(18, 17, 14, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(18, 17, 14, 0.06) 1px, transparent 1px);
+    background-size: 120px 120px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.28), transparent 70%);
+  }
+
+  .story-intro__brand,
+  .story-event__brand,
+  .story-qr__brand,
+  .story-site__brand {
+    position: absolute;
+    top: var(--story-safe-top);
+    left: var(--story-safe-left);
+    z-index: 4;
+    width: 288px;
+  }
+
+  .story-intro__brand {
+    width: 408px;
+    top: 242px;
+  }
+
+  .story-qr__brand {
+    width: 268px;
+    filter: brightness(0) saturate(100%) opacity(0.92);
+  }
+
+  .story-site__brand {
+    width: 344px;
+    filter: brightness(0) saturate(100%) opacity(0.96);
+  }
+
+  .story-intro__kicker {
+    position: absolute;
+    top: 404px;
+    left: var(--story-safe-left);
+    z-index: 3;
+    margin: 0;
+    font: 600 0.96rem/1 var(--font-display);
+    letter-spacing: 0.16em;
+    color: rgba(19, 17, 14, 0.56);
+  }
+
+  .story-intro__copy {
+    position: absolute;
+    top: 494px;
+    left: var(--story-safe-left);
+    z-index: 4;
+    display: grid;
+    gap: 0.16rem;
+  }
+
+  .story-intro__title-line {
+    margin: 0;
+    font: 700 7.18rem/0.88 var(--font-display);
+    letter-spacing: -0.07em;
+    color: #171310;
+  }
+
+  .story-intro__support {
+    position: absolute;
+    left: var(--story-safe-left);
+    bottom: 560px;
+    z-index: 4;
+    margin: 0;
+    max-width: 28rem;
+    font: 700 1.34rem/0.98 var(--font-display);
+    letter-spacing: -0.03em;
+    color: #fff5ec;
+  }
+
+  .story-intro__period {
+    position: absolute;
+    left: var(--story-safe-left);
+    bottom: 416px;
+    z-index: 4;
+    margin: 0;
+    font: 700 3.2rem/0.92 var(--font-display);
+    letter-spacing: -0.05em;
+    color: white;
+  }
+
+  .story-intro__count {
+    position: absolute;
+    left: var(--story-safe-left);
+    bottom: 358px;
+    z-index: 4;
+    margin: 0;
+    font: 600 1.02rem/1 var(--font-display);
+    letter-spacing: 0.16em;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .story-intro__outline {
+    position: absolute;
+    right: 36px;
+    bottom: 54px;
+    z-index: 2;
+    margin: 0;
+    font: 700 12rem/0.86 var(--font-display);
+    letter-spacing: -0.08em;
+    color: transparent;
+    -webkit-text-stroke: 3px rgba(255, 255, 255, 0.22);
+    text-stroke: 3px rgba(255, 255, 255, 0.22);
+  }
+
+  .story-event__photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--event-photo-position, center center);
+    transform: scale(var(--event-photo-scale, 1.04));
+    transform-origin: center center;
+  }
+
+  .story-event {
+    --event-photo-veil-top: 0.06;
+    --event-photo-veil-mid: 0.18;
+    --event-photo-veil-bottom: 0.62;
+    --event-photo-veil-left: 0.34;
+    --event-photo-veil-center: 0.1;
+    --event-photo-veil-right: 0.03;
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .story-event__camera {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    animation: storyEventCamera var(--scene-duration) cubic-bezier(0.16, 0.82, 0.22, 1) both;
+  }
+
+  .story-event__photo-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(16, 13, 12, var(--event-photo-veil-top)) 0%,
+        rgba(16, 13, 12, var(--event-photo-veil-mid)) 48%,
+        rgba(16, 13, 12, var(--event-photo-veil-bottom)) 100%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(16, 13, 12, var(--event-photo-veil-left)) 0%,
+        rgba(16, 13, 12, var(--event-photo-veil-center)) 44%,
+        rgba(16, 13, 12, var(--event-photo-veil-right)) 100%
+      );
+  }
+
+  .story-event__paper-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 52%;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(245, 237, 226, 0.98) 100%);
+    clip-path: polygon(0 12%, 72% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .story-event__accent-rail {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 40%;
+    background:
+      radial-gradient(circle at 44% 16%, rgba(255, 255, 255, 0.16), transparent 18rem),
+      linear-gradient(180deg, #d84b31 0%, #b33824 100%);
+    clip-path: polygon(20% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .story-event__topline {
+    position: absolute;
+    top: 282px;
+    left: 402px;
+    right: var(--story-safe-right);
+    z-index: 4;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .story-event__format,
+  .story-event__progress {
+    margin: 0;
+    font: 600 0.96rem/1 var(--font-display);
+    letter-spacing: 0.16em;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .story-event__date-time {
+    position: absolute;
+    top: 364px;
+    left: var(--story-safe-left);
+    z-index: 4;
+    display: flex;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .story-event__date-card {
+    display: grid;
+    justify-items: start;
+    gap: 0.15rem;
+    padding: 1.05rem 1.2rem 1rem;
+    background: rgba(245, 237, 226, 0.94);
+    color: #181513;
+  }
+
+  .story-event__weekday,
+  .story-event__month {
+    font: 600 0.98rem/1 var(--font-display);
+    letter-spacing: 0.14em;
+    color: rgba(24, 21, 19, 0.58);
+  }
+
+  .story-event__date-card strong {
+    font: 700 5rem/0.86 var(--font-display);
+    letter-spacing: -0.07em;
+  }
+
+  .story-event__time-card {
+    display: grid;
+    align-content: start;
+    gap: 0.42rem;
+    min-width: 332px;
+    padding: 1rem 1.2rem 1rem;
+    background:
+      linear-gradient(180deg, rgba(26, 22, 19, 0.86) 0%, rgba(18, 15, 14, 0.96) 100%);
+    color: #fff5ec;
+    box-shadow: 0 24px 44px rgba(18, 14, 12, 0.16);
+  }
+
+  .story-event__time-label {
+    font: 600 0.94rem/1 var(--font-display);
+    letter-spacing: 0.16em;
+    color: rgba(255, 245, 236, 0.68);
+  }
+
+  .story-event__time-card strong {
+    font: 700 3.68rem/0.86 var(--font-display);
+    letter-spacing: -0.06em;
+    color: #fff5ec;
+  }
+
+  .story-event__time-venue {
+    margin: 0.18rem 0 0;
+    font: 500 1.08rem/1.18 var(--font-body);
+    color: rgba(255, 245, 236, 0.78);
+    text-wrap: balance;
+    hyphens: auto;
+  }
+
+  .story-event__copy {
+    position: absolute;
+    left: var(--story-safe-left);
+    right: 412px;
+    bottom: 504px;
+    z-index: 4;
+  }
+
+  .story-event__title {
+    --story-event-title-size: 5.58rem;
+    --story-event-title-max: 8.6ch;
+    margin: 0;
+    max-width: var(--story-event-title-max);
+    font: 700 var(--story-event-title-size)/0.88 var(--font-display);
+    letter-spacing: -0.07em;
+    color: #16120f;
+    text-wrap: balance;
+    hyphens: auto;
+  }
+
+  .story-event__title-line {
+    display: block;
+  }
+
+  .story-event__support {
+    margin-top: 1.05rem;
+    display: grid;
+    gap: 0.18rem;
+  }
+
+  .story-event__support-line {
+    margin: 0;
+    font: 700 1.34rem/1.02 var(--font-display);
+    letter-spacing: -0.02em;
+    color: rgba(22, 18, 15, 0.76);
+    text-wrap: balance;
+    hyphens: auto;
+  }
+
+  .story-event__meta {
+    position: absolute;
+    left: var(--story-safe-left);
+    right: 408px;
+    bottom: 364px;
+    z-index: 4;
+    display: grid;
+    gap: 0.38rem;
+  }
+
+  .story-event__speaker {
+    margin: 0;
+    font: 700 1.24rem/1.04 var(--font-display);
+    letter-spacing: -0.02em;
+    color: rgba(22, 18, 15, 0.94);
+  }
+
+  .story-event__role {
+    margin: 0;
+    font: 500 1.02rem/1.18 var(--font-body);
+    color: rgba(24, 21, 19, 0.76);
+    max-width: 29rem;
+    text-wrap: balance;
+    hyphens: auto;
+  }
+
+  .story-event__portrait {
+    position: absolute;
+    right: -76px;
+    bottom: -4px;
+    z-index: 5;
+    width: var(--event-portrait-width-mobile, 54%);
+    max-width: 660px;
+    max-height: 88%;
+    object-fit: contain;
+    object-position: bottom center;
+    transform:
+      translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
+      scale(var(--event-portrait-size, 1));
+    transform-origin: bottom center;
+  }
+
+  .story-site__accent,
+  .story-qr__accent {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 38%;
+    background:
+      radial-gradient(circle at 44% 16%, rgba(255, 255, 255, 0.18), transparent 18rem),
+      linear-gradient(180deg, #d84b31 0%, #b33824 100%);
+    clip-path: polygon(18% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .story-site__copy,
+  .story-qr__copy {
+    position: absolute;
+    left: var(--story-safe-left);
+    right: 412px;
+    top: 420px;
+    z-index: 4;
+    display: grid;
+    gap: 0.8rem;
+    color: #171411;
+  }
+
+  .story-site__copy {
+    top: 396px;
+    right: 280px;
+    gap: 0.95rem;
+  }
+
+  .story-site__eyebrow,
+  .story-qr__eyebrow {
+    margin: 0;
+    font: 600 0.98rem/1 var(--font-display);
+    letter-spacing: 0.15em;
+    color: rgba(23, 20, 17, 0.56);
+  }
+
+  .story-site__domain {
+    margin: 0;
+    font: 700 7rem/0.86 var(--font-display);
+    letter-spacing: -0.08em;
+    color: #171411;
+  }
+
+  .story-site__title {
+    margin: 0;
+    font: 700 1.56rem/1 var(--font-display);
+    letter-spacing: 0.08em;
+    color: #d84b31;
+  }
+
+  .story-site__subtitle {
+    margin: 0;
+    max-width: 26rem;
+    font: 500 1.16rem/1.22 var(--font-body);
+    color: rgba(23, 20, 17, 0.8);
+  }
+
+  .story-site__footer {
+    margin: 0;
+    max-width: 23rem;
+    font: 600 0.94rem/1.22 var(--font-display);
+    letter-spacing: 0.12em;
+    color: rgba(23, 20, 17, 0.52);
+  }
+
+  .story-qr__title {
+    margin: 0;
+    font: 700 7rem/0.88 var(--font-display);
+    letter-spacing: -0.08em;
+    color: #171411;
+  }
+
+  .story-qr__cta {
+    margin: 0;
+    font: 700 1.46rem/1 var(--font-display);
+    letter-spacing: 0.12em;
+    color: #d84b31;
+  }
+
+  .story-qr__handle {
+    margin: 0;
+    font: 700 2.56rem/0.94 var(--font-display);
+    letter-spacing: -0.05em;
+  }
+
+  .story-qr__subtitle {
+    margin: 0;
+    font: 500 1.16rem/1.22 var(--font-body);
+    color: rgba(23, 20, 17, 0.78);
+  }
+
+  .story-qr__footer {
+    margin: 0;
+    font: 600 0.94rem/1.2 var(--font-display);
+    letter-spacing: 0.12em;
+    color: rgba(23, 20, 17, 0.46);
+  }
+
+  .story-qr__code-shell {
+    position: absolute;
+    right: 74px;
+    bottom: 378px;
+    z-index: 4;
+  }
+
+  .story-qr__code {
+    width: 398px;
+    height: 398px;
+    padding: 18px;
+    background: white;
+    box-shadow: 0 28px 72px rgba(28, 20, 17, 0.14);
+  }
+
+  .anim {
+    animation-duration: var(--anim-duration, var(--scene-duration));
+    animation-fill-mode: both;
+    animation-iteration-count: 1;
+    animation-play-state: paused;
+    animation-timing-function: cubic-bezier(0.19, 0.86, 0.24, 1);
+    will-change: transform, opacity, clip-path;
+  }
+
+  .anim--fade {
+    animation-name: storyFade;
+  }
+
+  .anim--fade-up {
+    animation-name: storyFadeUp;
+    animation-delay: var(--anim-delay, 0ms);
+  }
+
+  .anim--slide-up {
+    animation-name: storySlideUp;
+    animation-delay: var(--anim-delay, 0ms);
+  }
+
+  .anim--slide-down {
+    animation-name: storySlideDown;
+    animation-delay: var(--anim-delay, 0ms);
+  }
+
+  .anim--title {
+    animation-name: storyTitle;
+    animation-delay: var(--anim-delay, 0ms);
+  }
+
+  .anim--wipe-up {
+    animation-name: storyWipeUp;
+  }
+
+  .anim--panel-up {
+    animation-name: storyPanelUp;
+    animation-delay: var(--anim-delay, 0ms);
+  }
+
+  .anim--photo-reveal {
+    animation-name: storyPhotoReveal;
+  }
+
+  .anim--portrait-reveal {
+    animation-name: storyPortraitReveal;
+    animation-delay: var(--anim-delay, 320ms);
+  }
+
+  .anim--qr {
+    animation-name: storyQr;
+    animation-delay: var(--anim-delay, 0ms);
+  }
+
+  @keyframes storySceneDrift {
+    0% {
+      transform: translateY(8px) scale(1.015);
+    }
+    100% {
+      transform: translateY(-2px) scale(1);
+    }
+  }
+
+  @keyframes storyFade {
+    0% {
+      opacity: 0;
+    }
+    14%,
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes storyFadeUp {
+    0% {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    34%,
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes storySlideUp {
+    0% {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    36%,
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes storySlideDown {
+    0% {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+    32%,
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes storyTitle {
+    0% {
+      opacity: 0;
+      transform: translateY(16px) scale(0.998);
+    }
+    38%,
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes storyWipeUp {
+    0% {
+      clip-path: inset(100% 0 0 0);
+    }
+    26%,
+    100% {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes storyPanelUp {
+    0% {
+      opacity: 0;
+      transform: translateY(44px);
+    }
+    30%,
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes storyEventCamera {
+    0% {
+      transform: translate3d(-18px, 18px, 0) scale(1.04);
+    }
+    100% {
+      transform: translate3d(8px, -6px, 0) scale(1);
+    }
+  }
+
+  @keyframes storyPhotoReveal {
+    0% {
+      opacity: 0;
+      transform: scale(var(--event-photo-scale, 1.04));
+    }
+    18%,
+    100% {
+      opacity: 1;
+      transform: scale(var(--event-photo-scale, 1.04));
+    }
+  }
+
+  @keyframes storyPortraitReveal {
+    0% {
+      opacity: 0;
+      transform:
+        translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
+        scale(var(--event-portrait-size, 1));
+    }
+    18%,
+    100% {
+      opacity: 1;
+      transform:
+        translate(var(--event-portrait-shift-x, 0rem), var(--event-portrait-shift-y, 0rem))
+        scale(var(--event-portrait-size, 1));
+    }
+  }
+
+  @keyframes storyQr {
+    0% {
+      opacity: 0;
+      transform: translateY(14px) scale(0.992);
+    }
+    34%,
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @media (max-width: 1460px) {
+    .story-preview-page {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

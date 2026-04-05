@@ -1,0 +1,89 @@
+---
+import PreviewLayout from '../../layouts/PreviewLayout.astro';
+import { getVideoStoryScenes } from '../../lib/video-story-scenes';
+
+const scenes = getVideoStoryScenes();
+---
+
+<PreviewLayout title="Video Story Preview">
+  <main class="story-index">
+    <div class="story-index__card">
+      <p class="story-index__eyebrow">VERTICAL STORY PREVIEW</p>
+      <h1>Анонс недели</h1>
+      <p class="story-index__lead">
+        Внутренний preview для короткого ролика `1080x1920` о событиях недели `6–12 апреля 2026`.
+      </p>
+      <div class="story-index__grid">
+        {scenes.map((scene) => (
+          <a class="story-index__link" href={`/video-story/${scene.slug}/`}>
+            <strong>{scene.label}</strong>
+            <span>{(scene.durationMs / 1000).toFixed(1)} сек</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </main>
+</PreviewLayout>
+
+<style>
+  .story-index {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+  }
+
+  .story-index__card {
+    width: min(100%, 58rem);
+    padding: 2rem;
+    background: rgba(17, 14, 14, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(18px);
+  }
+
+  .story-index__eyebrow {
+    margin: 0 0 0.8rem;
+    font: 600 0.84rem/1 var(--font-display);
+    letter-spacing: 0.16em;
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .story-index h1 {
+    margin: 0;
+    font: 700 clamp(2.6rem, 6vw, 4.6rem)/0.92 var(--font-display);
+    color: white;
+  }
+
+  .story-index__lead {
+    margin: 1rem 0 0;
+    max-width: 42rem;
+    font: 400 1.06rem/1.45 var(--font-body);
+    color: rgba(255, 255, 255, 0.76);
+  }
+
+  .story-index__grid {
+    margin-top: 1.8rem;
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .story-index__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .story-index__link strong {
+    font: 700 1.18rem/1.05 var(--font-display);
+  }
+
+  .story-index__link span {
+    font: 500 0.92rem/1 var(--font-body);
+    color: rgba(255, 255, 255, 0.62);
+  }
+</style>
