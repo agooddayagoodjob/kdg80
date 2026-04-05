@@ -47,12 +47,12 @@ const deliverableRoot = path.join(workspaceRoot, 'outputs', 'video');
 const deliverablePath = path.join(deliverableRoot, `${outputBaseName}.mp4`);
 
 const scenes = [
-  { slug: 'week-intro', durationMs: 2600 },
-  { slug: 'week-priroda-chemodana', durationMs: 5000 },
-  { slug: 'week-zoo-right', durationMs: 5200 },
-  { slug: 'week-nostalgia', durationMs: 5000 },
-  { slug: 'week-bridge', durationMs: 5200 },
-  { slug: 'week-site', durationMs: 2800 },
+  { slug: 'week-intro', durationMs: 2800 },
+  { slug: 'week-priroda-chemodana', durationMs: 5800 },
+  { slug: 'week-zoo-right', durationMs: 6000 },
+  { slug: 'week-nostalgia', durationMs: 5800 },
+  { slug: 'week-bridge', durationMs: 6000 },
+  { slug: 'week-site', durationMs: 3200 },
   { slug: 'week-telegram', durationMs: 3400 },
   { slug: 'week-max', durationMs: 3400 },
 ];

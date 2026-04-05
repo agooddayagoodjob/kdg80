@@ -34,6 +34,8 @@ export type VideoStoryEventScene = VideoStorySceneBase & {
   speakerLine: string;
   speakerRoleLine: string;
   venueLine: string;
+  locationTitle: string;
+  locationLine: string;
   image: string;
   portraitImage?: string;
   portraitStyle?: string;
@@ -104,59 +106,57 @@ const EVENT_SCENE_SEEDS: EventSceneSeed[] = [
     slug: 'week-priroda-chemodana',
     label: 'Анонс недели / Природа чемодана',
     eventSlug: 'priroda-chemodana',
-    durationMs: 5000,
+    durationMs: 5800,
     titleLines: ['ПРИРОДА', 'ЧЕМОДАНА'],
     supportLines: ['СОВЕТСКОЕ ДЕТСТВО, ВЕЩИ', 'И ПАМЯТЬ О НОВОЙ ЖИЗНИ'],
     portraitStyle:
-      '--event-portrait-size:1.16; --event-portrait-width-mobile:60%; --event-portrait-shift-x:-0.18rem; --event-portrait-shift-y:0rem;',
-    photoStyle: '--event-photo-position: 52% 50%; --event-photo-scale: 1.04;',
+      '--event-portrait-size:1.22; --event-portrait-width-mobile:61%; --event-portrait-shift-x:-0.1rem; --event-portrait-shift-y:0rem;',
+    photoStyle: '--event-photo-position: 50% 50%; --event-photo-scale: 1.02;',
   },
   {
     slug: 'week-zoo-right',
     label: 'Анонс недели / Зоопарки в современном мире',
     eventSlug: 'pravo-na-suschestvovanie-zooparki-v-sovremennom-mire-perspektivy-razvitiya-kaliningradskogo-zooparka',
-    durationMs: 5200,
+    durationMs: 6000,
     titleLines: ['ЗООПАРКИ', 'В СОВРЕМЕННОМ', 'МИРЕ'],
     supportLines: ['ПЕРСПЕКТИВЫ РАЗВИТИЯ', 'КАЛИНИНГРАДСКОГО ЗООПАРКА'],
     titleStyle: '--story-event-title-size:5.2rem; --story-event-title-max:8.8ch;',
     portraitStyle:
-      '--event-portrait-size:1.24; --event-portrait-width-mobile:58%; --event-portrait-shift-x:-0.1rem; --event-portrait-shift-y:0rem;',
-    photoStyle: '--event-photo-position: 86% 64%; --event-photo-scale: 1.01;',
+      '--event-portrait-size:1.3; --event-portrait-width-mobile:60%; --event-portrait-shift-x:-0.04rem; --event-portrait-shift-y:0rem;',
+    photoStyle: '--event-photo-position: 77% 54%; --event-photo-scale: 0.96;',
   },
   {
     slug: 'week-nostalgia',
     label: 'Анонс недели / Ностальгический разговор',
     eventSlug: 'nostalgicheskiy-razgovor',
-    durationMs: 5000,
+    durationMs: 5800,
     titleLines: ['НОСТАЛЬГИЧЕСКИЙ', 'РАЗГОВОР'],
     supportLines: ['КАК ГОВОРИТЬ О ПРОШЛОМ', 'БЕЗ ШТАМПОВ И МЕЛОДРАМЫ'],
     titleStyle: '--story-event-title-size:4.98rem; --story-event-title-max:10.8ch;',
     portraitStyle:
-      '--event-portrait-size:1.18; --event-portrait-width-mobile:56%; --event-portrait-shift-x:-0.08rem; --event-portrait-shift-y:0rem;',
-    photoStyle: '--event-photo-position: 42% 48%; --event-photo-scale: 1.04;',
+      '--event-portrait-size:1.24; --event-portrait-width-mobile:58%; --event-portrait-shift-x:-0.02rem; --event-portrait-shift-y:0rem;',
+    photoStyle: '--event-photo-position: 46% 46%; --event-photo-scale: 1;',
   },
   {
     slug: 'week-bridge',
     label: 'Анонс недели / Мост, который соединяет времена',
     eventSlug: 'most-kotoryy-soedinyaet-vremena-dvuhyarusnyy-most-proshloe-nastoyaschee-i-buduschee',
-    durationMs: 5200,
+    durationMs: 6000,
     titleLines: ['МОСТ, КОТОРЫЙ', 'СОЕДИНЯЕТ', 'ВРЕМЕНА'],
     supportLines: ['ДВУХЪЯРУСНЫЙ МОСТ:', 'ПРОШЛОЕ, НАСТОЯЩЕЕ, БУДУЩЕЕ'],
     titleStyle: '--story-event-title-size:5rem; --story-event-title-max:10.5ch;',
     portraitImage: '/generated/speaker-strip/mosienko-evgeniy.webp',
     portraitStyle:
-      '--event-portrait-size:1.22; --event-portrait-width-mobile:62%; --event-portrait-shift-x:-0.12rem; --event-portrait-shift-y:0rem;',
-    photoStyle: '--event-photo-position: 50% 40%; --event-photo-scale: 1.0;',
-    photoVeilStyle: '--event-photo-veil-left: 0.22; --event-photo-veil-mid: 0.12; --event-photo-veil-bottom: 0.5;',
+      '--event-portrait-size:1.28; --event-portrait-width-mobile:64%; --event-portrait-shift-x:-0.04rem; --event-portrait-shift-y:0rem;',
+    photoStyle:
+      '--event-photo-shell-height: 980px; --event-photo-fit: cover; --event-photo-position: 50% 55%; --event-photo-scale: 1.06; --event-scene-background: #6d7c89; --event-camera-start-scale: 1.006; --event-camera-end-scale: 1.028; --event-camera-start-x: -12px; --event-camera-end-x: 10px; --event-camera-start-y: 10px; --event-camera-end-y: -8px;',
+    photoVeilStyle:
+      '--event-photo-veil-top: 0.02; --event-photo-veil-left: 0.15; --event-photo-veil-mid: 0.05; --event-photo-veil-bottom: 0.42;',
   },
 ];
 
-function getShortSpeakerName(value: string) {
-  const parts = value.trim().split(/\s+/).filter(Boolean);
-  if (parts.length >= 2) {
-    return `${parts[0]} ${parts.at(-1) ?? ''}`.trim();
-  }
-  return value.trim();
+function getFullSpeakerName(value: string) {
+  return value.replace(/\s+/g, ' ').trim();
 }
 
 function parseStoryDate(dateLabel: string) {
@@ -173,6 +173,50 @@ function parseStoryDate(dateLabel: string) {
     dayNumber: match[1].padStart(2, '0'),
     monthLabel: MONTHS_SHORT[match[2].toLowerCase()] ?? match[2].slice(0, 3).toUpperCase(),
     weekdayLabel: WEEKDAYS_SHORT[match[3].toLowerCase()] ?? match[3].slice(0, 2).toUpperCase(),
+  };
+}
+
+function formatStoryLocation(venue: string, address: string) {
+  const locationLookup = `${venue} ${address}`.toLowerCase();
+
+  if (locationLookup.includes('фридланд')) {
+    return {
+      locationTitle: 'Музей «Фридландские ворота»',
+      locationLine: 'Корпус Блокгауз · ул. Дзержинского, 30',
+    };
+  }
+
+  if (locationLookup.includes('океани') || locationLookup.includes('мирового океана')) {
+    return {
+      locationTitle: 'Музей Мирового океана',
+      locationLine: 'Лекторий ОКЕАНиЯ · наб. Петра Великого, 1',
+    };
+  }
+
+  if (locationLookup.includes('чехова') || locationLookup.includes('центральная городская библиотека')) {
+    return {
+      locationTitle: 'Библиотека им. А. П. Чехова',
+      locationLine: 'Лекционный зал · Московский пр-т, 39',
+    };
+  }
+
+  if (locationLookup.includes('научная библиотека') || locationLookup.includes('лекционный зал')) {
+    return {
+      locationTitle: 'Калининградская областная научная библиотека',
+      locationLine: 'Лекционный зал, 4 этаж · проспект Мира, 9/11',
+    };
+  }
+
+  if (locationLookup.includes('историко-художественный музей')) {
+    return {
+      locationTitle: 'Калининградский областной историко-художественный музей',
+      locationLine: 'Главный корпус · ул. Клиническая, 21',
+    };
+  }
+
+  return {
+    locationTitle: venue.trim(),
+    locationLine: address.trim(),
   };
 }
 
@@ -197,6 +241,7 @@ function createEventScene(seed: EventSceneSeed, index: number, total: number): V
     .filter(Boolean)
     .join(' ') || undefined;
   const dateParts = parseStoryDate(event.dateLabel);
+  const storyLocation = formatStoryLocation(event.venue, event.address);
 
   return {
     slug: seed.slug,
@@ -213,9 +258,11 @@ function createEventScene(seed: EventSceneSeed, index: number, total: number): V
     weekdayLabel: dateParts.weekdayLabel,
     titleLines: seed.titleLines,
     supportLines: seed.supportLines,
-    speakerLine: getShortSpeakerName(event.speakerLabel),
+    speakerLine: getFullSpeakerName(event.speakerLabel),
     speakerRoleLine: getSpeakerCaption(event.heroRole || event.affiliation),
     venueLine: event.venue,
+    locationTitle: storyLocation.locationTitle,
+    locationLine: storyLocation.locationLine,
     image: event.image ?? '',
     portraitImage,
     portraitStyle,
@@ -243,7 +290,7 @@ export function getVideoStoryScenes(): VideoStoryScene[] {
       slug: 'week-intro',
       label: 'Анонс недели / Интро',
       kind: 'intro',
-      durationMs: 2600,
+      durationMs: 2800,
       titleLines: ['АНОНС', 'НЕДЕЛИ'],
       supportLine: 'ФЕСТИВАЛЬ «80 ИСТОРИЙ О ГЛАВНОМ»',
       period: '6–12 АПРЕЛЯ 2026',
@@ -255,7 +302,7 @@ export function getVideoStoryScenes(): VideoStoryScene[] {
       slug: 'week-site',
       label: 'Анонс недели / Сайт',
       kind: 'site',
-      durationMs: 2800,
+      durationMs: 3200,
       eyebrow: 'ПОЛНАЯ ПРОГРАММА И РЕГИСТРАЦИЯ',
       title: 'РЕГИСТРАЦИЯ НА СОБЫТИЯ',
       domain: 'KGD80.RU',

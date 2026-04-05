@@ -3,87 +3,330 @@ import PreviewLayout from '../../layouts/PreviewLayout.astro';
 import { getVideoStoryScenes } from '../../lib/video-story-scenes';
 
 const scenes = getVideoStoryScenes();
+
+const specs = [
+  ['Canvas', '1080x1920 · 9:16 vertical story'],
+  ['Safe area', 'критичный текст внутри ~250 px сверху и ~340 px снизу'],
+  ['Export', '30 fps · H.264 · AAC · playback-safe mp4'],
+  ['Hook', 'hero-lockup фестиваля в интро + быстрый вход в 4 события недели'],
+];
+
+const motionRules = [
+  'Одна сцена = один главный вектор внимания: сначала дата и время, затем название, затем спикер и регалии.',
+  'Никаких ранних остановок: фото, портрет и камера продолжают мягкий drift до конца readable-beat.',
+  'Фото всегда full-bleed без чёрных полей, а split-плоскость не имеет права визуально разрезать спикера.',
+  'Дата и время крупные; площадка идёт institution-first: сначала музей / библиотека, затем корпус или зал и адрес.',
+];
+
+const workflow = [
+  'Меняем weekly scenes в `src/lib/video-story-scenes.ts`: порядок, тексты, длительности, cropping и логика CTA.',
+  'Шлифуем композицию и анимацию в `src/pages/video-story/[scene].astro` на отдельных scene-preview маршрутах.',
+  'Проверяем real render через `scripts/capture_video_story_weekly.mjs` и финально собираем mp4 через `scripts/render_video_story_weekly.mjs`.',
+  'Перед релизом вручную проверяем intro, bridge-scene, site-CTA и оба QR на desktop и mobile.',
+];
+
+const commands = [
+  ['Build preview', 'cd /workspaces/kdg80/site && npm run build'],
+  ['Capture desktop/mobile', 'cd /workspaces/kdg80/site && VIDEO_STORY_PORT=4327 node scripts/capture_video_story_weekly.mjs'],
+  ['Render weekly story', "cd /workspaces/kdg80/site && node scripts/render_video_story_weekly.mjs --profile=playback-safe --quality=high --fps=30 --tag=next-week-20260406-20260412"],
+  ['Render with audio offset', "cd /workspaces/kdg80/site && node scripts/render_video_story_weekly.mjs --profile=playback-safe --quality=high --fps=30 --tag=next-week-20260406-20260412 --audio='/workspaces/kdg80/Исходные данные/The_xx_-_Intro.mp3' --audio-start-seconds=19"],
+];
 ---
 
-<PreviewLayout title="Video Story Preview">
+<PreviewLayout title="Video Story Playbook">
   <main class="story-index">
-    <div class="story-index__card">
-      <p class="story-index__eyebrow">VERTICAL STORY PREVIEW</p>
-      <h1>Анонс недели</h1>
-      <p class="story-index__lead">
-        Внутренний preview для короткого ролика `1080x1920` о событиях недели `6–12 апреля 2026`.
-      </p>
-      <div class="story-index__grid">
-        {scenes.map((scene) => (
-          <a class="story-index__link" href={`/video-story/${scene.slug}/`}>
-            <strong>{scene.label}</strong>
-            <span>{(scene.durationMs / 1000).toFixed(1)} сек</span>
-          </a>
-        ))}
+    <section class="story-index__hero">
+      <div class="story-index__paper">
+        <p class="story-index__eyebrow">WEEKLY MOBILE STORY PLAYBOOK</p>
+        <img
+          class="story-index__brand"
+          src="/shared-assets/logo-80-istorii-hero.svg"
+          alt="80 историй о главном"
+        />
+        <h1>Анонс недели</h1>
+        <p class="story-index__lead">
+          Внутренний маршрут для weekly-story ролика: формат, motion-инварианты, безопасные зоны,
+          порядок сцен и команды для build, capture и финального render-прохода.
+        </p>
+        <div class="story-index__badges">
+          <span>06–12 апреля 2026</span>
+          <span>4 события</span>
+          <span>kgd80.ru + Telegram + MAX</span>
+        </div>
       </div>
-    </div>
+
+      <aside class="story-index__rail">
+        <p class="story-index__rail-label">Scene Order</p>
+        <nav class="story-index__scene-list" aria-label="Список weekly story сцен">
+          {scenes.map((scene) => (
+            <a class="story-index__scene-link" href={`/video-story/${scene.slug}/`}>
+              <strong>{scene.label}</strong>
+              <span>{(scene.durationMs / 1000).toFixed(1)} сек</span>
+            </a>
+          ))}
+        </nav>
+      </aside>
+    </section>
+
+    <section class="story-index__grid">
+      <article class="story-index__panel">
+        <p class="story-index__panel-label">Spec</p>
+        <div class="story-index__spec-list">
+          {specs.map(([label, value]) => (
+            <div class="story-index__spec-row">
+              <span>{label}</span>
+              <strong>{value}</strong>
+            </div>
+          ))}
+        </div>
+      </article>
+
+      <article class="story-index__panel">
+        <p class="story-index__panel-label">Motion</p>
+        <div class="story-index__rule-list">
+          {motionRules.map((rule) => (
+            <p>{rule}</p>
+          ))}
+        </div>
+      </article>
+
+      <article class="story-index__panel">
+        <p class="story-index__panel-label">Workflow</p>
+        <div class="story-index__rule-list">
+          {workflow.map((step) => (
+            <p>{step}</p>
+          ))}
+        </div>
+      </article>
+
+      <article class="story-index__panel story-index__panel--commands">
+        <p class="story-index__panel-label">Commands</p>
+        <div class="story-index__command-list">
+          {commands.map(([label, command]) => (
+            <div class="story-index__command">
+              <strong>{label}</strong>
+              <pre><code>{command}</code></pre>
+            </div>
+          ))}
+        </div>
+      </article>
+    </section>
   </main>
 </PreviewLayout>
 
 <style>
   .story-index {
     min-height: 100vh;
+    padding: clamp(1.2rem, 2vw, 2rem);
+    background:
+      radial-gradient(circle at 18% 12%, rgba(216, 75, 49, 0.18), transparent 24rem),
+      linear-gradient(180deg, #120f10 0%, #1a1414 100%);
+  }
+
+  .story-index__hero {
     display: grid;
-    place-items: center;
-    padding: 2rem;
-  }
-
-  .story-index__card {
-    width: min(100%, 58rem);
-    padding: 2rem;
-    background: rgba(17, 14, 14, 0.82);
+    grid-template-columns: minmax(0, 1.55fr) minmax(18rem, 0.85fr);
+    min-height: 34rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(18px);
+    background:
+      linear-gradient(101deg, rgba(245, 237, 226, 0.99) 0%, rgba(245, 237, 226, 0.99) 68%, rgba(207, 71, 45, 0.98) 68%, rgba(179, 56, 36, 0.98) 100%);
+    box-shadow: 0 36px 90px rgba(8, 6, 6, 0.38);
+    overflow: clip;
   }
 
-  .story-index__eyebrow {
-    margin: 0 0 0.8rem;
-    font: 600 0.84rem/1 var(--font-display);
-    letter-spacing: 0.16em;
-    color: rgba(255, 255, 255, 0.62);
+  .story-index__paper {
+    padding: clamp(1.4rem, 3vw, 2.4rem);
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    color: #171411;
+  }
+
+  .story-index__eyebrow,
+  .story-index__panel-label,
+  .story-index__rail-label {
+    margin: 0;
+    font: 600 0.9rem/1 var(--font-display);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .story-index__eyebrow,
+  .story-index__panel-label {
+    color: rgba(23, 20, 17, 0.58);
+  }
+
+  .story-index__brand {
+    width: min(26rem, 100%);
+    max-width: 100%;
+    display: block;
+    filter: brightness(0) saturate(100%);
   }
 
   .story-index h1 {
     margin: 0;
-    font: 700 clamp(2.6rem, 6vw, 4.6rem)/0.92 var(--font-display);
-    color: white;
+    max-width: 7ch;
+    font: 700 clamp(3rem, 8vw, 6.4rem)/0.84 var(--font-display);
+    letter-spacing: -0.08em;
+    color: #171411;
+    text-transform: uppercase;
   }
 
   .story-index__lead {
-    margin: 1rem 0 0;
-    max-width: 42rem;
-    font: 400 1.06rem/1.45 var(--font-body);
-    color: rgba(255, 255, 255, 0.76);
+    margin: 0;
+    max-width: 36rem;
+    font: 500 1.08rem/1.36 var(--font-body);
+    color: rgba(23, 20, 17, 0.78);
+  }
+
+  .story-index__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+
+  .story-index__badges span {
+    padding: 0.58rem 0.78rem 0.52rem;
+    background: rgba(23, 20, 17, 0.07);
+    font: 700 0.94rem/1 var(--font-display);
+    letter-spacing: 0.06em;
+    color: #171411;
+  }
+
+  .story-index__rail {
+    padding: clamp(1.2rem, 3vw, 2rem);
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    color: #fff7ef;
+  }
+
+  .story-index__rail-label {
+    color: rgba(255, 247, 239, 0.78);
+  }
+
+  .story-index__scene-list {
+    display: grid;
+    gap: 0.62rem;
+  }
+
+  .story-index__scene-link {
+    display: grid;
+    gap: 0.24rem;
+    padding: 0.86rem 0.9rem 0.82rem;
+    border: 1px solid rgba(255, 247, 239, 0.16);
+    background: rgba(22, 16, 14, 0.18);
+    color: #fff7ef;
+    transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease;
+  }
+
+  .story-index__scene-link:hover,
+  .story-index__scene-link:focus-visible {
+    transform: translateY(-2px);
+    background: rgba(22, 16, 14, 0.28);
+    border-color: rgba(255, 247, 239, 0.3);
+  }
+
+  .story-index__scene-link strong {
+    font: 700 1.02rem/0.96 var(--font-display);
+    letter-spacing: -0.03em;
+  }
+
+  .story-index__scene-link span {
+    font: 600 0.88rem/1 var(--font-display);
+    letter-spacing: 0.12em;
+    color: rgba(255, 247, 239, 0.72);
   }
 
   .story-index__grid {
-    margin-top: 1.8rem;
+    margin-top: 1rem;
     display: grid;
-    gap: 0.8rem;
-  }
-
-  .story-index__link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
-    padding: 1rem 1.1rem;
-    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .story-index__panel {
+    min-height: 100%;
+    padding: 1.3rem 1.35rem 1.4rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.9);
+    background: rgba(17, 13, 13, 0.82);
+    backdrop-filter: blur(16px);
+    color: #fff7ef;
   }
 
-  .story-index__link strong {
-    font: 700 1.18rem/1.05 var(--font-display);
+  .story-index__panel--commands {
+    grid-column: 1 / -1;
   }
 
-  .story-index__link span {
-    font: 500 0.92rem/1 var(--font-body);
-    color: rgba(255, 255, 255, 0.62);
+  .story-index__spec-list,
+  .story-index__rule-list,
+  .story-index__command-list {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.72rem;
+  }
+
+  .story-index__spec-row {
+    display: grid;
+    gap: 0.2rem;
+    padding-top: 0.72rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .story-index__spec-row:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .story-index__spec-row span {
+    font: 600 0.84rem/1 var(--font-display);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 247, 239, 0.56);
+  }
+
+  .story-index__spec-row strong,
+  .story-index__rule-list p,
+  .story-index__command strong {
+    margin: 0;
+    font: 500 1rem/1.3 var(--font-body);
+    color: #fff7ef;
+  }
+
+  .story-index__rule-list p {
+    padding-top: 0.72rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .story-index__rule-list p:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .story-index__command {
+    display: grid;
+    gap: 0.42rem;
+  }
+
+  .story-index__command pre {
+    margin: 0;
+    padding: 0.86rem 0.92rem;
+    overflow-x: auto;
+    background: rgba(245, 237, 226, 0.06);
+    border: 1px solid rgba(245, 237, 226, 0.08);
+  }
+
+  .story-index__command code {
+    font: 500 0.94rem/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: rgba(255, 247, 239, 0.88);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  @media (max-width: 1140px) {
+    .story-index__hero,
+    .story-index__grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
