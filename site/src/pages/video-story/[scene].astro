@@ -36,6 +36,10 @@ function getSceneTitle(value: VideoStoryScene) {
   return `${value.platform} ${value.handle}`;
 }
 
+function splitWords(value: string) {
+  return value.trim().split(/\s+/).filter(Boolean);
+}
+
 const sceneTitle = getSceneTitle(scene);
 const siteDomainMain = scene.kind === 'site' ? scene.domain.replace(/\..*$/, '') : '';
 const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.length) : '';
@@ -75,27 +79,26 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
       >
         {scene.kind === 'intro' && (
           <div class="story-intro">
-            <div class="story-intro__paper anim anim--fade"></div>
-            <div class="story-intro__accent anim anim--wipe-up"></div>
-            <div class="story-intro__grid-lines anim anim--fade"></div>
+            <div class="story-intro__paper"></div>
+            <div class="story-intro__accent"></div>
+            <div class="story-intro__grid-lines"></div>
             <img
-              class="story-intro__brand anim anim--fade-up"
+              class="story-intro__brand"
               src="/shared-assets/logo-80-istorii-hero.svg"
               alt="80 историй о главном"
-              style="--anim-delay:80ms;"
             />
-            <p class="story-intro__kicker anim anim--fade-up" style="--anim-delay:260ms;">{scene.kicker}</p>
+            <p class="story-intro__kicker">{scene.kicker}</p>
             <div class="story-intro__copy">
               {scene.titleLines.map((line, index) => (
-                <p class="story-intro__title-line anim anim--title" style={`--anim-delay:${520 + index * 150}ms;`}>
+                <p class="story-intro__title-line" style={`--line-index:${index};`}>
                   {line}
                 </p>
               ))}
             </div>
-            <p class="story-intro__support anim anim--fade-up" style="--anim-delay:1140ms;">{scene.supportLine}</p>
-            <p class="story-intro__period anim anim--slide-up" style="--anim-delay:1400ms;">{scene.period}</p>
-            <p class="story-intro__count anim anim--slide-up" style="--anim-delay:1580ms;">{scene.countLabel}</p>
-            <p class="story-intro__outline anim anim--fade" style="--anim-delay:460ms;">06—12</p>
+            <p class="story-intro__support">{scene.supportLine}</p>
+            <p class="story-intro__period anim anim--fade-up" style="--anim-delay:180ms;">{scene.period}</p>
+            <p class="story-intro__count anim anim--fade-up" style="--anim-delay:320ms;">{scene.countLabel}</p>
+            <p class="story-intro__outline">06—12</p>
           </div>
         )}
 
@@ -103,11 +106,11 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
           <div class="story-event">
             <div class="story-event__camera">
               {scene.image && (
-                <div class="story-event__photo-shell" style={scene.photoStyle}>
+                <div class="story-event__photo-shell anim anim--photo-drift" style={scene.photoStyle}>
                   <img class="story-event__photo anim anim--photo-reveal" src={scene.image} alt="" />
                 </div>
               )}
-              <div class="story-event__photo-veil anim anim--fade" style={scene.photoVeilStyle}></div>
+              <div class="story-event__photo-veil" style={scene.photoVeilStyle}></div>
               <div class="story-event__paper-panel anim anim--panel-up"></div>
               <div class="story-event__accent-rail anim anim--panel-up" style="--anim-delay:120ms;"></div>
               <img
@@ -144,8 +147,15 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
               <div class="story-event__copy">
                 <h2 class="story-event__title" style={scene.titleStyle}>
                   {scene.titleLines.map((line, index) => (
-                    <span class="story-event__title-line anim anim--title" style={`--anim-delay:${1280 + index * 180}ms;`}>
-                      {line}
+                    <span class="story-event__title-line" style={`--line-index:${index};`}>
+                      {splitWords(line).map((word, wordIndex) => (
+                        <span
+                          class="story-event__title-word anim anim--word-rise"
+                          style={`--anim-delay:${1220 + index * 190 + wordIndex * 95}ms;`}
+                        >
+                          {word}
+                        </span>
+                      ))}
                     </span>
                   ))}
                 </h2>
@@ -156,15 +166,14 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
                     </p>
                   ))}
                 </div>
-              </div>
-
-              <div class="story-event__meta">
-                <p class="story-event__speaker anim anim--fade-up" style="--anim-delay:3180ms;">{scene.speakerLine}</p>
-                <p class="story-event__role anim anim--fade-up" style="--anim-delay:3440ms;">{scene.speakerRoleLine}</p>
+                <div class="story-event__meta">
+                  <p class="story-event__speaker anim anim--fade-up" style="--anim-delay:2860ms;">{scene.speakerLine}</p>
+                  <p class="story-event__role anim anim--fade-up" style="--anim-delay:3040ms;">{scene.speakerRoleLine}</p>
+                </div>
               </div>
 
               {scene.portraitImage && (
-                <>
+                <div class="story-event__portrait-shell anim anim--portrait-drift">
                   <img
                     class="story-event__portrait-matte anim anim--portrait-reveal"
                     style={`${scene.portraitStyle ?? ''} --anim-delay:1880ms;`}
@@ -178,7 +187,7 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
                     src={scene.portraitImage}
                     alt={scene.speakerLine}
                   />
-                </>
+                </div>
               )}
             </div>
           </div>
@@ -386,21 +395,17 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
     overflow: hidden;
     isolation: isolate;
     background: #120f10;
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   .story-intro,
   .story-qr,
   .story-site {
-    --scene-drift-start-x: -10px;
-    --scene-drift-start-y: 10px;
-    --scene-drift-end-x: 12px;
-    --scene-drift-end-y: -10px;
-    --scene-drift-start-scale: 1.008;
-    --scene-drift-end-scale: 1.028;
     position: relative;
     width: 100%;
     height: 100%;
-    animation: storySceneDrift var(--scene-duration) linear both;
   }
 
   .story-intro__paper,
@@ -445,10 +450,10 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
 
   .story-intro__brand {
     position: absolute;
-    top: 156px;
+    top: 142px;
     left: 52px;
     z-index: 4;
-    width: 432px;
+    width: 456px;
   }
 
   .story-qr__brand {
@@ -463,7 +468,7 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
 
   .story-intro__kicker {
     position: absolute;
-    top: 544px;
+    top: 520px;
     left: var(--story-safe-left);
     z-index: 3;
     margin: 0;
@@ -474,24 +479,25 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
 
   .story-intro__copy {
     position: absolute;
-    top: 622px;
+    top: 562px;
     left: var(--story-safe-left);
     z-index: 4;
     display: grid;
-    gap: 0.16rem;
+    gap: 0.12rem;
   }
 
   .story-intro__title-line {
     margin: 0;
-    font: 700 5.96rem/0.88 var(--font-display);
+    font: 700 8.2rem/0.82 var(--font-display);
     letter-spacing: -0.07em;
     color: #171310;
+    text-wrap: balance;
   }
 
   .story-intro__support {
     position: absolute;
     left: var(--story-safe-left);
-    bottom: 574px;
+    bottom: 566px;
     z-index: 4;
     margin: 0;
     max-width: 31rem;
@@ -503,7 +509,7 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
   .story-intro__period {
     position: absolute;
     left: var(--story-safe-left);
-    bottom: 422px;
+    bottom: 412px;
     z-index: 4;
     margin: 0;
     font: 700 3.2rem/0.92 var(--font-display);
@@ -514,7 +520,7 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
   .story-intro__count {
     position: absolute;
     left: var(--story-safe-left);
-    bottom: 356px;
+    bottom: 346px;
     z-index: 4;
     margin: 0;
     font: 600 1.02rem/1 var(--font-display);
@@ -554,6 +560,7 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
     height: var(--event-photo-shell-height, 100%);
     overflow: hidden;
     background: var(--event-photo-shell-background, transparent);
+    z-index: 0;
   }
 
   .story-event {
@@ -580,12 +587,12 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
     position: relative;
     width: 100%;
     height: 100%;
-    animation: storyEventCamera var(--scene-duration) linear both;
   }
 
   .story-event__photo-veil {
     position: absolute;
     inset: 0;
+    z-index: 1;
     background:
       linear-gradient(
         180deg,
@@ -742,8 +749,10 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
     position: absolute;
     left: var(--story-safe-left);
     right: 352px;
-    bottom: 536px;
+    bottom: 344px;
     z-index: 4;
+    display: grid;
+    gap: 1rem;
   }
 
   .story-event__title {
@@ -759,11 +768,16 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
   }
 
   .story-event__title-line {
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15em;
+  }
+
+  .story-event__title-word {
+    display: inline-block;
   }
 
   .story-event__support {
-    margin-top: 1.05rem;
     display: grid;
     gap: 0.18rem;
   }
@@ -778,41 +792,32 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
   }
 
   .story-event__meta {
-    position: absolute;
-    right: 18px;
-    bottom: 228px;
-    z-index: 7;
-    width: 24rem;
-    isolation: isolate;
+    max-width: 23rem;
     display: grid;
-    gap: 0.58rem;
-  }
-
-  .story-event__meta::before {
-    content: '';
-    position: absolute;
-    inset: -20px -18px -20px -30px;
-    z-index: -1;
-    background:
-      linear-gradient(90deg, rgba(18, 15, 14, 0.08) 0%, rgba(18, 15, 14, 0.34) 18%, rgba(18, 15, 14, 0.68) 58%, rgba(18, 15, 14, 0.88) 100%),
-      linear-gradient(180deg, rgba(18, 15, 14, 0.74) 0%, rgba(18, 15, 14, 0.46) 72%, rgba(18, 15, 14, 0) 100%);
+    gap: 0.22rem;
   }
 
   .story-event__speaker {
     margin: 0;
-    font: 700 1.84rem/0.96 var(--font-display);
+    font: 700 1.78rem/0.96 var(--font-display);
     letter-spacing: -0.03em;
-    color: #fff8f1;
+    color: rgba(22, 18, 15, 0.96);
     text-wrap: balance;
   }
 
   .story-event__role {
     margin: 0;
-    font: 600 1.24rem/1.12 var(--font-body);
-    color: rgba(255, 245, 236, 0.88);
-    max-width: 24rem;
+    font: 600 1.14rem/1.16 var(--font-body);
+    color: rgba(22, 18, 15, 0.7);
     text-wrap: balance;
     hyphens: auto;
+  }
+
+  .story-event__portrait-shell {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
   }
 
   .story-event__portrait-matte,
@@ -1000,14 +1005,13 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
 
   .story-intro__paper,
   .story-intro__grid-lines,
-  .story-intro__accent,
   .story-site__paper,
-  .story-site__accent,
   .story-qr__paper,
-  .story-qr__accent,
   .story-event__paper-panel,
   .story-event__accent-rail,
-  .story-event__photo-veil {
+  .story-event__photo-veil,
+  .story-intro__period,
+  .story-intro__count {
     --anim-duration: 820ms;
   }
 
@@ -1020,8 +1024,6 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
 
   .story-intro__kicker,
   .story-intro__support,
-  .story-intro__period,
-  .story-intro__count,
   .story-intro__outline,
   .story-event__format,
   .story-event__progress,
@@ -1042,12 +1044,14 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
     --anim-duration: 940ms;
   }
 
-  .story-intro__title-line,
-  .story-event__title-line,
-  .story-site__domain-main,
-  .story-site__domain-tld,
+  .story-event__title-word,
   .story-qr__title {
-    --anim-duration: 1040ms;
+    --anim-duration: 860ms;
+  }
+
+  .story-site__domain-main,
+  .story-site__domain-tld {
+    --anim-duration: 820ms;
   }
 
   .story-event__photo,
@@ -1057,13 +1061,18 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
     --anim-duration: 980ms;
   }
 
+  .story-event__photo-shell,
+  .story-event__portrait-shell {
+    --anim-duration: var(--scene-duration);
+  }
+
   .anim {
     animation-duration: var(--anim-duration, var(--scene-duration));
     animation-fill-mode: both;
     animation-iteration-count: 1;
     animation-play-state: paused;
-    animation-timing-function: cubic-bezier(0.19, 0.86, 0.24, 1);
-    will-change: transform, opacity, clip-path;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform, opacity;
   }
 
   .anim--fade {
@@ -1090,6 +1099,11 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
     animation-delay: var(--anim-delay, 0ms);
   }
 
+  .anim--word-rise {
+    animation-name: storyWordRise;
+    animation-delay: var(--anim-delay, 0ms);
+  }
+
   .anim--wipe-up {
     animation-name: storyWipeUp;
   }
@@ -1103,6 +1117,14 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
     animation-name: storyPhotoReveal;
   }
 
+  .anim--photo-drift {
+    animation-name: storyPhotoDrift;
+  }
+
+  .anim--portrait-drift {
+    animation-name: storyPortraitDrift;
+  }
+
   .anim--portrait-reveal {
     animation-name: storyPortraitReveal;
     animation-delay: var(--anim-delay, 320ms);
@@ -1111,19 +1133,6 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
   .anim--qr {
     animation-name: storyQr;
     animation-delay: var(--anim-delay, 0ms);
-  }
-
-  @keyframes storySceneDrift {
-    0% {
-      transform:
-        translate3d(var(--scene-drift-start-x, -10px), var(--scene-drift-start-y, 10px), 0)
-        scale(var(--scene-drift-start-scale, 1.008));
-    }
-    100% {
-      transform:
-        translate3d(var(--scene-drift-end-x, 12px), var(--scene-drift-end-y, -10px), 0)
-        scale(var(--scene-drift-end-scale, 1.028));
-    }
   }
 
   @keyframes storyFade {
@@ -1171,12 +1180,21 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
   @keyframes storyTitle {
     0% {
       opacity: 0;
-      clip-path: inset(0 0 100% 0);
-      transform: translateY(10px);
+      transform: translateY(14px);
     }
     100% {
       opacity: 1;
-      clip-path: inset(0 0 0 0);
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes storyWordRise {
+    0% {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    100% {
+      opacity: 1;
       transform: translateY(0);
     }
   }
@@ -1201,7 +1219,7 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
     }
   }
 
-  @keyframes storyEventCamera {
+  @keyframes storyPhotoDrift {
     0% {
       transform:
         translate3d(var(--event-camera-start-x, -16px), var(--event-camera-start-y, 14px), 0)
@@ -1214,10 +1232,23 @@ const siteDomainTld = scene.kind === 'site' ? scene.domain.slice(siteDomainMain.
     }
   }
 
+  @keyframes storyPortraitDrift {
+    0% {
+      transform:
+        translate3d(var(--event-portrait-drift-start-x, -8px), var(--event-portrait-drift-start-y, 10px), 0)
+        scale(var(--event-portrait-drift-start-scale, 1.006));
+    }
+    100% {
+      transform:
+        translate3d(var(--event-portrait-drift-end-x, 8px), var(--event-portrait-drift-end-y, -8px), 0)
+        scale(var(--event-portrait-drift-end-scale, 1.024));
+    }
+  }
+
   @keyframes storyPhotoReveal {
     0% {
       opacity: 0;
-      transform: scale(var(--event-photo-scale, 1.04));
+      transform: scale(calc(var(--event-photo-scale, 1.04) + 0.018));
     }
     100% {
       opacity: 1;
