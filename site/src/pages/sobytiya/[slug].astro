@@ -103,7 +103,14 @@ const structuredData = {
             </nav>
 
             <div class="event-leaf__identity">
-              <EventCard event={event} now={now} showActions={false} linkToDetails={false} headingLevel="page" />
+              <EventCard
+                event={event}
+                now={now}
+                showActions={false}
+                linkToDetails={false}
+                expandSummary={true}
+                headingLevel="page"
+              />
             </div>
 
             <div class="event-leaf__hero">

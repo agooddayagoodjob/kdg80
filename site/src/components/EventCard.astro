@@ -14,6 +14,7 @@ interface Props {
   now?: Date;
   showActions?: boolean;
   linkToDetails?: boolean;
+  expandSummary?: boolean;
   headingLevel?: 'default' | 'page';
 }
 
@@ -22,6 +23,7 @@ const {
   now = new Date(),
   showActions = true,
   linkToDetails = true,
+  expandSummary = false,
   headingLevel = 'default',
 } = Astro.props;
 
@@ -228,6 +230,7 @@ const dialogueStageParticipants = visualDialogueParticipants.length
 const cardText = getCardText(event);
 const cardExtraText = getCardExtraText(event);
 const hasExpandableCardSummary = hasExpandableSummary(event);
+const showExpandedCardSummary = expandSummary && hasExpandableCardSummary;
 const hasSpeakerAbout = shouldShowSpeakerAbout(event);
 const useScientificLibraryVisitSchedule = usesScientificLibraryVisitSchedule(event);
 const accessLabel = event.accessLabel ?? 'Бесплатно';
@@ -449,62 +452,53 @@ const BodyTitleTag = headingLevel === 'page' ? 'h1' : 'h4';
         </div>
       )}
 
-      {isRangeEvent ? (
-        hasExpandableCardSummary ? (
-          <details class="event-card__summary-details">
-            <summary class="event-card__summary-toggle">
-              <span class="event-card__summary-text">{cardText}</span>
-              <span class="event-card__summary-hint" aria-hidden="true"></span>
-            </summary>
-            {cardExtraText && <p class="event-card__summary-extra">{cardExtraText}</p>}
-            {shouldShowQuestionBlock(event) && (
-              <div class="event-card__question-block">
-                <p class="event-card__question-label">О чём поговорим</p>
-                <ul class="event-card__question-list">
-                  {event.questions.map((question) => (
-                    <li>{question}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {hasSpeakerAbout && (
-              <div class="event-card__speaker-about">
-                <p class="event-card__question-label">О спикере</p>
-                <p class="event-card__speaker-about-copy">{event.speakerAbout}</p>
-              </div>
-            )}
-          </details>
-        ) : (
+      {showExpandedCardSummary ? (
+        <div class="event-card__summary-expanded">
           <p class="event-card__summary-plain">{cardText}</p>
-        )
+          {cardExtraText && <p class="event-card__summary-extra">{cardExtraText}</p>}
+          {shouldShowQuestionBlock(event) && (
+            <div class="event-card__question-block">
+              <p class="event-card__question-label">О чём поговорим</p>
+              <ul class="event-card__question-list">
+                {event.questions.map((question) => (
+                  <li>{question}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {hasSpeakerAbout && (
+            <div class="event-card__speaker-about">
+              <p class="event-card__question-label">О спикере</p>
+              <p class="event-card__speaker-about-copy">{event.speakerAbout}</p>
+            </div>
+          )}
+        </div>
+      ) : hasExpandableCardSummary ? (
+        <details class="event-card__summary-details">
+          <summary class="event-card__summary-toggle">
+            <span class="event-card__summary-text">{cardText}</span>
+            <span class="event-card__summary-hint" aria-hidden="true"></span>
+          </summary>
+          {cardExtraText && <p class="event-card__summary-extra">{cardExtraText}</p>}
+          {shouldShowQuestionBlock(event) && (
+            <div class="event-card__question-block">
+              <p class="event-card__question-label">О чём поговорим</p>
+              <ul class="event-card__question-list">
+                {event.questions.map((question) => (
+                  <li>{question}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {hasSpeakerAbout && (
+            <div class="event-card__speaker-about">
+              <p class="event-card__question-label">О спикере</p>
+              <p class="event-card__speaker-about-copy">{event.speakerAbout}</p>
+            </div>
+          )}
+        </details>
       ) : (
-        hasExpandableCardSummary ? (
-          <details class="event-card__summary-details">
-            <summary class="event-card__summary-toggle">
-              <span class="event-card__summary-text">{cardText}</span>
-              <span class="event-card__summary-hint" aria-hidden="true"></span>
-            </summary>
-            {cardExtraText && <p class="event-card__summary-extra">{cardExtraText}</p>}
-            {shouldShowQuestionBlock(event) && (
-              <div class="event-card__question-block">
-                <p class="event-card__question-label">О чём поговорим</p>
-                <ul class="event-card__question-list">
-                  {event.questions.map((question) => (
-                    <li>{question}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {hasSpeakerAbout && (
-              <div class="event-card__speaker-about">
-                <p class="event-card__question-label">О спикере</p>
-                <p class="event-card__speaker-about-copy">{event.speakerAbout}</p>
-              </div>
-            )}
-          </details>
-        ) : (
-          <p class="event-card__summary-plain">{cardText}</p>
-        )
+        <p class="event-card__summary-plain">{cardText}</p>
       )}
 
       {event.relatedEvent && (

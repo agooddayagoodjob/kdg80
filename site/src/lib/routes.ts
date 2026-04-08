@@ -459,12 +459,31 @@ export function getRouteEventSections(events: FestivalEvent[]) {
 }
 
 export function getSmartProgramHref(events: FestivalEvent[], isHome = false, now = new Date()) {
-  const datedEvents = [...events]
-    .filter((event) => event.kind !== 'special' && event.isoStart)
+  const scheduledEvents = [...events]
+    .filter((event) => event.kind === 'dated' && event.isoStart)
     .sort((left, right) => (left.isoStart ?? '').localeCompare(right.isoStart ?? ''));
+  const rangeEvents = [...events]
+    .filter((event) => event.kind === 'range' && event.isoStart)
+    .sort((left, right) => (left.isoStart ?? '').localeCompare(right.isoStart ?? ''));
+  const firstEvent = scheduledEvents[0] ?? rangeEvents[0];
 
-  const currentOrUpcoming = datedEvents.find((event) => getEventTemporalState(event, now) !== 'past');
-  const fallbackEvent = currentOrUpcoming ?? datedEvents[0];
-  const anchor = fallbackEvent ? `#month-${fallbackEvent.monthAnchor}` : '#program';
+  if (!firstEvent) {
+    return isHome ? '#program' : '/programma/#program';
+  }
+
+  const festivalStarted = firstEvent.isoStart
+    ? now.getTime() >= new Date(firstEvent.isoStart).getTime()
+    : false;
+  const currentOrUpcomingScheduled = scheduledEvents.find((event) => getEventTemporalState(event, now) !== 'past');
+  const currentOrUpcomingRange = rangeEvents.find((event) => getEventTemporalState(event, now) !== 'past');
+  const targetAnchor = !festivalStarted
+    ? `#month-${firstEvent.monthAnchor}`
+    : currentOrUpcomingScheduled
+      ? `#event-${currentOrUpcomingScheduled.slug}`
+      : currentOrUpcomingRange
+        ? `#event-${currentOrUpcomingRange.slug}`
+        : `#event-${firstEvent.slug}`;
+
+  const anchor = targetAnchor || '#program';
   return isHome ? anchor : `/programma/${anchor}`;
 }
