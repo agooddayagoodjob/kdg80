@@ -49,6 +49,10 @@ const EVENT_OVERBOOKING_PERCENT_OVERRIDES: Record<string, number> = {
   'velikie-uchitelya-preemstvennost-hudozhestvennyh-pokoleniy': 20,
 };
 const EVENT_CATALOG_SYNC_OVERRIDES: Record<string, CatalogSyncOverride> = {
+  'privychki-kaliningradtsev-ty-nastoyaschiy-kaliningradets-esli-kaliningradtsy-glazami-gostey': {
+    defaultPublicState: 'open',
+    openOnCatalogSyncWhenStateIsSoon: true,
+  },
   'kaliningradskaya-oblast-glazami-turistov-togda-i-seychas': {
     defaultPublicState: 'open',
     openOnCatalogSyncWhenStateIsSoon: true,
