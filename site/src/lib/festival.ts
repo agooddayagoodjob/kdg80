@@ -1428,6 +1428,12 @@ function parseSections() {
     const dialogueParticipants = formatLabel.includes('Открытый диалог')
       ? extractDialogueParticipants(speakerRaw)
       : [];
+    const publicInfoNotice = normalizeText(
+      extractFirst(body, [
+        'Публичное примечание',
+        'Примечание для сайта',
+      ]),
+    );
     const dateLabel = extractField(body, 'Дата') || extractField(body, 'Период работы') || extractField(body, 'Период проведения') || 'Дата будет объявлена';
     const timeLabel = sanitizeTimeLabel(
       extractField(body, 'Время') || extractField(body, 'Режим посещения') || extractField(body, 'Время посещения') || 'Время будет объявлено',
@@ -1489,7 +1495,7 @@ function parseSections() {
       speakerAbout: kind === 'special' ? '' : speakerAbout,
       questions,
       registrationUrl: kind === 'dated' ? getFestivalRegistrationHref(slug) : undefined,
-      publicInfoNotice: isIcaePublicHoldback ? ICAE_PUBLIC_INFO_NOTICE : undefined,
+      publicInfoNotice: publicInfoNotice || (isIcaePublicHoldback ? ICAE_PUBLIC_INFO_NOTICE : undefined),
       publicRegistrationStateOverride: isIcaePublicHoldback ? 'registration_soon' : undefined,
       calendarReady: kind === 'dated' ? calendar.ready : false,
       googleCalendarUrl: kind === 'dated' ? calendar.googleUrl : undefined,
